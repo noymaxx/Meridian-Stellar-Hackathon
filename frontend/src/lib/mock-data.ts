@@ -37,6 +37,12 @@ export interface MarketStats {
   volumeLast24h: string;
 }
 
+export interface ChartDataPoint {
+  time: string;
+  value: number;
+  volume?: number;
+}
+
 export interface Position {
   id: string;
   userAddress: string;
@@ -170,4 +176,46 @@ export const mockKycStatus = {
     { type: "Address", status: "approved" },
     { type: "Institutional", status: "approved" }
   ]
+};
+
+// Mock chart data for market performance
+export const generateMockChartData = (baseValue: number, points: number = 24, trend: 'up' | 'down' | 'neutral' = 'up') => {
+  const data = [];
+  let currentValue = baseValue;
+  
+  for (let i = 0; i < points; i++) {
+    const time = new Date();
+    time.setHours(time.getHours() - (points - i));
+    
+    // Add some randomness with overall trend
+    let change;
+    switch (trend) {
+      case 'up':
+        change = (Math.random() - 0.3) * 0.2; // Bias towards positive
+        break;
+      case 'down':
+        change = (Math.random() - 0.7) * 0.2; // Bias towards negative
+        break;
+      default:
+        change = (Math.random() - 0.5) * 0.15; // Neutral
+    }
+    
+    currentValue += change;
+    currentValue = Math.max(0, currentValue); // Ensure non-negative
+    
+    data.push({
+      time: time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      value: currentValue,
+      volume: Math.random() * 50 + 10 // Random volume between 10-60M
+    });
+  }
+  
+  return data;
+};
+
+export const mockMarketCharts = {
+  supplyRates: generateMockChartData(4.85, 24, 'up'),
+  borrowRates: generateMockChartData(5.95, 24, 'neutral'),
+  utilization: generateMockChartData(71.1, 24, 'up'),
+  volume: generateMockChartData(45.2, 24, 'up')
 };
