@@ -110,11 +110,6 @@ export function useStellarWallet(): WalletState & WalletActions {
 
       await coreConnect(WalletType.FREIGHTER);
       
-      // Fetch balance after connection
-      setTimeout(() => {
-        refreshBalance();
-      }, 1000); // Small delay to ensure everything is ready
-      
       // Show success message based on network
       if (networkInfo && account) {
         toast({

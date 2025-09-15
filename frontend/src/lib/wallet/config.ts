@@ -5,19 +5,42 @@ import { NetworkType, NetworkInfo, WalletType, WalletConfig, WalletInfo } from "
 // NETWORK CONFIGURATIONS
 // ===========================
 
+// Detecta se está em desenvolvimento para usar proxy
+const isDevelopment = () => {
+  return import.meta.env.DEV && typeof window !== 'undefined' && 
+         window.location.hostname === 'localhost';
+};
+
+// URLs para desenvolvimento (com proxy) e produção
+const getHorizonUrl = (network: NetworkType): string => {
+  if (isDevelopment()) {
+    // Usar proxy local em desenvolvimento para evitar CORS
+    const port = window.location.port;
+    const baseUrl = `http://localhost:${port}`;
+    return network === NetworkType.TESTNET 
+      ? `${baseUrl}/api/horizon-testnet` 
+      : `${baseUrl}/api/horizon-mainnet`;
+  } else {
+    // URLs diretas em produção
+    return network === NetworkType.TESTNET
+      ? 'https://horizon-testnet.stellar.org'
+      : 'https://horizon.stellar.org';
+  }
+};
+
 export const NETWORKS: Record<NetworkType, NetworkInfo> = {
   [NetworkType.TESTNET]: {
     type: NetworkType.TESTNET,
     name: "Testnet",
     networkPassphrase: Networks.TESTNET,
-    horizonUrl: "https://horizon-testnet.stellar.org",
+    horizonUrl: getHorizonUrl(NetworkType.TESTNET),
     sorobanRpcUrl: "https://soroban-testnet.stellar.org"
   },
   [NetworkType.MAINNET]: {
     type: NetworkType.MAINNET,
     name: "Mainnet", 
     networkPassphrase: Networks.PUBLIC,
-    horizonUrl: "https://horizon.stellar.org",
+    horizonUrl: getHorizonUrl(NetworkType.MAINNET),
     sorobanRpcUrl: "https://soroban-mainnet.stellar.org"
   }
 };

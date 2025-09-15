@@ -11,9 +11,17 @@ export class BalanceService {
     const key = network.horizonUrl;
     
     if (!this.servers.has(key)) {
-      const server = new Horizon.Server(network.horizonUrl);
+      // Configurar servidor com opções apropriadas para desenvolvimento
+      const serverOptions: any = {};
+      
+      // Em desenvolvimento, permitir URLs HTTP inseguras (proxy local)
+      if (import.meta.env.DEV && network.horizonUrl.startsWith('http://localhost')) {
+        serverOptions.allowHttp = true;
+      }
+      
+      const server = new Horizon.Server(network.horizonUrl, serverOptions);
       this.servers.set(key, server);
-      logger.debug(`Created new server instance for ${network.name}`);
+      logger.debug(`Created new server instance for ${network.name} with URL: ${network.horizonUrl}`);
     }
 
     return this.servers.get(key)!;

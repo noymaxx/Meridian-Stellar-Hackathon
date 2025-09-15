@@ -106,12 +106,13 @@ export function useWalletBalance(
     }
   }, []);
 
-  // Only refresh when explicitly requested (no auto-refresh)
+  // Auto-fetch balance when wallet connects (but only once)
   useEffect(() => {
-    if (autoRefresh && adapter && address && network) {
+    if (adapter && address && network && !balance) {
+      // Busca o saldo automaticamente quando conecta, mas só se ainda não tiver saldo
       refreshBalance();
     }
-  }, [adapter, address, network, autoRefresh, refreshBalance]);
+  }, [adapter, address, network, balance, refreshBalance]);
 
   // Cleanup monitoring on unmount
   useEffect(() => {
