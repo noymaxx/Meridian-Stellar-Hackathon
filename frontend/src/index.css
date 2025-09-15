@@ -1,0 +1,287 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* RWA Lending • Institutional Design System
+   Palette: Black base + baby blue brand + cold grays
+   All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Core Background (Institutional Black) */
+    --bg-black: 228 17% 5%;     /* #0B0D10 */
+    --bg-elev-1: 227 20% 7%;    /* #0F1318 */
+    --bg-elev-2: 224 23% 10%;   /* #141A21 */
+    --stroke-line: 222 23% 14%; /* #1D252E */
+
+    /* Text Colors */
+    --fg-primary: 0 0% 100%;      /* #FFFFFF */
+    --fg-secondary: 218 15% 69%;  /* #A6B0BF */
+    --fg-muted: 214 14% 59%;      /* #8992A1 */
+
+    /* Brand Colors (Baby Blue) */
+    --brand-50: 202 100% 87%;   /* #BFE8FF */
+    --brand-100: 200 100% 84%;  /* #AEE1FF */
+    --brand-200: 197 100% 79%;  /* #97D7FF */
+    --brand-300: 195 100% 75%;  /* #7FCAFF */
+    --brand-400: 193 100% 70%;  /* #66BEFF */
+    --brand-500: 192 100% 66%;  /* #4DB2FF - main accent */
+    --brand-600: 199 91% 56%;   /* #3A9FEA - hover */
+    --brand-700: 202 68% 51%;   /* #2D8ED8 - pressed */
+
+    /* Semantic Mapping for shadcn compatibility */
+    --background: var(--bg-black);
+    --foreground: var(--fg-primary);
+    --card: var(--bg-elev-1);
+    --card-foreground: var(--fg-primary);
+    --popover: var(--bg-elev-2);
+    --popover-foreground: var(--fg-primary);
+    --primary: var(--brand-500);
+    --primary-foreground: var(--bg-black);
+    --secondary: var(--bg-elev-1);
+    --secondary-foreground: var(--fg-primary);
+    --muted: var(--bg-elev-1);
+    --muted-foreground: var(--fg-secondary);
+    --accent: var(--brand-500);
+    --accent-foreground: var(--bg-black);
+    --destructive: 0 74% 75%;
+    --destructive-foreground: var(--fg-primary);
+    --border: var(--stroke-line);
+    --input: var(--bg-elev-1);
+    --ring: var(--brand-700);
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: "opsz" 32;
+  }
+
+  /* Typography scales */
+  .text-display-1 {
+    @apply text-[56px] leading-[64px] font-semibold tracking-[-0.01em];
+  }
+  
+  .text-display-2 {
+    @apply text-[44px] leading-[52px] font-semibold tracking-[-0.01em];
+  }
+  
+  .text-h1 {
+    @apply text-[32px] leading-[40px] font-semibold tracking-[-0.01em];
+  }
+  
+  .text-h2 {
+    @apply text-[24px] leading-[32px] font-semibold;
+  }
+  
+  .text-h3 {
+    @apply text-[20px] leading-[28px] font-medium;
+  }
+  
+  .text-body-1 {
+    @apply text-[16px] leading-[24px] font-normal;
+  }
+  
+  .text-body-2 {
+    @apply text-[14px] leading-[20px] font-normal;
+  }
+  
+  .text-micro {
+    @apply text-[12px] leading-[16px] font-medium;
+  }
+
+  /* Institutional animations */
+  .animate-fade-in {
+    animation: fade-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .animate-slide-up {
+    animation: slide-up 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .animate-scale-in {
+    animation: scale-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Hover effects */
+  .hover-lift {
+    @apply transition-transform duration-200 hover:scale-[1.02];
+  }
+
+  .pressed-scale {
+    @apply active:scale-[0.98] transition-transform duration-100;
+  }
+
+  /* Focus states */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* Custom shadows */
+  .shadow-card {
+    box-shadow: 0 1px 1px rgba(0,0,0,0.3), 0 4px 14px rgba(0,0,0,0.25);
+  }
+
+  .shadow-focus {
+    box-shadow: 0 0 0 3px hsl(var(--brand-700) / 0.35);
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-hero {
+    background: linear-gradient(180deg, hsl(var(--bg-black)) 0%, hsl(var(--bg-elev-1)) 100%);
+  }
+
+  .bg-gradient-glow {
+    background: radial-gradient(circle at center, hsl(var(--brand-500) / 0.02) 0%, transparent 70%);
+  }
+}
+
+@layer components {
+  /* Button variants */
+  .btn-institutional {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-xl text-body-2 font-medium transition-all duration-200 focus-ring pressed-scale disabled:pointer-events-none disabled:opacity-40;
+    min-height: 44px;
+    padding: 0 16px;
+  }
+
+  .btn-primary {
+    @apply btn-institutional bg-primary text-primary-foreground hover:bg-brand-600 active:bg-brand-700;
+  }
+
+  .btn-secondary {
+    @apply btn-institutional bg-secondary border border-border text-foreground hover:bg-bg-elev-2;
+  }
+
+  .btn-ghost {
+    @apply btn-institutional hover:bg-muted;
+  }
+
+  /* Input styling */
+  .input-institutional {
+    @apply flex w-full rounded-xl border border-border bg-input px-4 py-3 text-body-2 transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-ring disabled:cursor-not-allowed disabled:opacity-50;
+    min-height: 44px;
+  }
+
+  /* Card styling */
+  .card-institutional {
+    @apply rounded-xl border border-border bg-card p-6 shadow-card;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Enhanced button animations */
+.btn-primary {
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(77, 178, 255, 0.25);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* Card hover animations */
+.card-institutional {
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.card-institutional:hover {
+  border-color: rgba(77, 178, 255, 0.3);
+}
