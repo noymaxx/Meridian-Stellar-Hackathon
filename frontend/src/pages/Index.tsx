@@ -24,6 +24,7 @@ import {
   Sparkles,
   Star
 } from "lucide-react";
+import { OrbitingCircles } from "@/components/magicui/orbiting-circles";
 import heroImage from "@/assets/hero-bg.jpg";
 
 const Index = () => {
@@ -36,9 +37,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       {/* Enhanced Hero Section */}
-      <ParallaxBackground imageUrl={heroImage} className="min-h-screen flex items-center">
+      <ParallaxBackground imageUrl={heroImage} className="min-h-screen flex items-center relative overflow-hidden">
         <div className="container mx-auto max-w-7xl px-6 py-24 relative z-10">
           <motion.div 
             className="text-center space-y-8"
@@ -58,22 +59,51 @@ const Index = () => {
                 </Badge>
               </motion.div>
               
-              <motion.h1 
-                className="text-display-1 font-semibold text-fg-primary max-w-4xl mx-auto"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                Institutional RWA Lending
-                <motion.span 
-                  className="block text-brand-400 mt-2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.8 }}
+              {/* Title with single big orbit behind it */}
+              <div className="relative flex items-center justify-center">
+                {/* One large orbit; replace the placeholders with your PNGs */}
+                <div className="absolute -z-0 inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="relative h-[640px] w-[640px]">
+                    {/* Static ring (drawn once) + rotating images. Replace src with your PNGs. */}
+                    <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                      <circle cx="50" cy="50" r="48" className="stroke-brand-500/30" strokeWidth="0.5" fill="none" strokeDasharray="2 2" />
+                    </svg>
+                    {/* Rotating items on the main (visible) orbit */}
+                    <OrbitingCircles radius={300} duration={36} delay={0} path={false}>
+                      <img src="/placeholder.svg" alt="orbit-item-1" className="h-10 w-10 opacity-80" />
+                    </OrbitingCircles>
+                    <OrbitingCircles radius={300} duration={36} delay={10} path={false}>
+                      <img src="/placeholder.svg" alt="orbit-item-2" className="h-10 w-10 opacity-80" />
+                    </OrbitingCircles>
+                    <OrbitingCircles radius={300} duration={36} delay={20} path={false}>
+                      <img src="/placeholder.svg" alt="orbit-item-3" className="h-10 w-10 opacity-80" />
+                    </OrbitingCircles>
+                    {/* Inner orbit icons only (no visible ring) */}
+                    <OrbitingCircles radius={210} duration={28} delay={4} path={false}>
+                      <img src="/placeholder.svg" alt="inner-item-1" className="h-9 w-9 opacity-80" />
+                    </OrbitingCircles>
+                    <OrbitingCircles radius={210} duration={28} delay={18} path={false}>
+                      <img src="/placeholder.svg" alt="inner-item-2" className="h-9 w-9 opacity-80" />
+                    </OrbitingCircles>
+                  </div>
+                </div>
+                <motion.h1 
+                  className="text-display-1 font-semibold text-fg-primary max-w-4xl mx-auto relative z-10"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
                 >
-                  Native on Stellar
-                </motion.span>
-              </motion.h1>
+                  Panorama Block
+                  <motion.span 
+                    className="block text-brand-400 mt-2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 0.8 }}
+                  >
+                    Native on Stellar
+                  </motion.span>
+                </motion.h1>
+              </div>
               
               <motion.p 
                 className="text-body-1 text-fg-secondary max-w-2xl mx-auto leading-relaxed"
@@ -88,9 +118,9 @@ const Index = () => {
             
             <motion.div 
               className="flex flex-col sm:flex-row gap-4 justify-center"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 100, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1 }}
+              transition={{ duration: 0.1, delay: 1 }}
             >
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button className="btn-primary px-8 py-4 text-body-1 relative overflow-hidden group">
@@ -828,7 +858,7 @@ const Index = () => {
                 <div className="text-2xl font-bold text-primary-foreground">R</div>
               </motion.div>
               <div className="text-left">
-                <span className="text-h2 font-semibold text-fg-primary">RWA Lending</span>
+                <span className="text-h2 font-semibold text-fg-primary">Panorama Block</span>
                 <p className="text-micro text-brand-400 font-medium">Institutional DeFi</p>
               </div>
             </motion.div>
@@ -877,7 +907,7 @@ const Index = () => {
               transition={{ duration: 0.6, delay: 0.8 }}
             >
               <p className="text-micro text-fg-muted">
-                © 2024 RWA Lending Protocol. Built on Stellar Blockchain.
+                © 2024 Panorama Block. Built on Stellar Blockchain.
               </p>
             </motion.div>
           </motion.div>

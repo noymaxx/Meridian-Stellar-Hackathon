@@ -1,361 +1,124 @@
-import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, Shield, Users, AlertTriangle, Pause, Play, Edit } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, Legend } from "recharts";
+
+const lineData = [
+  { date: "1/23", value: 0.8 },
+  { date: "4/23", value: 1.2 },
+  { date: "7/23", value: 1.9 },
+  { date: "10/23", value: 2.7 },
+  { date: "1/24", value: 3.2 },
+  { date: "4/24", value: 3.9 },
+  { date: "7/24", value: 4.6 },
+  { date: "10/24", value: 1.3 },
+  { date: "1/25", value: 6.1 },
+  { date: "4/25", value: 6.7 },
+  { date: "7/25", value: 7.2 },
+];
+
+const pieData = [
+  { name: "Private Equity", value: 5300 },
+  { name: "US Treasury Debt", value: 507 },
+  { name: "non-US Government Debt", value: 304 },
+  { name: "Institutional", value: 426 },
+  { name: "Comodities", value: 179 },
+  { name: "Private Credit", value: 275 },
+];
+
+const pieColors = ["#60A5FA", "#34D399", "#F59E0B", "#F97316", "#A78BFA", "#94A3B8"];
 
 export default function Admin() {
-  const [isPaused, setIsPaused] = useState(false);
-  const [selectedMarket, setSelectedMarket] = useState("");
-
-  const markets = [
-    { id: "t-bills-1", name: "US Treasury Bills 3M", status: "active", lltv: "95%", premium: "0.5%" },
-    { id: "credit-1", name: "Corporate Credit Fund", status: "active", lltv: "80%", premium: "2.1%" },
-    { id: "re-1", name: "Commercial Real Estate", status: "paused", lltv: "75%", premium: "3.2%" },
-  ];
-
-  const users = [
-    { id: "1", address: "GABC123...DEF789", status: "approved", region: "US", lastActive: "2024-01-15" },
-    { id: "2", address: "GDEF456...GHI012", status: "pending", region: "UK", lastActive: "2024-01-14" },
-    { id: "3", address: "GHIJ789...KLM345", status: "approved", region: "SG", lastActive: "2024-01-13" },
-  ];
-
-  const handleMarketPause = (marketId: string) => {
-    toast({
-      title: "Market Updated",
-      description: `Market ${marketId} has been paused`,
-    });
-  };
-
-  const handleUserStatusChange = (userId: string, newStatus: string) => {
-    toast({
-      title: "User Status Updated",
-      description: `User ${userId} status changed to ${newStatus}`,
-    });
-  };
-
-  const handleEmergencyPause = () => {
-    setIsPaused(!isPaused);
-    toast({
-      title: isPaused ? "System Resumed" : "Emergency Pause Activated",
-      description: isPaused ? "All markets are now active" : "All markets have been paused",
-      variant: isPaused ? "default" : "destructive",
-    });
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="container mx-auto max-w-7xl px-6 py-8 space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between animate-fade-in">
+        <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <h1 className="text-h1 font-semibold text-fg-primary">Admin Dashboard</h1>
-            <p className="text-body-1 text-fg-secondary">
-              Manage risk parameters, user permissions, and system controls.
-            </p>
+            <h1 className="text-h1 font-semibold text-fg-primary">RWA Dashboard</h1>
+            <p className="text-body-1 text-fg-secondary">Tokenized Treasuries overview and market metrics.</p>
           </div>
-          
-          <Card className="bg-bg-elev-1 border-stroke-line p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                {isPaused ? (
-                  <AlertTriangle className="h-5 w-5 text-red-400" />
-                ) : (
-                  <Shield className="h-5 w-5 text-green-400" />
-                )}
-                <span className="text-body-2 font-medium text-fg-primary">
-                  System Status: {isPaused ? "Paused" : "Active"}
-                </span>
-              </div>
-              <Button
-                onClick={handleEmergencyPause}
-                variant={isPaused ? "default" : "destructive"}
-                size="sm"
-              >
-                {isPaused ? <Play className="h-4 w-4 mr-2" /> : <Pause className="h-4 w-4 mr-2" />}
-                {isPaused ? "Resume" : "Emergency Pause"}
-              </Button>
-            </div>
-          </Card>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 animate-slide-up">
-          <Card className="card-institutional">
-            <div className="flex items-center gap-3">
-              <Settings className="h-8 w-8 text-brand-400" />
-              <div>
-                <p className="text-micro text-fg-muted uppercase tracking-wide">Active Markets</p>
-                <p className="text-h3 font-semibold text-fg-primary">3</p>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card className="p-6">
+            <div className="space-y-1">
+              <p className="text-micro text-fg-muted uppercase">Total Value</p>
+              <div className="flex items-center gap-2">
+                <p className="text-h3 font-semibold text-fg-primary">$7.49B</p>
+                <Badge variant="outline" className="text-green-400 border-green-500/30 bg-green-500/10">+0.58%</Badge>
               </div>
             </div>
           </Card>
-          
-          <Card className="card-institutional">
-            <div className="flex items-center gap-3">
-              <Users className="h-8 w-8 text-brand-400" />
-              <div>
-                <p className="text-micro text-fg-muted uppercase tracking-wide">Verified Users</p>
-                <p className="text-h3 font-semibold text-fg-primary">127</p>
-              </div>
+          <Card className="p-6">
+            <div className="space-y-1">
+              <p className="text-micro text-fg-muted uppercase">Avg. Yield to Maturity</p>
+              <p className="text-h3 font-semibold text-fg-primary">4.12%</p>
             </div>
           </Card>
-          
-          <Card className="card-institutional">
-            <div className="flex items-center gap-3">
-              <Shield className="h-8 w-8 text-brand-400" />
-              <div>
-                <p className="text-micro text-fg-muted uppercase tracking-wide">Risk Alerts</p>
-                <p className="text-h3 font-semibold text-fg-primary">0</p>
-              </div>
+          <Card className="p-6">
+            <div className="space-y-1">
+              <p className="text-micro text-fg-muted uppercase">Total Assets</p>
+              <p className="text-h3 font-semibold text-fg-primary">49</p>
             </div>
           </Card>
-          
-          <Card className="card-institutional">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="h-8 w-8 text-brand-400" />
-              <div>
-                <p className="text-micro text-fg-muted uppercase tracking-wide">Pending Reviews</p>
-                <p className="text-h3 font-semibold text-fg-primary">5</p>
+          <Card className="p-6">
+            <div className="space-y-1">
+              <p className="text-micro text-fg-muted uppercase">Holders</p>
+              <div className="flex items-center gap-2">
+                <p className="text-h3 font-semibold text-fg-primary">53,049</p>
+                <Badge variant="outline" className="text-green-400 border-green-500/30 bg-green-500/10">+0.26%</Badge>
               </div>
             </div>
           </Card>
         </div>
 
-        {/* Management Tabs */}
-        <Card className="card-institutional animate-fade-in">
-          <Tabs defaultValue="markets" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="markets">Markets</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="risk">Risk Parameters</TabsTrigger>
-              <TabsTrigger value="system">System</TabsTrigger>
-            </TabsList>
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="p-6 lg:col-span-2">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-h3 font-medium text-fg-primary">Total RWA Value</h3>
+            </div>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={lineData} margin={{ top: 5, right: 10, bottom: 0, left: 0 }}>
+                  <defs>
+                    <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#60A5FA" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#60A5FA" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} domain={[0, "dataMax+0.5"]} />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="value" stroke="#60A5FA" strokeWidth={2} fill="url(#areaFill)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
 
-            <TabsContent value="markets" className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-h3 font-medium text-fg-primary">Market Management</h3>
-                <Button className="btn-primary">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Configure New Market
-                </Button>
-              </div>
-              
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Market</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>LLTV</TableHead>
-                    <TableHead>Risk Premium</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {markets.map((market) => (
-                    <TableRow key={market.id}>
-                      <TableCell className="font-medium">{market.name}</TableCell>
-                      <TableCell>
-                        <Badge variant={market.status === "active" ? "default" : "secondary"}>
-                          {market.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="tabular-nums">{market.lltv}</TableCell>
-                      <TableCell className="tabular-nums">{market.premium}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button variant="ghost" size="sm">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleMarketPause(market.id)}
-                          >
-                            {market.status === "active" ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TabsContent>
-
-            <TabsContent value="users" className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-h3 font-medium text-fg-primary">User Management</h3>
-                <div className="flex gap-3">
-                  <Select>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Users</SelectItem>
-                      <SelectItem value="approved">Approved</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="rejected">Rejected</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Address</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Region</TableHead>
-                    <TableHead>Last Active</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-mono text-micro">{user.address}</TableCell>
-                      <TableCell>
-                        <Badge variant={user.status === "approved" ? "default" : "secondary"}>
-                          {user.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{user.region}</TableCell>
-                      <TableCell>{user.lastActive}</TableCell>
-                      <TableCell>
-                        <Select onValueChange={(value) => handleUserStatusChange(user.id, value)}>
-                          <SelectTrigger className="w-32">
-                            <SelectValue placeholder="Change status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="approved">Approve</SelectItem>
-                            <SelectItem value="rejected">Reject</SelectItem>
-                            <SelectItem value="suspended">Suspend</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TabsContent>
-
-            <TabsContent value="risk" className="space-y-6">
-              <h3 className="text-h3 font-medium text-fg-primary">Risk Parameter Configuration</h3>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="bg-bg-elev-2 border-stroke-line p-6">
-                  <h4 className="text-body-1 font-medium text-fg-primary mb-4">Global Settings</h4>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="base-rate">Base Interest Rate (%)</Label>
-                      <Input id="base-rate" defaultValue="3.5" className="input-institutional" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="max-utilization">Max Utilization (%)</Label>
-                      <Input id="max-utilization" defaultValue="90" className="input-institutional" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="liquidation-threshold">Liquidation Threshold (%)</Label>
-                      <Input id="liquidation-threshold" defaultValue="85" className="input-institutional" />
-                    </div>
-                  </div>
-                </Card>
-                
-                <Card className="bg-bg-elev-2 border-stroke-line p-6">
-                  <h4 className="text-body-1 font-medium text-fg-primary mb-4">Asset-Specific Premiums</h4>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="treasury-premium">Treasury Bills Premium (%)</Label>
-                      <Input id="treasury-premium" defaultValue="0.5" className="input-institutional" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="credit-premium">Corporate Credit Premium (%)</Label>
-                      <Input id="credit-premium" defaultValue="2.1" className="input-institutional" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="re-premium">Real Estate Premium (%)</Label>
-                      <Input id="re-premium" defaultValue="3.2" className="input-institutional" />
-                    </div>
-                  </div>
-                </Card>
-              </div>
-              
-              <div className="flex justify-end">
-                <Button className="btn-primary">Save Risk Parameters</Button>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="system" className="space-y-6">
-              <h3 className="text-h3 font-medium text-fg-primary">System Configuration</h3>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="bg-bg-elev-2 border-stroke-line p-6">
-                  <h4 className="text-body-1 font-medium text-fg-primary mb-4">Circuit Breakers</h4>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-body-2 text-fg-primary">Auto-pause on high volatility</p>
-                        <p className="text-micro text-fg-muted">Automatically pause markets during extreme price movements</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-body-2 text-fg-primary">Liquidation protection</p>
-                        <p className="text-micro text-fg-muted">Prevent mass liquidations during market stress</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-body-2 text-fg-primary">Oracle staleness protection</p>
-                        <p className="text-micro text-fg-muted">Pause trading when oracle prices are stale</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-                  </div>
-                </Card>
-                
-                <Card className="bg-bg-elev-2 border-stroke-line p-6">
-                  <h4 className="text-body-1 font-medium text-fg-primary mb-4">Monitoring</h4>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-body-2 text-fg-primary">Real-time alerts</p>
-                        <p className="text-micro text-fg-muted">Send notifications for critical events</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-body-2 text-fg-primary">Audit logging</p>
-                        <p className="text-micro text-fg-muted">Log all administrative actions</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-body-2 text-fg-primary">Performance monitoring</p>
-                        <p className="text-micro text-fg-muted">Track system performance metrics</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </Card>
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-h3 font-medium text-fg-primary">Market Caps</h3>
+            </div>
+            <div className="h-96">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={110} paddingAngle={3}>
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
+                    ))}
+                  </Pie>
+                  <Legend verticalAlign="bottom" height={24} />
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </div>
       </main>
     </div>
   );

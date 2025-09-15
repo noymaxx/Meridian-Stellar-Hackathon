@@ -12,6 +12,16 @@ import KYC from "./pages/KYC";
 import Admin from "./pages/Admin";
 import Docs from "./pages/Docs";
 import NotFound from "./pages/NotFound";
+import Home from "./pages/Home";
+import SRWAIssuance from "./pages/SRWAIssuance";
+import KYCEligibility from "./pages/KYCEligibility";
+import OracleNav from "./pages/OracleNav";
+import Pools from "./pages/Pools";
+import CreatePool from "./pages/CreatePool";
+import PoolDetail from "./pages/PoolDetail";
+import SoroswapPage from "./pages/Soroswap";
+import Optimizer from "./pages/Optimizer";
+import Dashboards from "./pages/Dashboards";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +34,17 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/srwa-issuance" element={<SRWAIssuance />} />
+            <Route path="/kyc-eligibility" element={<KYCEligibility />} />
+            <Route path="/oracle-nav" element={<OracleNav />} />
+            <Route path="/pools" element={<Pools />} />
+            <Route path="/create-pool" element={<CreatePool />} />
+            <Route path="/pool/:id" element={<PoolDetail />} />
+            <Route path="/soroswap" element={<SoroswapPage />} />
+            <Route path="/optimizer" element={<Optimizer />} />
+            <Route path="/dashboards" element={<Dashboards />} />
+
             <Route path="/markets" element={<Markets />} />
             <Route path="/market/:id" element={<MarketDetail />} />
             <Route path="/portfolio" element={<Portfolio />} />
