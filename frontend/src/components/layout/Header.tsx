@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Wallet, Menu, X } from "lucide-react";
 import { useStellarWallet } from "@/hooks/useStellarWallet";
 import Logo from "@/assets/logoProject.png";
+import { SettingsButton } from "@/components/settings/SettingsDialog";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -28,27 +29,27 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          <a href="/" className="text-body-2 text-fg-secondary hover:text-fg-primary hover:text-brand-400 transition-colors relative group">
+          <a href="/" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
             Home
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
-          <a href="/markets" className="text-body-2 text-fg-secondary hover:text-fg-primary hover:text-brand-400 transition-colors relative group">
+          <a href="/markets" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
             Markets
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
-          <a href="/portfolio" className="text-body-2 text-fg-secondary hover:text-fg-primary hover:text-brand-400 transition-colors relative group">
+          <a href="/portfolio" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
             Portfolio
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
-          <a href="/kyc" className="text-body-2 text-fg-secondary hover:text-fg-primary hover:text-brand-400 transition-colors relative group">
+          <a href="/kyc" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
             KYC
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
-          <a href="/docs" className="text-body-2 text-fg-secondary hover:text-fg-primary hover:text-brand-400 transition-colors relative group">
+          <a href="/docs" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
             Documentation
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
-          <a href="/admin" className="text-body-2 text-fg-secondary hover:text-fg-primary hover:text-brand-400 transition-colors relative group">
+          <a href="/admin" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
             Admin
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
@@ -56,6 +57,7 @@ export function Header() {
 
         {/* Wallet Connection */}
         <div className="flex items-center space-x-4">
+          <SettingsButton />
           {isConnected ? (
             <div className="flex items-center space-x-3">
               <Badge variant="secondary" className="text-micro">
@@ -88,22 +90,22 @@ export function Header() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-stroke-line bg-card animate-slide-up">
           <nav className="container mx-auto px-6 py-4 space-y-2">
-            <a href="/" className="block py-2 text-body-2 text-fg-secondary hover:text-fg-primary hover:text-brand-400 transition-colors">
+            <a href="/" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
               Home
             </a>
-            <a href="/markets" className="block py-2 text-body-2 text-fg-secondary hover:text-fg-primary hover:text-brand-400 transition-colors">
+            <a href="/markets" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
               Markets
             </a>
-            <a href="/portfolio" className="block py-2 text-body-2 text-fg-secondary hover:text-fg-primary hover:text-brand-400 transition-colors">
+            <a href="/portfolio" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
               Portfolio
             </a>
-            <a href="/kyc" className="block py-2 text-body-2 text-fg-secondary hover:text-fg-primary hover:text-brand-400 transition-colors">
+            <a href="/kyc" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
               KYC
             </a>
-            <a href="/docs" className="block py-2 text-body-2 text-fg-secondary hover:text-fg-primary hover:text-brand-400 transition-colors">
+            <a href="/docs" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
               Documentation
             </a>
-            <a href="/admin" className="block py-2 text-body-2 text-fg-secondary hover:text-fg-primary hover:text-brand-400 transition-colors">
+            <a href="/admin" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
               Admin
             </a>
           </nav>
