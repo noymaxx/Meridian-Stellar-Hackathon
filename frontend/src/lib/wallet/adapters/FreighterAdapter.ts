@@ -27,7 +27,22 @@ export class FreighterAdapter implements WalletAdapter {
 
   async isInstalled(): Promise<boolean> {
     try {
-      return await isConnected();
+      // Check if Freighter extension is available in the window object
+      // Wait a bit for the extension to load
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Check if window.freighter exists and has the necessary methods
+      if (typeof window !== 'undefined' && window.freighter) {
+        return true;
+      }
+      
+      // Alternative check using the API
+      try {
+        await isConnected();
+        return true;
+      } catch {
+        return false;
+      }
     } catch (error) {
       logger.debug('Freighter not detected:', error);
       return false;
@@ -38,21 +53,39 @@ export class FreighterAdapter implements WalletAdapter {
     try {
       logger.debug('Attempting to connect to Freighter...');
       
+      // Wait a bit for extension to be ready
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
       const installed = await this.isInstalled();
       if (!installed) {
+        logger.debug('Freighter not installed');
         const error = createWalletError(WalletErrorCode.WALLET_NOT_INSTALLED);
         return { success: false, error };
       }
 
+      // Check if already connected and allowed
+      const alreadyConnected = await this.isConnected();
+      if (alreadyConnected) {
+        logger.debug('Already connected, getting account...');
+        const account = await this.getAccount();
+        if (account) {
+          logger.debug('Successfully connected to Freighter');
+          return { success: true, account };
+        }
+      }
+
+      // Check permissions
       const allowed = await this.isAllowed();
       if (!allowed) {
+        logger.debug('Not allowed, requesting access...');
         return await this.requestAccess();
       }
 
+      // Try to get account
       const account = await this.getAccount();
       if (!account) {
-        const error = createWalletError(WalletErrorCode.UNKNOWN_ERROR, 'Failed to get account information');
-        return { success: false, error };
+        logger.debug('Failed to get account, requesting access...');
+        return await this.requestAccess();
       }
 
       logger.debug('Successfully connected to Freighter');
@@ -83,8 +116,14 @@ export class FreighterAdapter implements WalletAdapter {
 
   async getAccount(): Promise<WalletAccount | null> {
     try {
+      // First check if we have access
+      const allowed = await this.isAllowed();
+      if (!allowed) {
+        logger.debug('No access to Freighter - need to request permission first');
+        return null;
+      }
+
       const addressResult = await getAddress();
-      const networkResult = await getNetwork();
       
       // Extract address from result object
       const address = typeof addressResult === 'string' 
@@ -96,16 +135,7 @@ export class FreighterAdapter implements WalletAdapter {
         return null;
       }
 
-      // Extract network passphrase from result object
-      const networkPassphrase = typeof networkResult === 'string'
-        ? networkResult
-        : networkResult?.networkPassphrase;
-
-      if (!networkPassphrase) {
-        logger.error('Failed to get network from Freighter');
-        return null;
-      }
-
+      // Get network information (avoid calling getNetwork twice)
       const network = await this.getNetwork();
       
       const account: WalletAccount = {
@@ -162,12 +192,25 @@ export class FreighterAdapter implements WalletAdapter {
       const result = await requestAccess();
       
       if (result.error) {
+        logger.debug('Access request failed:', result.error);
         const error = createWalletError(WalletErrorCode.CONNECTION_REJECTED, result.error);
+        return { success: false, error };
+      }
+
+      // Wait a bit for permissions to propagate
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Verify permissions were granted
+      const allowed = await this.isAllowed();
+      if (!allowed) {
+        logger.debug('Access not granted after request');
+        const error = createWalletError(WalletErrorCode.CONNECTION_REJECTED, 'Access was not granted');
         return { success: false, error };
       }
 
       const account = await this.getAccount();
       if (!account) {
+        logger.debug('Failed to get account after access granted');
         const error = createWalletError(WalletErrorCode.UNKNOWN_ERROR, 'Failed to get account after access granted');
         return { success: false, error };
       }
