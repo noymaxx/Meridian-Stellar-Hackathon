@@ -11,19 +11,19 @@ const lineData = [
   { date: "1/24", value: 3.2 },
   { date: "4/24", value: 3.9 },
   { date: "7/24", value: 4.6 },
-  { date: "10/24", value: 5.3 },
+  { date: "10/24", value: 1.3 },
   { date: "1/25", value: 6.1 },
   { date: "4/25", value: 6.7 },
   { date: "7/25", value: 7.2 },
 ];
 
 const pieData = [
-  { name: "Ethereum", value: 5300 },
-  { name: "Stellar", value: 507 },
-  { name: "Solana", value: 304 },
-  { name: "BNB Chain", value: 426 },
-  { name: "Arbitrum", value: 179 },
-  { name: "Others", value: 275 },
+  { name: "Private Equity", value: 5300 },
+  { name: "US Treasury Debt", value: 507 },
+  { name: "non-US Government Debt", value: 304 },
+  { name: "Institutional", value: 426 },
+  { name: "Comodities", value: 179 },
+  { name: "Private Credit", value: 275 },
 ];
 
 const pieColors = ["#60A5FA", "#34D399", "#F59E0B", "#F97316", "#A78BFA", "#94A3B8"];
@@ -80,7 +80,7 @@ export default function Admin() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="p-6 lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-h3 font-medium text-fg-primary">Treasury Product Metrics</h3>
+              <h3 className="text-h3 font-medium text-fg-primary">Total RWA Value</h3>
             </div>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
