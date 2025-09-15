@@ -20,7 +20,7 @@ export function Header() {
             <div className="text-lg font-bold text-primary-foreground">R</div>
           </div>
           <div>
-            <div className="text-h3 font-semibold text-fg-primary">RWA Lending</div>
+            <div className="text-h3 font-semibold text-fg-primary">Panorama Block</div>
             <div className="text-micro text-fg-muted">Institutional DeFi</div>
           </div>
         </div>

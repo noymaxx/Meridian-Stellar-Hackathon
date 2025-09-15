@@ -3,7 +3,13 @@ import { Header } from "@/components/layout/Header";
 import { KPICard } from "@/components/ui/kpi-card";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { HeroOrbitingCircles, OrbitingCircles } from "@/components/ui/orbiting-circles";
+import { MagicCard } from "@/components/ui/magic-card";
+import { Particles } from "@/components/ui/particles";
+import { Shimmer } from "@/components/ui/shimmer";
 import { mockMarketStats, mockMarkets } from "@/lib/mock-data";
+import { SmoothCursor } from "@/components/ui/smooth-cursor";
+
 import { 
   Shield, 
   BarChart3, 
@@ -14,7 +20,15 @@ import {
   Zap,
   DollarSign,
   ArrowRight,
-  CheckCircle
+  CheckCircle,
+  Building2,
+  Coins,
+  Database,
+  Network,
+  Wallet,
+  Banknote,
+  PieChart,
+  Activity
 } from "lucide-react";
 
 const Index = () => {
@@ -22,11 +36,19 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-hero">
-        <div className="container mx-auto max-w-7xl px-6 py-24">
+      <section className="relative bg-gradient-hero overflow-hidden">
+        
+        {/* Orbiting circles background */}
+        <HeroOrbitingCircles />
+        
+        {/* Particles background */}
+        <Particles count={30} className="opacity-30" />
+        
+        <div className="container mx-auto max-w-7xl px-6 py-24 relative z-10">
           <div className="text-center space-y-8 animate-fade-in">
             <div className="space-y-4">
               <Badge variant="secondary" className="bg-brand-500/10 text-brand-400 border-brand-500/20">
@@ -43,10 +65,12 @@ const Index = () => {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="btn-primary px-8 py-4 text-body-1">
-                Connect Wallet
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <Shimmer className="rounded-xl">
+                <Button className="btn-primary px-8 py-4 text-body-1">
+                  Connect Wallet
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Shimmer>
               <Button variant="outline" className="px-8 py-4 text-body-1">
                 View Markets
               </Button>
@@ -92,8 +116,20 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto max-w-7xl px-6 py-16">
-        <div className="text-center space-y-4 mb-12">
+      <section className="container mx-auto max-w-7xl px-6 py-16 relative overflow-hidden">
+        {/* Subtle orbiting circles for features section */}
+        <div className="absolute top-10 right-10 w-32 h-32 opacity-30">
+          <OrbitingCircles radius={50} duration={40} delay={0} iconSize={12}>
+            <div className="w-3 h-3 rounded-full bg-brand-400/40" />
+          </OrbitingCircles>
+        </div>
+        <div className="absolute bottom-20 left-10 w-24 h-24 opacity-20">
+          <OrbitingCircles radius={30} duration={35} delay={10} reverse iconSize={8}>
+            <div className="w-2 h-2 rounded-full bg-brand-300/30" />
+          </OrbitingCircles>
+        </div>
+        
+        <div className="text-center space-y-4 mb-12 relative z-10">
           <h2 className="text-h1 font-semibold text-fg-primary">
             Institutional-Grade Infrastructure
           </h2>
@@ -135,7 +171,7 @@ const Index = () => {
               description: "Professional dashboards, reporting, and treasury-grade position management."
             }
           ].map((feature, index) => (
-            <Card key={index} className="card-institutional hover-lift animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+            <MagicCard key={index} className="animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
               <div className="space-y-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500/10">
                   <feature.icon className="h-6 w-6 text-brand-400" />
@@ -147,14 +183,27 @@ const Index = () => {
                   {feature.description}
                 </p>
               </div>
-            </Card>
+            </MagicCard>
           ))}
         </div>
       </section>
 
+
       {/* Markets Preview */}
-      <section className="container mx-auto max-w-7xl px-6 py-16">
-        <div className="text-center space-y-4 mb-12">
+      <section className="container mx-auto max-w-7xl px-6 py-16 relative overflow-hidden">
+        {/* Orbiting circles for markets section */}
+        <div className="absolute top-16 left-16 w-28 h-28 opacity-20">
+          <OrbitingCircles radius={40} duration={38} delay={5} iconSize={10}>
+            <div className="w-2 h-2 rounded-full bg-brand-400/35" />
+          </OrbitingCircles>
+        </div>
+        <div className="absolute bottom-16 right-16 w-36 h-36 opacity-25">
+          <OrbitingCircles radius={50} duration={42} delay={20} reverse iconSize={12}>
+            <div className="w-3 h-3 rounded-full bg-brand-300/40" />
+          </OrbitingCircles>
+        </div>
+        
+        <div className="text-center space-y-4 mb-12 relative z-10">
           <h2 className="text-h1 font-semibold text-fg-primary">
             Active Markets
           </h2>
@@ -218,8 +267,25 @@ const Index = () => {
 
       {/* Trust Indicators */}
       <section className="container mx-auto max-w-7xl px-6 py-16">
-        <Card className="card-institutional bg-gradient-hero">
-          <div className="text-center space-y-8">
+        <Card className="card-institutional bg-gradient-hero relative overflow-hidden">
+          {/* Orbiting circles for trust section */}
+          <div className="absolute top-8 right-8 w-40 h-40 opacity-25">
+            <OrbitingCircles radius={60} duration={45} delay={0} iconSize={14}>
+              <div className="w-3 h-3 rounded-full bg-brand-400/50" />
+            </OrbitingCircles>
+          </div>
+          <div className="absolute bottom-8 left-8 w-32 h-32 opacity-20">
+            <OrbitingCircles radius={40} duration={30} delay={15} reverse iconSize={10}>
+              <div className="w-2 h-2 rounded-full bg-brand-300/40" />
+            </OrbitingCircles>
+          </div>
+          <div className="absolute top-1/2 right-1/4 w-24 h-24 opacity-15">
+            <OrbitingCircles radius={30} duration={25} delay={30} iconSize={8}>
+              <div className="w-2 h-2 rounded-full bg-brand-500/30" />
+            </OrbitingCircles>
+          </div>
+          
+          <div className="text-center space-y-8 relative z-10">
             <h2 className="text-h2 font-semibold text-fg-primary">
               Trusted by Institutional Investors
             </h2>
