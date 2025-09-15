@@ -21,7 +21,7 @@ export function Header() {
           <img src={Logo} alt="Logo" className="h-10 w-10" />
           
           <div>
-            <div className="text-h3 font-semibold text-fg-primary group-hover:text-brand-400 transition-colors">RWA Lending</div>
+            <div className="text-h3 font-semibold text-fg-primary group-hover:text-brand-400 transition-colors">Panorama Block</div>
             <div className="text-micro text-fg-muted">Institutional DeFi</div>
           </div>
         </div>

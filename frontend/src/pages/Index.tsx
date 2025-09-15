@@ -35,7 +35,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       {/* Enhanced Hero Section */}
       <ParallaxBackground imageUrl={heroImage} className="min-h-screen flex items-center">
         <div className="container mx-auto max-w-7xl px-6 py-24 relative z-10">
@@ -63,7 +63,7 @@ const Index = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                Institutional RWA Lending
+                Panorama Block
                 <motion.span 
                   className="block text-brand-400 mt-2"
                   initial={{ opacity: 0 }}
@@ -827,7 +827,7 @@ const Index = () => {
                 <div className="text-2xl font-bold text-primary-foreground">R</div>
               </motion.div>
               <div className="text-left">
-                <span className="text-h2 font-semibold text-fg-primary">RWA Lending</span>
+                <span className="text-h2 font-semibold text-fg-primary">Panorama Block</span>
                 <p className="text-micro text-brand-400 font-medium">Institutional DeFi</p>
               </div>
             </motion.div>
@@ -876,7 +876,7 @@ const Index = () => {
               transition={{ duration: 0.6, delay: 0.8 }}
             >
               <p className="text-micro text-fg-muted">
-                © 2024 RWA Lending Protocol. Built on Stellar Blockchain.
+                © 2024 Panorama Block. Built on Stellar Blockchain.
               </p>
             </motion.div>
           </motion.div>
