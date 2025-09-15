@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { MarketChart } from "@/components/ui/market-chart";
+import { FreighterDebug } from "@/components/wallet/FreighterDebug";
 import { mockMarketStats, mockMarkets, mockMarketCharts } from "@/lib/mock-data";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
@@ -882,6 +883,9 @@ const Index = () => {
           </motion.div>
         </div>
       </footer>
+      
+      {/* Debug Component (only shows in development) */}
+      <FreighterDebug />
     </div>
   );
 };
