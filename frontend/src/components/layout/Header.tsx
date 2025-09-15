@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Wallet, Menu, X } from "lucide-react";
 import { useStellarWallet } from "@/hooks/useStellarWallet";
+import Logo from "@/assets/logoProject.png";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -14,16 +15,16 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-stroke-line bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        {/* Logo - Clickable */}
-        <a href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity group">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500 group-hover:bg-brand-400 transition-colors">
-            <div className="text-lg font-bold text-primary-foreground">R</div>
-          </div>
+
+        {/* Logo */}
+        <div className="flex items-center space-x-3">
+          <img src={Logo} alt="Logo" className="h-10 w-10" />
+          
           <div>
             <div className="text-h3 font-semibold text-fg-primary group-hover:text-brand-400 transition-colors">RWA Lending</div>
             <div className="text-micro text-fg-muted">Institutional DeFi</div>
           </div>
-        </a>
+        </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
