@@ -11,7 +11,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
-// Hooks
+// Hooks  
 import { useBlendPools } from '@/hooks/markets/useBlendPools';
 import { useEnhancedPoolData } from '@/hooks/markets/useDefIndexData';
 import { MarketsDashboard } from '@/components/markets/MarketsDashboard';
@@ -144,18 +144,18 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto max-w-7xl px-6 py-8 space-y-8">
+      <main className="container mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
 
         {/* Header with Create SRWA Button */}
         <motion.div 
-          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8"
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <div>
+          <div className="w-full sm:w-auto">
             <motion.h1 
-              className="text-3xl md:text-4xl font-bold text-fg-primary"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-fg-primary"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -163,7 +163,7 @@ export default function Dashboard() {
               Dashboard
             </motion.h1>
             <motion.p 
-              className="text-lg text-fg-secondary mt-2"
+              className="text-base sm:text-lg text-fg-secondary mt-2"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
@@ -173,6 +173,7 @@ export default function Dashboard() {
           </div>
           
           <motion.div
+            className="w-full sm:w-auto"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
@@ -180,11 +181,11 @@ export default function Dashboard() {
             whileTap={{ scale: 0.95 }}
           >
             <Button 
-              className="btn-primary px-6 py-3 text-body-1 relative overflow-hidden group"
+              className="btn-primary w-full sm:w-auto px-4 sm:px-6 py-3 text-sm sm:text-body-1 relative overflow-hidden group"
               onClick={() => window.location.href = '/kyc'}
             >
               <span className="relative z-10">Create SRWA</span>
-              <Plus className="ml-2 h-5 w-5 relative z-10 group-hover:rotate-90 transition-transform" />
+              <Plus className="ml-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 group-hover:rotate-90 transition-transform" />
               <motion.div 
                 className="absolute inset-0 bg-gradient-to-r from-brand-600 to-brand-400 opacity-0 group-hover:opacity-100 transition-opacity"
                 whileHover={{
@@ -203,7 +204,7 @@ export default function Dashboard() {
 
         {/* Global Stats Overview */}
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, staggerChildren: 0.1 }}
@@ -276,26 +277,28 @@ export default function Dashboard() {
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="flex justify-center">
-              <TabsList className="grid w-full max-w-md grid-cols-3 h-12 bg-card/50 backdrop-blur-sm border border-brand-500/20">
+              <TabsList className="grid w-full max-w-md grid-cols-3 h-10 sm:h-12 bg-card/50 backdrop-blur-sm border border-brand-500/20">
                 <TabsTrigger 
                   value="markets" 
-                  className="data-[state=active]:bg-brand-500/20 data-[state=active]:text-brand-300 transition-all duration-300"
+                  className="data-[state=active]:bg-brand-500/20 data-[state=active]:text-brand-300 transition-all duration-300 text-xs sm:text-sm"
                 >
-                  <Globe className="w-4 h-4 mr-2" />
-                  Markets
+                  <Globe className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Markets</span>
+                  <span className="sm:hidden">Mkts</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="portfolio" 
-                  className="data-[state=active]:bg-brand-500/20 data-[state=active]:text-brand-300 transition-all duration-300"
+                  className="data-[state=active]:bg-brand-500/20 data-[state=active]:text-brand-300 transition-all duration-300 text-xs sm:text-sm"
                 >
-                  <Shield className="w-4 h-4 mr-2" />
-                  Portfolio
+                  <Shield className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Portfolio</span>
+                  <span className="sm:hidden">Port</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="admin" 
-                  className="data-[state=active]:bg-brand-500/20 data-[state=active]:text-brand-300 transition-all duration-300"
+                  className="data-[state=active]:bg-brand-500/20 data-[state=active]:text-brand-300 transition-all duration-300 text-xs sm:text-sm"
                 >
-                  <Lock className="w-4 h-4 mr-2" />
+                  <Lock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Admin
                 </TabsTrigger>
               </TabsList>
@@ -311,7 +314,7 @@ export default function Dashboard() {
               >
                 <div className="text-center space-y-4">
                   <motion.h2 
-                    className="text-3xl font-bold text-fg-primary"
+                    className="text-2xl sm:text-3xl font-bold text-fg-primary"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
@@ -322,11 +325,11 @@ export default function Dashboard() {
                       animate={{ rotate: [0, 10, -10, 0] }}
                       transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                     >
-                      <Zap className="h-6 w-6 text-brand-400 inline" />
+                      <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-brand-400 inline" />
                     </motion.span>
                   </motion.h2>
                   <motion.p 
-                    className="text-lg text-fg-secondary max-w-2xl mx-auto"
+                    className="text-base sm:text-lg text-fg-secondary max-w-2xl mx-auto px-4"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
@@ -357,7 +360,7 @@ export default function Dashboard() {
               >
                 <div className="text-center space-y-4">
                   <motion.h2 
-                    className="text-3xl font-bold text-fg-primary"
+                    className="text-2xl sm:text-3xl font-bold text-fg-primary"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
@@ -368,11 +371,11 @@ export default function Dashboard() {
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                     >
-                      <Shield className="h-6 w-6 text-brand-400 inline" />
+                      <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-brand-400 inline" />
                     </motion.span>
                   </motion.h2>
                   <motion.p 
-                    className="text-lg text-fg-secondary max-w-2xl mx-auto"
+                    className="text-base sm:text-lg text-fg-secondary max-w-2xl mx-auto px-4"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
@@ -383,7 +386,7 @@ export default function Dashboard() {
 
                 {/* Portfolio Overview KPIs */}
                 <motion.div 
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.4, staggerChildren: 0.1 }}
@@ -447,15 +450,15 @@ export default function Dashboard() {
 
                 {/* Portfolio Tabs */}
                 <Tabs defaultValue="positions" className="space-y-6">
-                  <TabsList className="grid w-full grid-cols-3 lg:w-96">
-                    <TabsTrigger value="positions">Positions</TabsTrigger>
-                    <TabsTrigger value="activity">Activity</TabsTrigger>
-                    <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-3 sm:w-96">
+                    <TabsTrigger value="positions" className="text-xs sm:text-sm">Positions</TabsTrigger>
+                    <TabsTrigger value="activity" className="text-xs sm:text-sm">Activity</TabsTrigger>
+                    <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
                   </TabsList>
 
                   {/* Positions Tab */}
                   <TabsContent value="positions" className="space-y-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                       {mockUserPositions.map((position, index) => (
                         <motion.div
                           key={position.marketId}
@@ -658,7 +661,7 @@ export default function Dashboard() {
               >
                 <div className="text-center space-y-4">
                   <motion.h2 
-                    className="text-3xl font-bold text-fg-primary"
+                    className="text-2xl sm:text-3xl font-bold text-fg-primary"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
@@ -669,11 +672,11 @@ export default function Dashboard() {
                       animate={{ rotateY: [0, 180, 0] }}
                       transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
                     >
-                      <Lock className="h-6 w-6 text-brand-400 inline" />
+                      <Lock className="h-5 w-5 sm:h-6 sm:w-6 text-brand-400 inline" />
                     </motion.span>
                   </motion.h2>
                   <motion.p 
-                    className="text-lg text-fg-secondary max-w-2xl mx-auto"
+                    className="text-base sm:text-lg text-fg-secondary max-w-2xl mx-auto px-4"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
@@ -684,7 +687,7 @@ export default function Dashboard() {
 
                 {/* Admin Quick Stats */}
                 <motion.div 
-                  className="grid grid-cols-1 md:grid-cols-4 gap-6"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.4, staggerChildren: 0.1 }}
@@ -754,7 +757,7 @@ export default function Dashboard() {
 
                 {/* Admin Charts */}
                 <motion.div 
-                  className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+                  className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.6 }}
@@ -764,7 +767,7 @@ export default function Dashboard() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
                     whileHover={{ y: -5, scale: 1.01 }}
-                    className="lg:col-span-2"
+                    className="xl:col-span-2"
                   >
                     <Card className="p-6 card-institutional hover-lift">
                       <div className="flex items-center justify-between mb-4">

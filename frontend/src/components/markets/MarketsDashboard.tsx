@@ -441,30 +441,30 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
       
       {/* Market Overview */}
       {marketStats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="bg-card border-stroke-line hover:border-brand-400/30 transition-all duration-300 hover:shadow-lg hover:shadow-brand-400/10 hover:scale-105 group">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-brand-500/10 group-hover:bg-brand-500/20 transition-colors duration-300">
-                  <DollarSign className="h-5 w-5 text-brand-400 group-hover:scale-110 transition-transform duration-300" />
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-brand-500/10 group-hover:bg-brand-500/20 transition-colors duration-300">
+                  <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-brand-400 group-hover:scale-110 transition-transform duration-300" />
                 </div>
-                <div>
-                  <p className="text-micro text-fg-muted uppercase tracking-wide">Total TVL</p>
-                  <p className="text-h3 font-bold text-fg-primary tabular-nums">{formatCurrency(marketStats.totalTVL)}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-micro text-fg-muted uppercase tracking-wide">Total TVL</p>
+                  <p className="text-lg sm:text-xl lg:text-h3 font-bold text-fg-primary tabular-nums truncate">{formatCurrency(marketStats.totalTVL)}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-card border-stroke-line hover:border-brand-400/30 transition-all duration-300 hover:shadow-lg hover:shadow-brand-400/10 hover:scale-105 group">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-brand-500/10 group-hover:bg-brand-500/20 transition-colors duration-300">
-                  <TrendingUp className="h-5 w-5 text-brand-400 group-hover:scale-110 transition-transform duration-300" />
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-brand-500/10 group-hover:bg-brand-500/20 transition-colors duration-300">
+                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-brand-400 group-hover:scale-110 transition-transform duration-300" />
                 </div>
-                <div>
-                  <p className="text-micro text-fg-muted uppercase tracking-wide">Avg Supply APY</p>
-                  <p className="text-h3 font-bold text-brand-400 tabular-nums">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-micro text-fg-muted uppercase tracking-wide">Avg Supply APY</p>
+                  <p className="text-lg sm:text-xl lg:text-h3 font-bold text-brand-400 tabular-nums truncate">
                     {formatPercent(marketStats.averageSupplyAPY)}
                   </p>
                 </div>
@@ -473,28 +473,28 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
           </Card>
 
           <Card className="bg-card border-stroke-line hover:border-brand-400/30 transition-all duration-300 hover:shadow-lg hover:shadow-brand-400/10 hover:scale-105 group">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-brand-500/10 group-hover:bg-brand-500/20 transition-colors duration-300">
-                  <Activity className="h-5 w-5 text-brand-400 group-hover:scale-110 transition-transform duration-300" />
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-brand-500/10 group-hover:bg-brand-500/20 transition-colors duration-300">
+                  <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-brand-400 group-hover:scale-110 transition-transform duration-300" />
                 </div>
-                <div>
-                  <p className="text-micro text-fg-muted uppercase tracking-wide">24h Volume</p>
-                  <p className="text-h3 font-bold text-fg-primary tabular-nums">{formatCurrency(marketStats.totalVolume24h)}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-micro text-fg-muted uppercase tracking-wide">24h Volume</p>
+                  <p className="text-lg sm:text-xl lg:text-h3 font-bold text-fg-primary tabular-nums truncate">{formatCurrency(marketStats.totalVolume24h)}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-card border-stroke-line hover:border-brand-400/30 transition-all duration-300 hover:shadow-lg hover:shadow-brand-400/10 hover:scale-105 group">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-brand-500/10 group-hover:bg-brand-500/20 transition-colors duration-300">
-                  <Users className="h-5 w-5 text-brand-400 group-hover:scale-110 transition-transform duration-300" />
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-brand-500/10 group-hover:bg-brand-500/20 transition-colors duration-300">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-brand-400 group-hover:scale-110 transition-transform duration-300" />
                 </div>
-                <div>
-                  <p className="text-micro text-fg-muted uppercase tracking-wide">Active Pools</p>
-                  <p className="text-h3 font-bold text-fg-primary tabular-nums">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-micro text-fg-muted uppercase tracking-wide">Active Pools</p>
+                  <p className="text-lg sm:text-xl lg:text-h3 font-bold text-fg-primary tabular-nums truncate">
                     {marketStats.activePools}/{marketStats.totalPools}
                   </p>
                 </div>
@@ -506,15 +506,15 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
 
       {/* Controls */}
       <Card className="bg-card border-stroke-line">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-fg-primary">
-              <Activity className="h-5 w-5 text-brand-400" />
+        <CardHeader className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <CardTitle className="flex items-center gap-2 text-fg-primary text-lg sm:text-xl">
+              <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-brand-400" />
               Lending Pools
-              <Badge variant="outline" className="bg-brand-500/10 text-brand-400 border-brand-500/20">{filteredAndSortedPools.length}</Badge>
+              <Badge variant="outline" className="bg-brand-500/10 text-brand-400 border-brand-500/20 text-xs sm:text-sm">{filteredAndSortedPools.length}</Badge>
             </CardTitle>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button
                 variant="outline"
                 size="sm"
@@ -565,40 +565,42 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 p-4 sm:p-6">
           {/* Search and Sort */}
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-fg-muted" />
               <Input
                 placeholder="Search pools..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-bg-elev-1 border-stroke-line text-fg-primary placeholder:text-fg-muted focus:border-brand-400 focus:ring-brand-400/20"
+                className="pl-10 bg-bg-elev-1 border-stroke-line text-fg-primary placeholder:text-fg-muted focus:border-brand-400 focus:ring-brand-400/20 text-sm sm:text-base"
               />
             </div>
             
-            <Select value={sortField} onValueChange={(value) => setSortField(value as SortField)}>
-              <SelectTrigger className="w-48 bg-bg-elev-1 border-stroke-line text-fg-primary hover:border-brand-400/50">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="tvl">Total Value Locked</SelectItem>
-                <SelectItem value="supplyAPY">Supply APY</SelectItem>
-                <SelectItem value="borrowAPY">Borrow APY</SelectItem>
-                <SelectItem value="utilizationRate">Utilization</SelectItem>
-                <SelectItem value="volume24h">24h Volume</SelectItem>
-                <SelectItem value="activeUsers">Active Users</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Button
-              variant="outline"
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="border-stroke-line hover:border-brand-400/50 hover:bg-brand-400/5 text-fg-secondary hover:text-brand-400"
-            >
-              {sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
-            </Button>
+            <div className="flex gap-2 sm:gap-4">
+              <Select value={sortField} onValueChange={(value) => setSortField(value as SortField)}>
+                <SelectTrigger className="w-full sm:w-48 bg-bg-elev-1 border-stroke-line text-fg-primary hover:border-brand-400/50 text-sm sm:text-base">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="tvl">Total Value Locked</SelectItem>
+                  <SelectItem value="supplyAPY">Supply APY</SelectItem>
+                  <SelectItem value="borrowAPY">Borrow APY</SelectItem>
+                  <SelectItem value="utilizationRate">Utilization</SelectItem>
+                  <SelectItem value="volume24h">24h Volume</SelectItem>
+                  <SelectItem value="activeUsers">Active Users</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Button
+                variant="outline"
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                className="border-stroke-line hover:border-brand-400/50 hover:bg-brand-400/5 text-fg-secondary hover:text-brand-400 px-3 sm:px-4"
+              >
+                {sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+              </Button>
+            </div>
           </div>
 
           {/* Advanced Filters */}

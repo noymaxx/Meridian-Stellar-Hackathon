@@ -23,44 +23,45 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-stroke-line bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+      <div className="container mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
 
         {/* Logo */}
-        <div className="flex items-center space-x-3">
-          <img src={Logo} alt="Logo" className="h-auto w-10" />
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <img src={Logo} alt="Logo" className="h-auto w-8 sm:w-10" />
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          <a href="/" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
+        <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+          <a href="/" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
             Home
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
-          <a href="/dashboard" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group font-medium">
+          <a href="/dashboard" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group font-medium">
             Dashboard
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
-          <a href="/docs" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
+          <a href="/docs" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
             Documentation
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
         </nav>
 
         {/* Wallet Connection */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           <SettingsButton />
           {isConnected ? (
             <Popover open={walletPopoverOpen} onOpenChange={setWalletPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button 
                   variant="outline" 
-                  className="flex items-center space-x-2 hover:bg-accent"
+                  className="flex items-center space-x-1 sm:space-x-2 hover:bg-accent text-xs sm:text-sm"
                 >
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full" />
-                    <span className="text-sm">{formatStellarAddress(address)}</span>
+                  <div className="flex items-center space-x-1 sm:space-x-2">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full" />
+                    <span className="hidden sm:inline">{formatStellarAddress(address)}</span>
+                    <span className="sm:hidden">{formatStellarAddress(address).slice(0, 6)}...</span>
                     {balance && (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
                         {balance} XLM
                       </Badge>
                     )}
@@ -76,14 +77,15 @@ export function Header() {
             <Button 
               onClick={connect} 
               disabled={isConnecting}
-              className="btn-primary flex items-center space-x-2"
+              className="btn-primary flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm px-2 sm:px-4"
             >
               {isConnecting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
               ) : (
-                <Wallet className="h-4 w-4" />
+                <Wallet className="h-3 w-3 sm:h-4 sm:w-4" />
               )}
-              <span>{isConnecting ? "Connecting..." : "Connect Wallet"}</span>
+              <span className="hidden sm:inline">{isConnecting ? "Connecting..." : "Connect Wallet"}</span>
+              <span className="sm:hidden">{isConnecting ? "..." : "Connect"}</span>
             </Button>
           )}
 
@@ -91,7 +93,7 @@ export function Header() {
           <Button
             variant="ghost"
             size="sm"
-            className="md:hidden"
+            className="md:hidden p-2"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -102,14 +104,14 @@ export function Header() {
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-stroke-line bg-card animate-slide-up">
-          <nav className="container mx-auto px-6 py-4 space-y-2">
-            <a href="/" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
+          <nav className="container mx-auto px-4 sm:px-6 py-4 space-y-2">
+            <a href="/" className="block py-2 text-sm sm:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
               Home
             </a>
-            <a href="/dashboard" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors font-medium">
+            <a href="/dashboard" className="block py-2 text-sm sm:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors font-medium">
               Dashboard
             </a>
-            <a href="/docs" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
+            <a href="/docs" className="block py-2 text-sm sm:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
               Documentation
             </a>
           </nav>

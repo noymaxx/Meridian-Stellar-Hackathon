@@ -71,22 +71,23 @@ const Index = () => {
 
       {/* Enhanced Hero Section */}
       <ParallaxBackground imageUrl={heroImage} className="min-h-screen flex items-center relative overflow-hidden">
-        <div className="container mx-auto max-w-7xl px-6 py-24 relative z-10">
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-24 relative z-10">
           <motion.div 
             className="text-center space-y-8"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                <Badge variant="secondary" className="bg-brand-500/20 text-brand-300 border-brand-500/30 backdrop-blur-sm px-4 py-2">
+                <Badge variant="secondary" className="bg-brand-500/20 text-brand-300 border-brand-500/30 backdrop-blur-sm px-3 sm:px-4 py-2 text-xs sm:text-sm">
                   <Sparkles className="w-3 h-3 mr-2" />
-                  Stellar Blockchain • Soroban Smart Contracts
+                  <span className="hidden sm:inline">Stellar Blockchain • Soroban Smart Contracts</span>
+                  <span className="sm:hidden">Stellar • Soroban</span>
                 </Badge>
               </motion.div>
               
@@ -165,14 +166,14 @@ const Index = () => {
                   </div>
                 </div>
                 <motion.h1 
-                  className="text-display-1 font-semibold text-fg-primary max-w-4xl mx-auto relative z-10"
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-display-1 font-semibold text-fg-primary max-w-4xl mx-auto relative z-10 px-4"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.4 }}
                 >
                   Panorama Block
                   <motion.span 
-                    className="block text-brand-400 mt-2"
+                    className="block text-brand-400 mt-2 text-xl sm:text-2xl md:text-3xl lg:text-4xl"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.8 }}
@@ -183,7 +184,7 @@ const Index = () => {
               </div>
               
               <motion.p 
-                className="text-body-1 text-fg-secondary max-w-2xl mx-auto leading-relaxed"
+                className="text-sm sm:text-body-1 text-fg-secondary max-w-2xl mx-auto leading-relaxed px-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
@@ -194,72 +195,72 @@ const Index = () => {
             </div>
             
             <motion.div 
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4"
               initial={{ opacity: 100, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.1, delay: 1 }}
             >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button className="btn-primary px-8 py-4 text-body-1 relative overflow-hidden group">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
+                <Button className="btn-primary w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-body-1 relative overflow-hidden group">
                   <span className="relative z-10">Connect Wallet</span>
-                  <ArrowRight className="ml-2 h-5 w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   <div className="absolute inset-0 bg-gradient-to-r from-brand-600 to-brand-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </Button>
               </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
                 <Button 
                   variant="outline" 
-                  className="px-8 py-4 text-body-1 backdrop-blur-sm border-brand-500/30 hover:bg-brand-500/10 relative group"
+                  className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-body-1 backdrop-blur-sm border-brand-500/30 hover:bg-brand-500/10 relative group"
                   onClick={() => window.location.href = '/dashboard'}
                 >
                   <span className="relative z-10">Unified Dashboard</span>
                   <Badge variant="secondary" className="ml-2 bg-green-500/20 text-green-400 border-green-500/30 text-xs relative z-10">
                     NEW
                   </Badge>
-                  <ArrowRight className="ml-2 h-4 w-4 relative z-10 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4 relative z-10 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </motion.div>
             </motion.div>
             
             {/* Live Stats Preview */}
             <motion.div 
-              className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-12 sm:mt-16 max-w-4xl mx-auto"
+              className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mt-8 sm:mt-12 lg:mt-16 max-w-4xl mx-auto px-4"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.2 }}
             >
-              <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-brand-500/20">
+              <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-2 sm:p-3 lg:p-4 border border-brand-500/20">
                 {isLoading ? (
-                  <div className="text-h2 font-semibold text-brand-400 tabular-nums">Loading...</div>
+                  <div className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums">Loading...</div>
                 ) : (
-                  <AnimatedCounter value={marketStats.totalValueLocked} className="text-h2 font-semibold text-brand-400 tabular-nums" />
+                  <AnimatedCounter value={marketStats.totalValueLocked} className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums" />
                 )}
                 <p className="text-micro text-fg-muted uppercase tracking-wide hidden sm:block">Total Value Locked</p>
                 <p className="text-micro text-fg-muted uppercase tracking-wide sm:hidden">TVL</p>
               </div>
-              <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-brand-500/20">
+              <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-2 sm:p-3 lg:p-4 border border-brand-500/20">
                 {isLoading ? (
-                  <div className="text-h2 font-semibold text-brand-400 tabular-nums">-</div>
+                  <div className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums">-</div>
                 ) : (
-                  <AnimatedCounter value={marketStats.totalMarkets.toString()} className="text-h2 font-semibold text-brand-400 tabular-nums" />
+                  <AnimatedCounter value={marketStats.totalMarkets.toString()} className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums" />
                 )}
                 <p className="text-micro text-fg-muted uppercase tracking-wide hidden sm:block">Active Markets</p>
                 <p className="text-micro text-fg-muted uppercase tracking-wide sm:hidden">Markets</p>
               </div>
-              <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-brand-500/20">
+              <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-2 sm:p-3 lg:p-4 border border-brand-500/20">
                 {isLoading ? (
-                  <div className="text-h2 font-semibold text-brand-400 tabular-nums">-</div>
+                  <div className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums">-</div>
                 ) : (
-                  <AnimatedCounter value={marketStats.totalUsers.toString()} className="text-h2 font-semibold text-brand-400 tabular-nums" />
+                  <AnimatedCounter value={marketStats.totalUsers.toString()} className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums" />
                 )}
                 <p className="text-micro text-fg-muted uppercase tracking-wide hidden sm:block">Institutions</p>
                 <p className="text-micro text-fg-muted uppercase tracking-wide sm:hidden">Users</p>
               </div>
-              <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-brand-500/20">
+              <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-2 sm:p-3 lg:p-4 border border-brand-500/20">
                 {isLoading ? (
-                  <div className="text-h2 font-semibold text-brand-400 tabular-nums">-</div>
+                  <div className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums">-</div>
                 ) : (
-                  <AnimatedCounter value={marketStats.avgUtilization} className="text-h2 font-semibold text-brand-400 tabular-nums" />
+                  <AnimatedCounter value={marketStats.avgUtilization} className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums" />
                 )}
                 <p className="text-micro text-fg-muted uppercase tracking-wide hidden sm:block">Avg Utilization</p>
                 <p className="text-micro text-fg-muted uppercase tracking-wide sm:hidden">Util.</p>
@@ -274,9 +275,9 @@ const Index = () => {
       </ParallaxBackground>
 
       {/* Enhanced Stats Section */}
-      <section className="container mx-auto max-w-7xl px-6 py-20 -mt-16 relative z-20">
+      <section className="container mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-20 -mt-8 sm:-mt-16 relative z-20">
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, staggerChildren: 0.1 }}
@@ -341,7 +342,7 @@ const Index = () => {
       </section>
 
       {/* Enhanced Features Section */}
-      <section ref={featuresRef} className="container mx-auto max-w-7xl px-6 py-20">
+      <section ref={featuresRef} className="container mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-20">
         <motion.div 
           className="text-center space-y-4 mb-16"
           initial={{ opacity: 0, y: 30 }}
@@ -350,7 +351,7 @@ const Index = () => {
           viewport={{ once: true }}
         >
           <motion.h2 
-            className="text-h1 font-semibold text-fg-primary"
+            className="text-2xl sm:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -358,7 +359,7 @@ const Index = () => {
             Institutional-Grade Infrastructure
           </motion.h2>
           <motion.p 
-            className="text-body-1 text-fg-secondary max-w-2xl mx-auto"
+            className="text-sm sm:text-body-1 text-fg-secondary max-w-2xl mx-auto px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -368,7 +369,7 @@ const Index = () => {
         </motion.div>
 
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
           initial={{ opacity: 0 }}
           animate={isFeatureInView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.8, staggerChildren: 0.1 }}
@@ -446,7 +447,7 @@ const Index = () => {
       </section>
 
       {/* Enhanced Markets Preview */}
-      <section ref={marketsRef} className="container mx-auto max-w-7xl px-6 py-20 bg-gradient-to-b from-transparent via-bg-elev-1/30 to-transparent">
+      <section ref={marketsRef} className="container mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-20 bg-gradient-to-b from-transparent via-bg-elev-1/30 to-transparent">
         <motion.div 
           className="text-center space-y-6 mb-16"
           initial={{ opacity: 0, y: 30 }}
@@ -455,7 +456,7 @@ const Index = () => {
           viewport={{ once: true }}
         >
           <motion.h2 
-            className="text-h1 font-semibold text-fg-primary"
+            className="text-2xl sm:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -466,11 +467,11 @@ const Index = () => {
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
             >
-              <Star className="h-6 w-6 text-brand-400 inline" />
+              <Star className="h-5 w-5 sm:h-6 sm:w-6 text-brand-400 inline" />
             </motion.span>
           </motion.h2>
           <motion.p 
-            className="text-body-1 text-fg-secondary max-w-2xl mx-auto"
+            className="text-sm sm:text-body-1 text-fg-secondary max-w-2xl mx-auto px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -480,7 +481,7 @@ const Index = () => {
         </motion.div>
 
         <motion.div 
-          className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12"
           initial={{ opacity: 0 }}
           animate={isMarketsInView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.8, staggerChildren: 0.15 }}
@@ -653,7 +654,7 @@ const Index = () => {
       </section>
 
       {/* Market Analytics Section */}
-      <section className="container mx-auto max-w-7xl px-6 py-20 bg-gradient-to-b from-transparent via-bg-elev-1/20 to-transparent">
+      <section className="container mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-20 bg-gradient-to-b from-transparent via-bg-elev-1/20 to-transparent">
         <motion.div 
           className="text-center space-y-6 mb-16"
           initial={{ opacity: 0, y: 30 }}
@@ -662,7 +663,7 @@ const Index = () => {
           viewport={{ once: true }}
         >
           <motion.h2 
-            className="text-h1 font-semibold text-fg-primary"
+            className="text-2xl sm:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -670,7 +671,7 @@ const Index = () => {
             Real-Time Market Analytics
           </motion.h2>
           <motion.p 
-            className="text-body-1 text-fg-secondary max-w-2xl mx-auto"
+            className="text-sm sm:text-body-1 text-fg-secondary max-w-2xl mx-auto px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -765,7 +766,7 @@ const Index = () => {
       </section>
 
       {/* Social Proof Section */}
-      <section className="container mx-auto max-w-7xl px-6 py-20">
+      <section className="container mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-20">
         <motion.div 
           className="text-center space-y-6 mb-16"
           initial={{ opacity: 0, y: 30 }}
@@ -774,7 +775,7 @@ const Index = () => {
           viewport={{ once: true }}
         >
           <motion.h2 
-            className="text-h1 font-semibold text-fg-primary"
+            className="text-2xl sm:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -782,7 +783,7 @@ const Index = () => {
             Trusted by Leading Institutions
           </motion.h2>
           <motion.p 
-            className="text-body-1 text-fg-secondary max-w-2xl mx-auto"
+            className="text-sm sm:text-body-1 text-fg-secondary max-w-2xl mx-auto px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -793,7 +794,7 @@ const Index = () => {
 
         {/* Partner Logos */}
         <motion.div 
-          className="flex flex-wrap justify-center items-center gap-8 mb-16 opacity-60"
+          className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16 opacity-60 px-4"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 0.6, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
@@ -801,20 +802,20 @@ const Index = () => {
           {["Stellar", "Soroban", "Meridian", "RWA Capital", "DeFi Partners", "Block Ventures"].map((partner, index) => (
             <motion.div
               key={partner}
-              className="px-6 py-3 bg-card/50 rounded-lg border border-stroke-line/50"
+              className="px-4 sm:px-6 py-2 sm:py-3 bg-card/50 rounded-lg border border-stroke-line/50"
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               whileHover={{ scale: 1.05, opacity: 0.8 }}
             >
-              <span className="text-body-2 font-medium text-fg-muted">{partner}</span>
+              <span className="text-xs sm:text-body-2 font-medium text-fg-muted">{partner}</span>
             </motion.div>
           ))}
         </motion.div>
 
         {/* Testimonials */}
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, staggerChildren: 0.2 }}
@@ -889,7 +890,7 @@ const Index = () => {
       </section>
 
       {/* Enhanced Trust Indicators */}
-      <section className="container mx-auto max-w-7xl px-6 py-16">
+      <section className="container mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-16">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -926,15 +927,15 @@ const Index = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <h2 className="text-h2 font-semibold text-fg-primary mb-4">
+                <h2 className="text-xl sm:text-2xl lg:text-h2 font-semibold text-fg-primary mb-4 px-4">
                   Enterprise-Ready Platform
                 </h2>
-                <p className="text-body-1 text-fg-secondary max-w-2xl mx-auto">
+                <p className="text-sm sm:text-body-1 text-fg-secondary max-w-2xl mx-auto px-4">
                   Built with institutional standards from day one
                 </p>
               </motion.div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
                 {[
                   {
                     icon: CheckCircle,
@@ -997,7 +998,7 @@ const Index = () => {
           <div className="absolute top-0 left-1/2 w-px h-full bg-brand-400" />
         </div>
         
-        <div className="container mx-auto max-w-7xl px-6 py-16 relative z-10">
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-16 relative z-10">
           <motion.div 
             className="text-center space-y-8"
             initial={{ opacity: 0, y: 30 }}
@@ -1018,13 +1019,13 @@ const Index = () => {
                 <div className="text-2xl font-bold text-primary-foreground">R</div>
               </motion.div>
               <div className="text-left">
-                <span className="text-h2 font-semibold text-fg-primary">Panorama Block</span>
+                <span className="text-xl sm:text-2xl lg:text-h2 font-semibold text-fg-primary">Panorama Block</span>
                 <p className="text-micro text-brand-400 font-medium">Institutional DeFi</p>
               </div>
             </motion.div>
             
             <motion.p 
-              className="text-body-1 text-fg-muted max-w-md mx-auto"
+              className="text-sm sm:text-body-1 text-fg-muted max-w-md mx-auto px-4"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
@@ -1033,7 +1034,7 @@ const Index = () => {
             </motion.p>
             
             <motion.div 
-              className="flex flex-wrap justify-center gap-8 text-body-2"
+              className="flex flex-wrap justify-center gap-4 sm:gap-6 lg:gap-8 text-sm sm:text-body-2 px-4"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
