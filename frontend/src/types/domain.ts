@@ -1,3 +1,5 @@
+// ===== LEGACY TYPES (keep for backward compatibility) =====
+
 export type Rule = {
 	id: string;
 	name: string;
@@ -64,3 +66,34 @@ export type Position = {
 	hf: number;
 	lltv: number;
 };
+
+// ===== RE-EXPORTS FOR NEW ENHANCED TYPES =====
+
+export type {
+	BlendPool,
+	BlendReserve,
+	BlendAsset,
+	UserPosition,
+	AssetPosition,
+	TransactionPreview,
+	BlendTransaction,
+	PoolAnalytics,
+	MarketOverview,
+	BlendError,
+	BlendErrorCode
+} from './blend';
+
+export type {
+	DefIndexPoolData,
+	DefIndexPosition,
+	DefIndexAnalytics,
+	PriceData,
+	OracleFeed,
+	ReflectorState,
+	EnhancedPoolData,
+	PortfolioMetrics,
+	RiskAlert,
+	RiskAnalysis,
+	MarketsDashboardState,
+	PerformanceMetrics
+} from './markets';

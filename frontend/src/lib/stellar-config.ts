@@ -1,4 +1,5 @@
 import { Networks } from "@stellar/stellar-sdk";
+import type { OracleContractConfig } from "@/types/markets";
 
 export type StellarNetwork = "testnet" | "mainnet";
 
@@ -8,6 +9,7 @@ export interface StellarConfig {
   sorobanRpcUrl: string;
   networkPassphrase: string;
   isTestnet: boolean;
+  oracleContracts: OracleContractConfig;
 }
 
 // Get environment variables with fallbacks
@@ -25,9 +27,9 @@ const getHorizonUrl = (network: StellarNetwork): string => {
 
 const getSorobanRpcUrl = (network: StellarNetwork): string => {
   if (network === "mainnet") {
-    return import.meta.env.VITE_STELLAR_SOROBAN_RPC_URL_MAINNET || "https://soroban-mainnet.stellar.org";
+    return import.meta.env.VITE_STELLAR_SOROBAN_RPC_URL_MAINNET || "https://soroban-rpc.mainnet.stellar.org";
   }
-  return import.meta.env.VITE_STELLAR_SOROBAN_RPC_URL_TESTNET || "https://soroban-testnet.stellar.org";
+  return import.meta.env.VITE_STELLAR_SOROBAN_RPC_URL_TESTNET || "https://soroban-rpc.testnet.stellar.org";
 };
 
 const getNetworkPassphrase = (network: StellarNetwork): string => {
@@ -35,6 +37,70 @@ const getNetworkPassphrase = (network: StellarNetwork): string => {
     return import.meta.env.VITE_STELLAR_NETWORK_PASSPHRASE_MAINNET || Networks.PUBLIC;
   }
   return import.meta.env.VITE_STELLAR_NETWORK_PASSPHRASE_TESTNET || Networks.TESTNET;
+};
+
+const getOracleContracts = (network: StellarNetwork): OracleContractConfig => {
+  if (network === "mainnet") {
+    return {
+      stellarDex: import.meta.env.VITE_ORACLE_STELLAR_DEX_MAINNET || 'CALI2BYU2JE6WVRUFYTS6MSBNEHGJ35P4AVCZYF3B6QOE3QKOB2PLE6M',
+      externalDexs: import.meta.env.VITE_ORACLE_EXTERNAL_DEXS_MAINNET || 'CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN',
+      fiatRates: import.meta.env.VITE_ORACLE_FIAT_RATES_MAINNET || 'CBKGPWGKSKZF52CFHMTRR23TBWTPMRDIYZ4O2P5VS65BMHYH4DXMCJZC'
+    };
+  }
+  return {
+    stellarDex: import.meta.env.VITE_ORACLE_STELLAR_DEX_TESTNET || 'CALI2BYU2JE6WVRUFYTS6MSBNEHGJ35P4AVCZYF3B6QOE3QKOB2PLE6M',
+    externalDexs: import.meta.env.VITE_ORACLE_EXTERNAL_DEXS_TESTNET || 'CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN',
+    fiatRates: import.meta.env.VITE_ORACLE_FIAT_RATES_TESTNET || 'CBKGPWGKSKZF52CFHMTRR23TBWTPMRDIYZ4O2P5VS65BMHYH4DXMCJZC'
+  };
+};
+
+// ===== ORACLE-SPECIFIC CONFIGURATION (ALWAYS MAINNET FOR REAL DATA) =====
+
+const getOracleNetworkConfig = (): StellarNetwork => {
+  // Use same network as the app for oracle contracts
+  // Testnet has its own oracle contracts with real data
+  const forceOracleMainnet = import.meta.env.VITE_ORACLE_FORCE_MAINNET === 'true';
+  
+  if (forceOracleMainnet) {
+    console.log('🔮 Oracle configured to use MAINNET for real price data');
+    return 'mainnet';
+  }
+  
+  const currentNetwork = getCurrentNetwork();
+  console.log(`🔮 Oracle configured to use ${currentNetwork.toUpperCase()} network (same as app)`);
+  return currentNetwork;
+};
+
+// Oracle-specific RPC URLs with fallbacks for better reliability
+const getOracleRpcUrls = (network: StellarNetwork): string[] => {
+  if (network === 'mainnet') {
+    return [
+      import.meta.env.VITE_STELLAR_SOROBAN_RPC_URL_MAINNET || "https://soroban-rpc.mainnet.stellar.org",
+      "https://soroban-rpc.mainnet.stellar.org",
+      "https://mainnet.sorobanrpc.com",
+      "https://rpc-mainnet.stellar.org"
+    ];
+  }
+  return [
+    import.meta.env.VITE_STELLAR_SOROBAN_RPC_URL_TESTNET || "https://soroban-rpc.testnet.stellar.org",
+    "https://soroban-rpc.testnet.stellar.org",
+    "https://rpc-testnet.stellar.org"
+  ];
+};
+
+export const getOracleConfig = () => {
+  const oracleNetwork = getOracleNetworkConfig();
+  const rpcUrls = getOracleRpcUrls(oracleNetwork);
+  
+  return {
+    network: oracleNetwork,
+    sorobanRpcUrl: rpcUrls[0], // Primary RPC URL
+    fallbackRpcUrls: rpcUrls.slice(1), // Fallback RPC URLs
+    networkPassphrase: oracleNetwork === 'mainnet' 
+      ? import.meta.env.VITE_STELLAR_NETWORK_PASSPHRASE_MAINNET || Networks.PUBLIC
+      : import.meta.env.VITE_STELLAR_NETWORK_PASSPHRASE_TESTNET || Networks.TESTNET,
+    oracleContracts: getOracleContracts(oracleNetwork)
+  };
 };
 
 // Current network configuration
@@ -46,6 +112,7 @@ export const STELLAR_CONFIG: StellarConfig = {
   sorobanRpcUrl: getSorobanRpcUrl(CURRENT_NETWORK),
   networkPassphrase: getNetworkPassphrase(CURRENT_NETWORK),
   isTestnet: CURRENT_NETWORK === "testnet",
+  oracleContracts: getOracleContracts(CURRENT_NETWORK),
 };
 
 // Network-specific configurations
@@ -56,6 +123,7 @@ export const NETWORK_CONFIGS: Record<StellarNetwork, StellarConfig> = {
     sorobanRpcUrl: getSorobanRpcUrl("testnet"),
     networkPassphrase: getNetworkPassphrase("testnet"),
     isTestnet: true,
+    oracleContracts: getOracleContracts("testnet"),
   },
   mainnet: {
     network: "mainnet",
@@ -63,6 +131,7 @@ export const NETWORK_CONFIGS: Record<StellarNetwork, StellarConfig> = {
     sorobanRpcUrl: getSorobanRpcUrl("mainnet"),
     networkPassphrase: getNetworkPassphrase("mainnet"),
     isTestnet: false,
+    oracleContracts: getOracleContracts("mainnet"),
   },
 };
 

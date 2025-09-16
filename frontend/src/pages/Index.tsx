@@ -7,7 +7,8 @@ import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { MarketChart } from "@/components/ui/market-chart";
 import { FreighterDebug } from "@/components/wallet/FreighterDebug";
-import { mockMarketStats, mockMarkets, mockMarketCharts } from "@/lib/mock-data";
+import { useBlendPools } from "@/hooks/markets/useBlendPools";
+import { useEnhancedPoolData } from "@/hooks/markets/useDefIndexData";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { 
@@ -28,7 +29,26 @@ import { OrbitingCircles } from "@/components/magicui/orbiting-circles";
 import heroImage from "@/assets/hero-bg.jpg";
 
 const Index = () => {
-  const topMarkets = mockMarkets.slice(0, 3);
+  // Fetch real pool data
+  const { pools: blendPools, loading: poolsLoading } = useBlendPools();
+  const { enhancedPools, loading: analyticsLoading } = useEnhancedPoolData(blendPools);
+  
+  const topMarkets = enhancedPools.slice(0, 3);
+  const isLoading = poolsLoading || analyticsLoading;
+  
+  // Calculate real market stats from enhanced pools
+  const marketStats = enhancedPools.length > 0 ? {
+    totalValueLocked: `$${(enhancedPools.reduce((sum, pool) => sum + pool.tvl, 0) / 1e6).toFixed(1)}M`,
+    totalMarkets: enhancedPools.length,
+    avgUtilization: `${(enhancedPools.reduce((sum, pool) => sum + pool.utilizationRate, 0) / enhancedPools.length * 100).toFixed(1)}%`,
+    totalUsers: enhancedPools.reduce((sum, pool) => sum + pool.activeUsers, 0)
+  } : {
+    totalValueLocked: "$0.0M",
+    totalMarkets: 0,
+    avgUtilization: "0.0%",
+    totalUsers: 0
+  };
+  
   const featuresRef = useRef(null);
   const marketsRef = useRef(null);
   const isFeatureInView = useInView(featuresRef, { once: true, margin: "-100px" });
@@ -144,22 +164,38 @@ const Index = () => {
               transition={{ duration: 0.8, delay: 1.2 }}
             >
               <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-brand-500/20">
-                <AnimatedCounter value={mockMarketStats.totalValueLocked} className="text-h2 font-semibold text-brand-400 tabular-nums" />
+                {isLoading ? (
+                  <div className="text-h2 font-semibold text-brand-400 tabular-nums">Loading...</div>
+                ) : (
+                  <AnimatedCounter value={marketStats.totalValueLocked} className="text-h2 font-semibold text-brand-400 tabular-nums" />
+                )}
                 <p className="text-micro text-fg-muted uppercase tracking-wide hidden sm:block">Total Value Locked</p>
                 <p className="text-micro text-fg-muted uppercase tracking-wide sm:hidden">TVL</p>
               </div>
               <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-brand-500/20">
-                <AnimatedCounter value={mockMarketStats.totalMarkets.toString()} className="text-h2 font-semibold text-brand-400 tabular-nums" />
+                {isLoading ? (
+                  <div className="text-h2 font-semibold text-brand-400 tabular-nums">-</div>
+                ) : (
+                  <AnimatedCounter value={marketStats.totalMarkets.toString()} className="text-h2 font-semibold text-brand-400 tabular-nums" />
+                )}
                 <p className="text-micro text-fg-muted uppercase tracking-wide hidden sm:block">Active Markets</p>
                 <p className="text-micro text-fg-muted uppercase tracking-wide sm:hidden">Markets</p>
               </div>
               <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-brand-500/20">
-                <AnimatedCounter value={mockMarketStats.totalUsers.toString()} className="text-h2 font-semibold text-brand-400 tabular-nums" />
+                {isLoading ? (
+                  <div className="text-h2 font-semibold text-brand-400 tabular-nums">-</div>
+                ) : (
+                  <AnimatedCounter value={marketStats.totalUsers.toString()} className="text-h2 font-semibold text-brand-400 tabular-nums" />
+                )}
                 <p className="text-micro text-fg-muted uppercase tracking-wide hidden sm:block">Institutions</p>
                 <p className="text-micro text-fg-muted uppercase tracking-wide sm:hidden">Users</p>
               </div>
               <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-brand-500/20">
-                <AnimatedCounter value={mockMarketStats.avgUtilization} className="text-h2 font-semibold text-brand-400 tabular-nums" />
+                {isLoading ? (
+                  <div className="text-h2 font-semibold text-brand-400 tabular-nums">-</div>
+                ) : (
+                  <AnimatedCounter value={marketStats.avgUtilization} className="text-h2 font-semibold text-brand-400 tabular-nums" />
+                )}
                 <p className="text-micro text-fg-muted uppercase tracking-wide hidden sm:block">Avg Utilization</p>
                 <p className="text-micro text-fg-muted uppercase tracking-wide sm:hidden">Util.</p>
               </div>
@@ -189,10 +225,10 @@ const Index = () => {
           >
             <KPICard
               title="Total Value Locked"
-              value={mockMarketStats.totalValueLocked}
+              value={isLoading ? "Loading..." : marketStats.totalValueLocked}
               icon={DollarSign}
               trend="up"
-              trendValue="+12.5%"
+              trendValue="Live"
             />
           </motion.div>
           <motion.div
@@ -203,7 +239,7 @@ const Index = () => {
           >
             <KPICard
               title="Active Markets"
-              value={mockMarketStats.totalMarkets.toString()}
+              value={isLoading ? "-" : marketStats.totalMarkets.toString()}
               icon={BarChart3}
               subtitle="Permissioned protocols"
             />
@@ -216,10 +252,10 @@ const Index = () => {
           >
             <KPICard
               title="Institutional Users"
-              value={mockMarketStats.totalUsers.toString()}
+              value={isLoading ? "-" : marketStats.totalUsers.toString()}
               icon={Users}
               trend="up"
-              trendValue="+8 this week"
+              trendValue="Active"
             />
           </motion.div>
           <motion.div
@@ -230,10 +266,10 @@ const Index = () => {
           >
             <KPICard
               title="Average Utilization"
-              value={mockMarketStats.avgUtilization}
+              value={isLoading ? "-" : marketStats.avgUtilization}
               icon={TrendingUp}
               trend="neutral"
-              trendValue="Stable"
+              trendValue="Live"
             />
           </motion.div>
         </motion.div>
@@ -384,102 +420,143 @@ const Index = () => {
           animate={isMarketsInView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.8, staggerChildren: 0.15 }}
         >
-          {topMarkets.map((market, index) => (
-            <motion.div
-              key={market.id}
-              initial={{ opacity: 0, y: 60, rotateX: 45 }}
-              animate={isMarketsInView ? { opacity: 1, y: 0, rotateX: 0 } : { opacity: 0, y: 60, rotateX: 45 }}
-              transition={{ duration: 0.8, delay: index * 0.15 }}
-              whileHover={{ y: -12, scale: 1.03 }}
-              className="group perspective-1000"
-            >
-              <Card className="card-institutional hover-lift h-full relative overflow-hidden border-brand-500/30 group-hover:border-brand-400/50 transition-all duration-300">
-                {/* Animated background gradient */}
-                <motion.div 
-                  className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-brand-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  initial={false}
-                  whileHover={{
-                    background: [
-                      "linear-gradient(135deg, rgba(77,178,255,0.1) 0%, transparent 50%, rgba(77,178,255,0.05) 100%)",
-                      "linear-gradient(225deg, rgba(77,178,255,0.1) 0%, transparent 50%, rgba(77,178,255,0.05) 100%)",
-                      "linear-gradient(315deg, rgba(77,178,255,0.1) 0%, transparent 50%, rgba(77,178,255,0.05) 100%)",
-                      "linear-gradient(135deg, rgba(77,178,255,0.1) 0%, transparent 50%, rgba(77,178,255,0.05) 100%)"
-                    ]
-                  }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                />
-                
-                <div className="space-y-6 relative z-10">
-                  <div className="flex items-center justify-between">
-                    <motion.div whileHover={{ scale: 1.1 }}>
-                      <Badge variant="outline" className="text-micro border-brand-500/40 text-brand-300">
-                        {market.assetSymbol}
+{isLoading ? (
+            // Loading state
+            [...Array(3)].map((_, index) => (
+              <motion.div
+                key={`loading-${index}`}
+                initial={{ opacity: 0, y: 60 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="group"
+              >
+                <Card className="card-institutional h-full border-brand-500/30">
+                  <div className="space-y-6 animate-pulse">
+                    <div className="flex items-center justify-between">
+                      <div className="h-6 w-16 bg-brand-500/20 rounded"></div>
+                      <div className="h-6 w-12 bg-green-500/20 rounded"></div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="h-8 w-3/4 bg-brand-500/20 rounded"></div>
+                      <div className="h-4 w-1/2 bg-brand-500/10 rounded"></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="text-center p-3 rounded-lg bg-brand-500/5">
+                        <div className="h-4 w-16 bg-brand-500/20 rounded mb-2 mx-auto"></div>
+                        <div className="h-6 w-12 bg-brand-500/20 rounded mx-auto"></div>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-brand-500/5">
+                        <div className="h-4 w-8 bg-brand-500/20 rounded mb-2 mx-auto"></div>
+                        <div className="h-6 w-16 bg-brand-500/20 rounded mx-auto"></div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))
+          ) : topMarkets.length > 0 ? (
+            topMarkets.map((market, index) => (
+              <motion.div
+                key={market.address}
+                initial={{ opacity: 0, y: 60, rotateX: 45 }}
+                animate={isMarketsInView ? { opacity: 1, y: 0, rotateX: 0 } : { opacity: 0, y: 60, rotateX: 45 }}
+                transition={{ duration: 0.8, delay: index * 0.15 }}
+                whileHover={{ y: -12, scale: 1.03 }}
+                className="group perspective-1000"
+              >
+                <Card className="card-institutional hover-lift h-full relative overflow-hidden border-brand-500/30 group-hover:border-brand-400/50 transition-all duration-300">
+                  {/* Animated background gradient */}
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-brand-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    initial={false}
+                    whileHover={{
+                      background: [
+                        "linear-gradient(135deg, rgba(77,178,255,0.1) 0%, transparent 50%, rgba(77,178,255,0.05) 100%)",
+                        "linear-gradient(225deg, rgba(77,178,255,0.1) 0%, transparent 50%, rgba(77,178,255,0.05) 100%)",
+                        "linear-gradient(315deg, rgba(77,178,255,0.1) 0%, transparent 50%, rgba(77,178,255,0.05) 100%)",
+                        "linear-gradient(135deg, rgba(77,178,255,0.1) 0%, transparent 50%, rgba(77,178,255,0.05) 100%)"
+                      ]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                  
+                  <div className="space-y-6 relative z-10">
+                    <div className="flex items-center justify-between">
+                      <motion.div whileHover={{ scale: 1.1 }}>
+                        <Badge variant="outline" className="text-micro border-brand-500/40 text-brand-300">
+                          {market.name.slice(0, 4).toUpperCase()}
+                        </Badge>
+                      </motion.div>
+                      <Badge variant="secondary" className="text-micro bg-green-500/10 text-green-400 border-green-500/20">
+                        <div className="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse" />
+                        {market.status}
                       </Badge>
-                    </motion.div>
-                    <Badge variant="secondary" className="text-micro bg-green-500/10 text-green-400 border-green-500/20">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse" />
-                      Live
-                    </Badge>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <h3 className="text-h3 font-semibold text-fg-primary group-hover:text-brand-300 transition-colors">
-                      {market.name}
-                    </h3>
-                    <p className="text-body-2 text-fg-muted group-hover:text-fg-secondary transition-colors">
-                      Min. Investment: <span className="text-brand-400 font-medium">{market.minInvestment}</span>
-                    </p>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-6">
-                    <motion.div 
-                      className="text-center p-3 rounded-lg bg-brand-500/5 group-hover:bg-brand-500/10 transition-colors"
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      <p className="text-micro text-fg-muted uppercase tracking-wide mb-1">Supply APY</p>
-                      <AnimatedCounter 
-                        value={market.supplyApy} 
-                        className="text-h3 font-semibold text-brand-400 tabular-nums"
-                      />
-                    </motion.div>
-                    <motion.div 
-                      className="text-center p-3 rounded-lg bg-brand-500/5 group-hover:bg-brand-500/10 transition-colors"
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      <p className="text-micro text-fg-muted uppercase tracking-wide mb-1">TVL</p>
-                      <AnimatedCounter 
-                        value={market.totalSupply} 
-                        className="text-h3 font-semibold text-fg-primary tabular-nums group-hover:text-brand-300 transition-colors"
-                      />
-                    </motion.div>
-                  </div>
-                  
-                  {/* Utilization Bar */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-micro text-fg-muted">Utilization</span>
-                      <span className="text-micro text-brand-400 font-medium">{market.utilization}</span>
                     </div>
-                    <div className="w-full bg-bg-elev-2 rounded-full h-2">
+                    
+                    <div className="space-y-3">
+                      <h3 className="text-h3 font-semibold text-fg-primary group-hover:text-brand-300 transition-colors">
+                        {market.name}
+                      </h3>
+                      <p className="text-body-2 text-fg-muted group-hover:text-fg-secondary transition-colors">
+                        Class: <span className="text-brand-400 font-medium">{market.class}</span>
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-6">
                       <motion.div 
-                        className="h-2 bg-gradient-to-r from-brand-600 to-brand-400 rounded-full"
-                        initial={{ width: 0 }}
-                        whileInView={{ width: market.utilization }}
-                        transition={{ duration: 1.5, delay: index * 0.2 }}
-                      />
+                        className="text-center p-3 rounded-lg bg-brand-500/5 group-hover:bg-brand-500/10 transition-colors"
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        <p className="text-micro text-fg-muted uppercase tracking-wide mb-1">Supply APY</p>
+                        <AnimatedCounter 
+                          value={`${(market.supplyAPY * 100).toFixed(2)}%`} 
+                          className="text-h3 font-semibold text-brand-400 tabular-nums"
+                        />
+                      </motion.div>
+                      <motion.div 
+                        className="text-center p-3 rounded-lg bg-brand-500/5 group-hover:bg-brand-500/10 transition-colors"
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        <p className="text-micro text-fg-muted uppercase tracking-wide mb-1">TVL</p>
+                        <AnimatedCounter 
+                          value={`$${(market.tvl / 1e6).toFixed(1)}M`} 
+                          className="text-h3 font-semibold text-fg-primary tabular-nums group-hover:text-brand-300 transition-colors"
+                        />
+                      </motion.div>
                     </div>
+                    
+                    {/* Utilization Bar */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-micro text-fg-muted">Utilization</span>
+                        <span className="text-micro text-brand-400 font-medium">{(market.utilizationRate * 100).toFixed(1)}%</span>
+                      </div>
+                      <div className="w-full bg-bg-elev-2 rounded-full h-2">
+                        <motion.div 
+                          className="h-2 bg-gradient-to-r from-brand-600 to-brand-400 rounded-full"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${market.utilizationRate * 100}%` }}
+                          transition={{ duration: 1.5, delay: index * 0.2 }}
+                        />
+                      </div>
+                    </div>
+                    
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button variant="outline" className="w-full group-hover:bg-brand-500/10 group-hover:border-brand-400/50 group-hover:text-brand-300 transition-all">
+                        View Details
+                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </motion.div>
                   </div>
-                  
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button variant="outline" className="w-full group-hover:bg-brand-500/10 group-hover:border-brand-400/50 group-hover:text-brand-300 transition-all">
-                      View Details
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </motion.div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
+                </Card>
+              </motion.div>
+            ))
+          ) : (
+            // No markets state
+            <div className="col-span-3 text-center py-12">
+              <p className="text-body-1 text-fg-muted">No markets available</p>
+            </div>
+          )}
         </motion.div>
 
         <motion.div 
@@ -544,42 +621,60 @@ const Index = () => {
           transition={{ duration: 0.8, staggerChildren: 0.1 }}
           viewport={{ once: true }}
         >
-          <MarketChart
-            title="Supply Rates"
-            value="4.85%"
-            change="+0.23%"
-            changeType="up"
-            data={mockMarketCharts.supplyRates}
-            type="area"
-            color="#10B981"
-          />
-          <MarketChart
-            title="Borrow Rates"
-            value="5.95%"
-            change="-0.05%"
-            changeType="down"
-            data={mockMarketCharts.borrowRates}
-            type="line"
-            color="#EF4444"
-          />
-          <MarketChart
-            title="Utilization"
-            value="71.1%"
-            change="+2.4%"
-            changeType="up"
-            data={mockMarketCharts.utilization}
-            type="area"
-            color="#8B5CF6"
-          />
-          <MarketChart
-            title="24h Volume"
-            value="$45.2M"
-            change="+12.8%"
-            changeType="up"
-            data={mockMarketCharts.volume}
-            type="line"
-            color="#F59E0B"
-          />
+          {isLoading ? (
+            [...Array(4)].map((_, index) => (
+              <div key={index} className="bg-card rounded-lg p-4 border border-stroke-line">
+                <div className="space-y-4 animate-pulse">
+                  <div className="h-4 w-24 bg-brand-500/20 rounded"></div>
+                  <div className="h-8 w-16 bg-brand-500/20 rounded"></div>
+                  <div className="h-32 bg-brand-500/10 rounded"></div>
+                </div>
+              </div>
+            ))
+          ) : enhancedPools.length > 0 ? (
+            <>
+              <MarketChart
+                title="Avg Supply Rate"
+                value={`${(enhancedPools.reduce((sum, p) => sum + p.supplyAPY, 0) / enhancedPools.length * 100).toFixed(2)}%`}
+                change="Live"
+                changeType="neutral"
+                data={[]} // Real chart data would come from historical pool data
+                type="area"
+                color="#10B981"
+              />
+              <MarketChart
+                title="Avg Borrow Rate"
+                value={`${(enhancedPools.reduce((sum, p) => sum + p.borrowAPY, 0) / enhancedPools.length * 100).toFixed(2)}%`}
+                change="Live"
+                changeType="neutral"
+                data={[]} // Real chart data would come from historical pool data
+                type="line"
+                color="#EF4444"
+              />
+              <MarketChart
+                title="Avg Utilization"
+                value={marketStats.avgUtilization}
+                change="Live"
+                changeType="neutral"
+                data={[]} // Real chart data would come from historical pool data
+                type="area"
+                color="#8B5CF6"
+              />
+              <MarketChart
+                title="Total TVL"
+                value={marketStats.totalValueLocked}
+                change="Live"
+                changeType="up"
+                data={[]} // Real chart data would come from historical pool data
+                type="line"
+                color="#F59E0B"
+              />
+            </>
+          ) : (
+            <div className="col-span-4 text-center py-12">
+              <p className="text-body-1 text-fg-muted">No market data available</p>
+            </div>
+          )}
         </motion.div>
 
         {/* Live Data Indicators */}
