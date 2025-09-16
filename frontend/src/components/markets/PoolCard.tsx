@@ -18,10 +18,11 @@ import {
   Shield
 } from 'lucide-react';
 import { EnhancedPoolData } from '@/types/markets';
+import { BlendPool } from '@/types/blend';
 import { cn } from '@/lib/utils';
 
 interface PoolCardProps {
-  pool: EnhancedPoolData;
+  pool: EnhancedPoolData & Partial<BlendPool>; // Support both types
   onViewDetails: (poolAddress: string) => void;
   onSupply: (poolAddress: string) => void;
   onBorrow: (poolAddress: string) => void;
@@ -102,10 +103,136 @@ export const PoolCard: React.FC<PoolCardProps> = ({
     );
   };
 
+  const getPoolTypeBadge = () => {
+    const poolType = pool.poolType || 'official';
+    
+    if (poolType === 'community') {
+      const verified = pool.verified;
+      return (
+        <Badge 
+          variant="outline" 
+          className={cn(
+            "flex items-center gap-1",
+            verified 
+              ? "bg-green-500/10 text-green-400 border-green-500/20" 
+              : "bg-orange-500/10 text-orange-400 border-orange-500/20"
+          )}
+        >
+          <Users className="h-3 w-3" />
+          {verified ? 'Verified Community' : 'Community'}
+        </Badge>
+      );
+    }
+    
+    return (
+      <Badge variant="outline" className="flex items-center gap-1 bg-blue-500/10 text-blue-400 border-blue-500/20">
+        <CheckCircle className="h-3 w-3" />
+        Official
+      </Badge>
+    );
+  };
+
+  const getRiskLevelBadge = () => {
+    if (!pool.riskLevel) return null;
+    
+    const configs = {
+      'Low': { color: 'bg-green-500/10 text-green-400 border-green-500/20', icon: Shield },
+      'Medium': { color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20', icon: AlertTriangle },
+      'High': { color: 'bg-red-500/10 text-red-400 border-red-500/20', icon: AlertTriangle },
+      'Experimental': { color: 'bg-purple-500/10 text-purple-400 border-purple-500/20', icon: Zap }
+    };
+    
+    const config = configs[pool.riskLevel];
+    if (!config) return null;
+    
+    const Icon = config.icon;
+    
+    return (
+      <Badge variant="outline" className={cn("flex items-center gap-1", config.color)}>
+        <Icon className="h-3 w-3" />
+        {pool.riskLevel} Risk
+      </Badge>
+    );
+  };
+
   const getRiskIndicator = (riskScore: number) => {
     if (riskScore < 0.3) return { color: 'text-brand-400', label: 'Low Risk' };
     if (riskScore < 0.6) return { color: 'text-yellow-400', label: 'Medium Risk' };
     return { color: 'text-red-400', label: 'High Risk' };
+  };
+
+  const getCommunityPoolWarnings = () => {
+    if (pool.poolType !== 'community') return [];
+    
+    const warnings: Array<{ level: 'info' | 'warning' | 'error'; message: string; icon: React.ReactNode }> = [];
+    
+    // Verification warnings
+    if (!pool.verified) {
+      warnings.push({
+        level: 'warning',
+        message: 'Unverified community pool. Code and security not audited.',
+        icon: <AlertTriangle className="h-4 w-4" />
+      });
+    }
+    
+    // Risk level warnings
+    if (pool.riskLevel === 'High' || pool.riskLevel === 'Experimental') {
+      warnings.push({
+        level: pool.riskLevel === 'Experimental' ? 'error' : 'warning',
+        message: pool.riskLevel === 'Experimental' 
+          ? 'Experimental pool - may contain untested features'
+          : 'High risk pool - potential for significant losses',
+        icon: <AlertTriangle className="h-4 w-4" />
+      });
+    }
+    
+    // Data freshness warnings
+    if (pool.dataFreshness === 'Stale' || pool.dataFreshness === 'Outdated') {
+      warnings.push({
+        level: pool.dataFreshness === 'Outdated' ? 'error' : 'warning',
+        message: pool.dataFreshness === 'Outdated'
+          ? 'Pool data is outdated - rates may be inaccurate'
+          : 'Pool data is stale - rates may not be current',
+        icon: <Clock className="h-4 w-4" />
+      });
+    }
+    
+    // Status warnings
+    if (pool.status === 'Degraded') {
+      warnings.push({
+        level: 'error',
+        message: 'Pool is experiencing issues - deposits/withdrawals may be limited',
+        icon: <AlertTriangle className="h-4 w-4" />
+      });
+    }
+    
+    if (pool.status === 'Paused') {
+      warnings.push({
+        level: 'error',
+        message: 'Pool is paused - no new transactions allowed',
+        icon: <AlertTriangle className="h-4 w-4" />
+      });
+    }
+    
+    // New pool warning (less than 7 days old)
+    const poolAge = Date.now() - (pool.createdAt || 0);
+    if (poolAge < 7 * 24 * 60 * 60 * 1000) {
+      warnings.push({
+        level: 'info',
+        message: 'New community pool - limited transaction history',
+        icon: <Clock className="h-4 w-4" />
+      });
+    }
+    
+    return warnings;
+  };
+
+  const getWarningColor = (level: 'info' | 'warning' | 'error') => {
+    switch (level) {
+      case 'info': return 'bg-blue-500/10 border-blue-500/20 text-blue-400';
+      case 'warning': return 'bg-orange-500/10 border-orange-500/20 text-orange-400';
+      case 'error': return 'bg-red-500/10 border-red-500/20 text-red-400';
+    }
   };
 
   const getUtilizationColor = (rate: number) => {
@@ -137,8 +264,10 @@ export const PoolCard: React.FC<PoolCardProps> = ({
               <h3 className="text-h3 font-semibold text-fg-primary mb-1">
                 {pool.name}
               </h3>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                {getPoolTypeBadge()}
                 {getClassBadge(pool.class)}
+                {getRiskLevelBadge()}
                 {getStatusIndicator(pool.status)}
               </div>
             </div>
@@ -243,6 +372,66 @@ export const PoolCard: React.FC<PoolCardProps> = ({
                 </span>
               </div>
             </div>
+
+            {/* Community Pool Info */}
+            {pool.poolType === 'community' && (
+              <div className="space-y-3 py-4 border-t border-stroke-line bg-bg-elev-1/50 -mx-6 px-6">
+                <div className="flex items-center gap-2 text-fg-secondary">
+                  <Users className="h-4 w-4" />
+                  <span className="text-micro uppercase tracking-wide">Community Pool</span>
+                </div>
+                
+                {pool.description && (
+                  <p className="text-body-2 text-fg-secondary">
+                    {pool.description}
+                  </p>
+                )}
+                
+                <div className="grid grid-cols-2 gap-4">
+                  {pool.creator && (
+                    <div className="space-y-1">
+                      <span className="text-micro text-fg-muted">Creator</span>
+                      <span className="text-body-2 font-medium text-fg-secondary truncate block">
+                        {pool.creator.split('@')[0]}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {pool.tags && pool.tags.length > 0 && (
+                    <div className="space-y-1">
+                      <span className="text-micro text-fg-muted">Tags</span>
+                      <div className="flex flex-wrap gap-1">
+                        {pool.tags.slice(0, 2).map((tag, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs bg-bg-elev-2 text-fg-muted border-stroke-line">
+                            {tag}
+                          </Badge>
+                        ))}
+                        {pool.tags.length > 2 && (
+                          <Badge variant="outline" className="text-xs bg-bg-elev-2 text-fg-muted border-stroke-line">
+                            +{pool.tags.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Community Pool Warnings */}
+                {getCommunityPoolWarnings().map((warning, idx) => (
+                  <div key={idx} className={cn(
+                    "flex items-center gap-2 p-2 border rounded-md",
+                    getWarningColor(warning.level)
+                  )}>
+                    <div className="flex-shrink-0">
+                      {warning.icon}
+                    </div>
+                    <span className="text-micro">
+                      {warning.message}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Performance & Data Freshness */}
             <div className="flex items-center justify-between text-micro">

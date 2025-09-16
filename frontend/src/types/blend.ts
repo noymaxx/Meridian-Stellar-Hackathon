@@ -45,6 +45,18 @@ export interface BlendPool {
   utilizationRate: number;
   createdAt: number;
   lastUpdated: number;
+  
+  // Community pool metadata (optional)
+  poolType?: 'official' | 'community';
+  creator?: string;
+  description?: string;
+  category?: 'DeFi' | 'RWA' | 'Experimental' | 'Gaming' | 'Other';
+  tags?: string[];
+  verified?: boolean;
+  riskLevel?: 'Low' | 'Medium' | 'High' | 'Experimental';
+  website?: string;
+  twitter?: string;
+  github?: string;
 }
 
 // ===== USER POSITIONS =====

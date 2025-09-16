@@ -659,6 +659,33 @@
   }
 }
 
+/* Custom Orbit Animations */
+@keyframes orbit {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes orbit-reverse {
+  from {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+}
+
+.animate-orbit {
+  animation: orbit linear infinite;
+}
+
+.animate-orbit-reverse {
+  animation: orbit-reverse linear infinite;
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .card-institutional {

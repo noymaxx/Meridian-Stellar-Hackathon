@@ -53,6 +53,7 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedClass, setSelectedClass] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [selectedPoolType, setSelectedPoolType] = useState<string>('all');
   const [minAPY, setMinAPY] = useState<string>('');
   const [maxTVL, setMaxTVL] = useState<string>('');
   const [sortField, setSortField] = useState<SortField>('tvl');
@@ -67,6 +68,8 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
     if (!pools.length) return null;
     
     const activePools = pools.filter(p => p.status === 'Active');
+    const communityPools = pools.filter(p => p.poolType === 'community');
+    const unverifiedCommunityPools = communityPools.filter(p => !p.verified);
     
     return {
       totalTVL: pools.reduce((sum, p) => sum + p.tvl, 0),
@@ -76,7 +79,9 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
       totalUsers: pools.reduce((sum, p) => sum + p.activeUsers, 0),
       activePools: activePools.length,
       totalPools: pools.length,
-      averageUtilization: pools.reduce((sum, p) => sum + p.utilizationRate, 0) / pools.length
+      averageUtilization: pools.reduce((sum, p) => sum + p.utilizationRate, 0) / pools.length,
+      communityPools: communityPools.length,
+      unverifiedCommunityPools: unverifiedCommunityPools.length
     };
   }, [pools]);
 
@@ -100,6 +105,19 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
     // Status filter
     if (selectedStatus !== 'all') {
       filtered = filtered.filter(pool => pool.status === selectedStatus);
+    }
+
+    // Pool type filter
+    if (selectedPoolType !== 'all') {
+      if (selectedPoolType === 'official') {
+        filtered = filtered.filter(pool => !pool.poolType || pool.poolType === 'official');
+      } else if (selectedPoolType === 'community') {
+        filtered = filtered.filter(pool => pool.poolType === 'community');
+      } else if (selectedPoolType === 'verified') {
+        filtered = filtered.filter(pool => pool.poolType === 'community' && pool.verified === true);
+      } else if (selectedPoolType === 'unverified') {
+        filtered = filtered.filter(pool => pool.poolType === 'community' && pool.verified === false);
+      }
     }
 
     // Active pools only
@@ -134,7 +152,7 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
     });
 
     return filtered;
-  }, [pools, searchQuery, selectedClass, selectedStatus, showOnlyActive, minAPY, maxTVL, sortField, sortOrder]);
+  }, [pools, searchQuery, selectedClass, selectedStatus, selectedPoolType, showOnlyActive, minAPY, maxTVL, sortField, sortOrder]);
 
   // ===== UTILITY FUNCTIONS =====
   
@@ -149,10 +167,26 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
     return `${value.toFixed(2)}%`;
   };
 
+  // Check if we should show community pool warnings
+  const shouldShowCommunityWarning = useMemo(() => {
+    if (selectedPoolType === 'community' || selectedPoolType === 'unverified') {
+      return true;
+    }
+    if (selectedPoolType === 'all') {
+      return filteredAndSortedPools.some(p => p.poolType === 'community');
+    }
+    return false;
+  }, [selectedPoolType, filteredAndSortedPools]);
+  
+  const communityPoolsInView = useMemo(() => {
+    return filteredAndSortedPools.filter(p => p.poolType === 'community');
+  }, [filteredAndSortedPools]);
+
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedClass('all');
     setSelectedStatus('all');
+    setSelectedPoolType('all');
     setMinAPY('');
     setMaxTVL('');
     setShowOnlyActive(false);
@@ -182,6 +216,42 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Community Pool Warning Banner */}
+      {shouldShowCommunityWarning && communityPoolsInView.length > 0 && (
+        <Card className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border-orange-500/20">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-orange-400 flex-shrink-0 mt-0.5" />
+              <div className="space-y-2">
+                <h3 className="text-body-1 font-semibold text-orange-400">
+                  Community Pools Notice
+                </h3>
+                <div className="text-body-2 text-fg-secondary space-y-1">
+                  <p>
+                    You are viewing community-developed pools ({communityPoolsInView.length} shown). 
+                    These pools are created by community members and may carry additional risks.
+                  </p>
+                  <div className="flex flex-wrap gap-4 text-micro">
+                    <span className="text-orange-400">
+                      • Unverified: {communityPoolsInView.filter(p => !p.verified).length} pools
+                    </span>
+                    <span className="text-red-400">
+                      • High/Experimental Risk: {communityPoolsInView.filter(p => p.riskLevel === 'High' || p.riskLevel === 'Experimental').length} pools
+                    </span>
+                    <span className="text-yellow-400">
+                      • Degraded Status: {communityPoolsInView.filter(p => p.status === 'Degraded').length} pools
+                    </span>
+                  </div>
+                  <p className="text-micro text-orange-400 font-medium">
+                    ⚠️ Always DYOR (Do Your Own Research) before interacting with community pools.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
       {/* Market Overview */}
       {marketStats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -356,7 +426,7 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label className="text-fg-secondary">Pool Class</Label>
                     <Select value={selectedClass} onValueChange={setSelectedClass}>
@@ -383,6 +453,22 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
                         <SelectItem value="Active">Active</SelectItem>
                         <SelectItem value="Paused">Paused</SelectItem>
                         <SelectItem value="Degraded">Degraded</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-fg-secondary">Pool Type</Label>
+                    <Select value={selectedPoolType} onValueChange={setSelectedPoolType}>
+                      <SelectTrigger className="bg-bg-elev-2 border-stroke-line text-fg-primary hover:border-brand-400/50">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="official">Official Pools</SelectItem>
+                        <SelectItem value="community">Community Pools</SelectItem>
+                        <SelectItem value="verified">Verified Community</SelectItem>
+                        <SelectItem value="unverified">Unverified Community</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

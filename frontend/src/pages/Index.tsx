@@ -9,6 +9,17 @@ import { MarketChart } from "@/components/ui/market-chart";
 import { FreighterDebug } from "@/components/wallet/FreighterDebug";
 import { useBlendPools } from "@/hooks/markets/useBlendPools";
 import { useEnhancedPoolData } from "@/hooks/markets/useDefIndexData";
+import { mockMarketStats, mockMarkets, mockMarketCharts } from "@/lib/mock-data";
+
+// Import das imagens para a órbita
+import blendLogo from "@/assets/blendLogo.png";
+import defiImage from "@/assets/defiI.jpg";
+import favicoImage from "@/assets/favico.png";
+import heroBackground from "@/assets/hero-bg.jpg";
+import logoProject from "@/assets/logoProject.png";
+import reflectorImage from "@/assets/reflector.jpg";
+import soroSwapLogo from "@/assets/soroSwap.png";
+import stellarLogo from "@/assets/stellarLogo.png";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { 
@@ -25,7 +36,7 @@ import {
   Sparkles,
   Star
 } from "lucide-react";
-import { OrbitingCircles } from "@/components/magicui/orbiting-circles";
+import { CustomOrbitingCircles } from "@/components/CustomOrbitingCircles";
 import heroImage from "@/assets/hero-bg.jpg";
 
 const Index = () => {
@@ -86,25 +97,71 @@ const Index = () => {
                   <div className="relative h-[640px] w-[640px]">
                     {/* Static ring (drawn once) + rotating images. Replace src with your PNGs. */}
                     <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-                      <circle cx="50" cy="50" r="48" className="stroke-brand-500/30" strokeWidth="0.5" fill="none" strokeDasharray="2 2" />
+                      <circle cx="50" cy="50" r="48" className="stroke-brand-500/30" strokeWidth="0.1" fill="none" strokeDasharray="1 2" />
                     </svg>
                     {/* Rotating items on the main (visible) orbit */}
-                    <OrbitingCircles radius={300} duration={36} delay={0} path={false}>
-                      <img src="/placeholder.svg" alt="orbit-item-1" className="h-10 w-10 opacity-80" />
-                    </OrbitingCircles>
-                    <OrbitingCircles radius={300} duration={36} delay={10} path={false}>
-                      <img src="/placeholder.svg" alt="orbit-item-2" className="h-10 w-10 opacity-80" />
-                    </OrbitingCircles>
-                    <OrbitingCircles radius={300} duration={36} delay={20} path={false}>
-                      <img src="/placeholder.svg" alt="orbit-item-3" className="h-10 w-10 opacity-80" />
-                    </OrbitingCircles>
-                    {/* Inner orbit icons only (no visible ring) */}
-                    <OrbitingCircles radius={210} duration={28} delay={4} path={false}>
-                      <img src="/placeholder.svg" alt="inner-item-1" className="h-9 w-9 opacity-80" />
-                    </OrbitingCircles>
-                    <OrbitingCircles radius={210} duration={28} delay={18} path={false}>
-                      <img src="/placeholder.svg" alt="inner-item-2" className="h-9 w-9 opacity-80" />
-                    </OrbitingCircles>
+                    {/* Blend Protocol - 2 instances */}
+                    <CustomOrbitingCircles key="blend-1" radius={300} duration={20} delay={0} path={false}>
+                      <img src={blendLogo} alt="Blend Protocol" className="h-10 w-10 opacity-80 rounded-full" />
+                    </CustomOrbitingCircles>
+          
+                    
+                    {/* DeFi Index - 2 instances */}
+                    <CustomOrbitingCircles key="defi-1" radius={300} duration={20} delay={2} path={false}>
+                      <img src={defiImage} alt="DeFi Index" className="h-auto w-14 opacity-80 rounded-full" />
+                    </CustomOrbitingCircles>
+             
+                    
+                    {/* Reflector - 2 instances */}
+                    <CustomOrbitingCircles key="reflector-1" radius={300} duration={20} delay={4} path={false}>
+                      <img src={reflectorImage} alt="Reflector" className="h-10 w-10 opacity-80 rounded-full" />
+                    </CustomOrbitingCircles>
+               
+                    
+                    {/* SoroSwap - 2 instances */}
+                    <CustomOrbitingCircles key="soroswap-1" radius={300} duration={20} delay={6} path={false}>
+                      <img src={soroSwapLogo} alt="SoroSwap" className="h-10 w-10 opacity-80 rounded-full" />
+                    </CustomOrbitingCircles>
+          
+                    
+                    {/* Stellar - 2 instances */}
+                    <CustomOrbitingCircles key="stellar-1" radius={300} duration={20} delay={8} path={false}>
+                      <img src={stellarLogo} alt="Stellar" className="h-10 w-10 opacity-80 rounded-full" />
+                    </CustomOrbitingCircles>
+             
+
+
+                    {/* Reverse orbit - Inner ring with different delays */}
+                    {/* Blend Protocol - 2 instances reverse */}
+                    <CustomOrbitingCircles key="blend-rev-1" radius={320} reverse duration={20} delay={1} path={false}>
+                      <img src={blendLogo} alt="Blend Protocol" className="h-auto w-14 opacity-80 rounded-full" />
+                    </CustomOrbitingCircles>
+      
+                    
+                    {/* DeFi Index - 2 instances reverse */}
+                    <CustomOrbitingCircles key="defi-rev-1" radius={320} reverse duration={20} delay={3} path={false}>
+                      <img src={defiImage} alt="DeFi Index" className="h-10 w-10 opacity-80 rounded-full" />
+                    </CustomOrbitingCircles>
+
+                    
+                    {/* Reflector - 2 instances reverse */}
+                    <CustomOrbitingCircles key="reflector-rev-1" radius={320} reverse duration={20} delay={5} path={false}>
+                      <img src={reflectorImage} alt="Reflector" className="h-10 w-10 opacity-80 rounded-full" />
+                    </CustomOrbitingCircles>
+    
+                    
+                    {/* SoroSwap - 2 instances reverse */}
+                    <CustomOrbitingCircles key="soroswap-rev-1" radius={320} reverse duration={20} delay={7} path={false}>
+                      <img src={soroSwapLogo} alt="SoroSwap" className="h-10 w-10 opacity-80 rounded-full" />
+                    </CustomOrbitingCircles>
+ 
+                    
+                    {/* Stellar - 2 instances reverse */}
+                    <CustomOrbitingCircles key="stellar-rev-1" radius={320} reverse duration={20} delay={9} path={false}>
+                      <img src={stellarLogo} alt="Stellar" className="h-10 w-10 opacity-80 rounded-full" />
+                    </CustomOrbitingCircles>
+    
+ 
                   </div>
                 </div>
                 <motion.h1 
