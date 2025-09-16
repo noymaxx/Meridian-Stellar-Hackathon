@@ -7,7 +7,6 @@ import { useWallet } from "@/components/wallet/WalletProvider";
 import { WalletStatus } from "@/components/wallet/WalletStatus";
 import { formatStellarAddress } from "@/lib/stellar-config";
 import Logo from "@/assets/logoProject.png";
-import { SettingsButton } from "@/components/settings/SettingsDialog";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -30,29 +29,29 @@ export function Header() {
           <img src={Logo} alt="Logo" className="h-auto w-8 sm:w-10" />
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
-          <a href="/" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
-            Home
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
-          </a>
-          <a href="/dashboard" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group font-medium">
-            Dashboard
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
-          </a>
-          <a href="/srwa-issuance" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
-            Create RWA
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
-          </a>
-          <a href="/srwa-demo" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
-            RWA Demo
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
-          </a>
-        </nav>
+        {/* Spacer for centering */}
+        <div className="flex-1"></div>
 
-        {/* Wallet Connection */}
-        <div className="flex items-center space-x-2 sm:space-x-4">
-          <SettingsButton />
+        {/* Desktop Navigation + Wallet Connection */}
+        <div className="hidden md:flex items-center space-x-4 lg:space-x-6">
+          {/* Navigation Links */}
+          <nav className="flex items-center space-x-4 lg:space-x-6">
+            <a href="/" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
+              Home
+              <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
+            </a>
+            <a href="/dashboard" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group font-medium">
+              Dashboard
+              <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
+            </a>
+            <a href="/docs" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
+              Documentation
+              <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
+            </a>
+          </nav>
+
+          {/* Wallet Connection */}
+          <div className="flex items-center space-x-2 sm:space-x-4 ml-4 lg:ml-6">
           {isConnected ? (
             <Popover open={walletPopoverOpen} onOpenChange={setWalletPopoverOpen}>
               <PopoverTrigger asChild>
@@ -92,17 +91,18 @@ export function Header() {
               <span className="sm:hidden">{isConnecting ? "..." : "Connect"}</span>
             </Button>
           )}
-
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="md:hidden p-2"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </Button>
+          </div>
         </div>
+
+        {/* Mobile Menu Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="md:hidden p-2 ml-2"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        </Button>
       </div>
 
       {/* Mobile Navigation */}
@@ -115,11 +115,8 @@ export function Header() {
             <a href="/dashboard" className="block py-2 text-sm sm:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors font-medium">
               Dashboard
             </a>
-            <a href="/srwa-issuance" className="block py-2 text-sm sm:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
-              Create RWA
-            </a>
-            <a href="/srwa-demo" className="block py-2 text-sm sm:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
-              RWA Demo
+            <a href="/docs" className="block py-2 text-sm sm:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
+              Documentation
             </a>
           </nav>
         </div>

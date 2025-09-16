@@ -1,0 +1,101 @@
+/* Dashboard Page Specific Styles */
+
+/* Native Tabs Styling */
+.dashboard-tab-button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative;
+  z-index: 10;
+}
+
+.dashboard-tab-button:hover {
+  transform: none !important;
+}
+
+.dashboard-tab-content {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* RWA Portfolio Isolated Container */
+.rwa-portfolio-isolated-container {
+  /* Complete isolation */
+  position: relative !important;
+  z-index: 1000 !important;
+  pointer-events: auto !important;
+  
+  /* Clear any potential conflicting styles */
+  transform: none !important;
+  will-change: auto !important;
+  
+  /* Ensure proper stacking context */
+  isolation: isolate;
+  
+  /* Prevent any motion interference */
+  backface-visibility: visible !important;
+  perspective: none !important;
+  
+  /* Ensure clicks pass through properly */
+  touch-action: auto !important;
+  user-select: auto !important;
+}
+
+/* Ensure all child elements in RWA container are interactive */
+.rwa-portfolio-isolated-container * {
+  pointer-events: auto !important;
+}
+
+/* Portfolio Tab Specific Styling */
+.dashboard-portfolio-tab {
+  /* Ensure the portfolio tab itself doesn't interfere */
+  position: relative;
+  z-index: 1;
+}
+
+/* Override any potential motion or animation interference */
+.dashboard-tab-content * {
+  backface-visibility: visible !important;
+  perspective: none !important;
+  will-change: auto !important;
+}
+
+/* Ensure buttons and interactive elements work properly */
+.dashboard-tab-content button,
+.dashboard-tab-content a,
+.dashboard-tab-content [role="button"] {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative;
+  z-index: 10;
+}
+
+/* Remove any potential transform interference */
+.dashboard-tab-content [style*="transform"] {
+  transform: none !important;
+}
+
+/* Clean hover states */
+.dashboard-tab-button:not([disabled]):hover,
+.rwa-portfolio-isolated-container button:not([disabled]):hover {
+  opacity: 0.9;
+  background-color: rgba(var(--brand-500-rgb), 0.1) !important;
+}
+
+/* Ensure proper focus states */
+.dashboard-tab-button:focus,
+.rwa-portfolio-isolated-container button:focus {
+  outline: 2px solid rgba(var(--brand-500-rgb), 0.5);
+  outline-offset: 2px;
+}
+
+/* Debug styles (remove in production) */
+.rwa-portfolio-isolated-container {
+  /* Uncomment for debugging */
+  /* border: 2px solid red !important; */
+}
+
+.dashboard-tab-button {
+  /* Uncomment for debugging */
+  /* border: 1px solid blue !important; */
+}
