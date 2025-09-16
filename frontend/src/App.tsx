@@ -22,6 +22,7 @@ import PoolDetail from "./pages/PoolDetail";
 import SoroswapPage from "./pages/Soroswap";
 import Optimizer from "./pages/Optimizer";
 import Dashboards from "./pages/Dashboards";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/soroswap" element={<SoroswapPage />} />
             <Route path="/optimizer" element={<Optimizer />} />
             <Route path="/dashboards" element={<Dashboards />} />
+            <Route path="/dashboard" element={<Dashboard />} />
 
             <Route path="/markets" element={<Markets />} />
             <Route path="/market/:id" element={<MarketDetail />} />

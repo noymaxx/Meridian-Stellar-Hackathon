@@ -36,24 +36,12 @@ export function Header() {
             Home
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
-          <a href="/markets" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
-            Markets
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
-          </a>
-          <a href="/portfolio" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
-            Portfolio
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
-          </a>
-          <a href="/kyc" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
-            KYC
+          <a href="/dashboard" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group font-medium">
+            Dashboard
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
           <a href="/docs" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
             Documentation
-            <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
-          </a>
-          <a href="/admin" className="text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
-            Admin
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
         </nav>
@@ -118,20 +106,11 @@ export function Header() {
             <a href="/" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
               Home
             </a>
-            <a href="/markets" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
-              Markets
-            </a>
-            <a href="/portfolio" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
-              Portfolio
-            </a>
-            <a href="/kyc" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
-              KYC
+            <a href="/dashboard" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors font-medium">
+              Dashboard
             </a>
             <a href="/docs" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
               Documentation
-            </a>
-            <a href="/admin" className="block py-2 text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
-              Admin
             </a>
           </nav>
         </div>

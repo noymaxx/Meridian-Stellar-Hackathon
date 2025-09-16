@@ -207,8 +207,16 @@ const Index = () => {
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button variant="outline" className="px-8 py-4 text-body-1 backdrop-blur-sm border-brand-500/30 hover:bg-brand-500/10">
-                  View Markets
+                <Button 
+                  variant="outline" 
+                  className="px-8 py-4 text-body-1 backdrop-blur-sm border-brand-500/30 hover:bg-brand-500/10 relative group"
+                  onClick={() => window.location.href = '/dashboard'}
+                >
+                  <span className="relative z-10">Unified Dashboard</span>
+                  <Badge variant="secondary" className="ml-2 bg-green-500/20 text-green-400 border-green-500/30 text-xs relative z-10">
+                    NEW
+                  </Badge>
+                  <ArrowRight className="ml-2 h-4 w-4 relative z-10 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </motion.div>
             </motion.div>
@@ -1033,6 +1041,7 @@ const Index = () => {
               {[
                 { href: "/docs", label: "Documentation" },
                 { href: "/kyc", label: "KYC Portal" }, 
+                { href: "/dashboard", label: "Dashboard" },
                 { href: "/markets", label: "Markets" },
                 { href: "/portfolio", label: "Portfolio" },
                 { href: "/admin", label: "Admin" }
