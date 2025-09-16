@@ -123,9 +123,9 @@ export function useStellarWallet(): WalletState & WalletActions {
       
       let errorMessage = "Failed to connect wallet. Please try again.";
       
-      if (error.message?.includes("User declined") || error.message?.includes("rejected")) {
+      if ((error as any)?.message?.includes("User declined") || (error as any)?.message?.includes("rejected")) {
         errorMessage = "Connection cancelled by user.";
-      } else if (error.message?.includes("not installed")) {
+      } else if ((error as any)?.message?.includes("not installed")) {
         errorMessage = "Freighter wallet not found. Please install it first.";
         setShowInstallModal(true);
       }
@@ -170,7 +170,7 @@ export function useStellarWallet(): WalletState & WalletActions {
     } catch (error: unknown) {
       logger.error('Transaction signing error:', error);
       
-      if (error.message?.includes("User declined") || error.message?.includes("rejected")) {
+      if ((error as any)?.message?.includes("User declined") || (error as any)?.message?.includes("rejected")) {
         throw new Error("Transaction cancelled by user");
       }
       
