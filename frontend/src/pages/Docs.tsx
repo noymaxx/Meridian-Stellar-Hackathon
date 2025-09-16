@@ -26,43 +26,43 @@ export default function Docs() {
       id: "architecture",
       title: "System Architecture Overview",
       content: `The SRWA ecosystem follows a token-first compliance approach with core layers including SRWA Token, Compliance Core, Identity Registry, and integration layers with Blend Money Market, SoroSwap AMM, Reflector Oracle, and DeFindex.`,
-      image: "/dist/assets/photo2Doc.png"
+      image: "/docs/photo2Doc.png"
     },
     {
       id: "token-architecture",
       title: "Token-first Architecture",
       content: `The SRWA ecosystem follows a token-first compliance approach where compliance is built into the token itself, ensuring that every dApp that can move a SEP-41 token can automatically respect regulation.`,
-      image: "/dist/assets/photo3Doc.png"
+      image: "/docs/photo3Doc.png"
     },
     {
       id: "use-cases",
       title: "Institutional Use-cases",
       content: `Treasury Credit backed by T-Bills, Private Credit/Receivables, and CRE/Bridge Loans with specific constraints and operational rules for each asset class.`,
-      image: "/dist/assets/photo4Doc.png"
+      image: "/docs/photo4Doc.png"
     },
     {
       id: "risks",
       title: "Risks, Assumptions & Mitigations",
       content: `Comprehensive risk assessment matrix covering compliance bypass, wrong/forged claims, NAV stale/oracle failure, liquidity shock, governance mistakes, data drift, and privacy leakage.`,
-      image: "/dist/assets/photo5Doc.png"
+      image: "/docs/photo5Doc.png"
     },
     {
       id: "contracts",
       title: "Contract Architecture",
       content: `Detailed contract structure including SRWA token, compliance core, identity registry, and all supporting modules.`,
-      image: "/dist/assets/photo6Doc.png"
+      image: "/docs/photo6Doc.png"
     },
     {
       id: "dataflow",
       title: "Dataflow Diagram",
       content: `Shows the flow from feeds through adapter to consumers in the oracle system.`,
-      image: "/dist/assets/photo7Doc.png"
+      image: "/docs/photo7Doc.png"
     },
     {
       id: "degraded-mode",
       title: "Degraded Mode State Machine",
       content: `Illustrates the state transitions when the system enters degraded mode due to oracle failures or other issues.`,
-      image: "/dist/assets/Photo8Doc.png"
+      image: "/docs/Photo8Doc.png"
     }
   ];
 

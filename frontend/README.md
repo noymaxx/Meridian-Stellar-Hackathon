@@ -102,14 +102,14 @@ PanoramaBlock introduces SRWA: a SEP-41–compatible fungible token with ERC-364
 - **Explicit allowlisting** → pro: safer integrations; con: governance overhead (mitigated with batched updates & events)
 - **Upgrade discipline** → pro: safer evolution; con: slower changes (intended for institutional trust)
 
-![Design Tenets & Trade-offs](./dist/assets/photoDoc1.png)
+![Design Tenets & Trade-offs](./public/docs/photoDoc1.png)
 
 
 ### 5. System Architecture Overview
 
-![System Architecture Overview](./dist/assets/photo2Doc.png)
+![System Architecture Overview](./public/docs/photo2Doc.png)
 
-![Token-first Architecture](./dist/assets/photo3Doc.png)
+![Token-first Architecture](./public/docs/photo3Doc.png)
 **Token-first Architecture:**
 
 The SRWA ecosystem follows a token-first compliance approach where:
@@ -145,7 +145,7 @@ The SRWA ecosystem follows a token-first compliance approach where:
 - **NAV cadence**: daily (or better), staleness max 24h (business); Reflector TWAP window 30 min, staleness ≤120s
 - **Operational rules**: If NAV.stale == true ⇒ degraded mode: new borrows blocked, LLTV temporarily reduced
 
-![Treasury Credit Use Case](./dist/assets/photo4Doc.png)
+![Treasury Credit Use Case](./public/docs/photo4Doc.png)
 
 #### Private Credit / Receivables (SRWA-Receivables → USDC)
 - **Differences**: LLTV ≤ 70%, threshold ≤ 75%, NAV cadence weekly/biweekly, haircut 100–300 bps, band ±100 bps
@@ -157,7 +157,7 @@ The SRWA ecosystem follows a token-first compliance approach where:
 
 ### 7. Risks, Assumptions & Mitigations
 
-![Risk Assessment Matrix](./dist/assets/photo5Doc.png)
+![Risk Assessment Matrix](./public/docs/photo5Doc.png)
 
 | Risk | Vector | Mitigation (enforced) |
 |------|--------|----------------------|
@@ -175,7 +175,7 @@ The SRWA ecosystem follows a token-first compliance approach where:
 - Institutional demand exists for USDC yield vs RWA-collateralized borrow
 
 
-![Risk Mitigation Strategies](./dist/assets/photo5Doc.png)
+![Risk Mitigation Strategies](./public/docs/photo5Doc.png)
 
 ---
 
@@ -212,7 +212,7 @@ All critical actions MUST emit structured events: compliance decisions, claim ch
 
 ### 2. Contracts
 
-![Contract Architecture](./dist/assets/photo6Doc.png)
+![Contract Architecture](./public/docs/photo6Doc.png)
 
 
 ### 3. Data Structures & State
@@ -495,15 +495,15 @@ All modules MUST return (bool, ErrorCode) for traceable denials.
 
 11.1 Dataflow (feeds → adapter → consumers)
 
-![Dataflow Diagram](./dist/assets/photo7Doc.png)
+![Dataflow Diagram](./public/docs/photo7Doc.png)
 
 ###11.2 Degraded mode state machine
 
-![Degraded Mode State Machine](./dist/assets/Photo8Doc.png)
+![Degraded Mode State Machine](./public/docs/Photo8Doc.png)
 
 ### 11.3 Clamp math 
 
-![Clamp Math Diagram](./dist/assets/Photo8Doc.png)
+![Clamp Math Diagram](./public/docs/Photo8Doc.png)
 
 
 ## Part III: Integration Guides
