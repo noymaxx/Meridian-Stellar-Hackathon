@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 import { useUserRWATokens, type RWAToken } from "@/hooks/useUserRWATokens";
 import { RWALendingModal } from "@/components/rwa/RWALendingModal";
+import { useWallet } from "@/components/wallet/WalletProvider";
 
 const RWATokenCard = ({ token, index }: { token: RWAToken; index: number }) => {
   const [copied, setCopied] = useState(false);
@@ -218,8 +219,15 @@ const RWATokenCard = ({ token, index }: { token: RWAToken; index: number }) => {
 
 const RWATokensGrid = () => {
   const { tokens, loading, error, refetch } = useUserRWATokens();
+  const { address } = useWallet();
 
   const handleRefresh = async () => {
+    // Clear any cached data to force a real refresh
+    if (typeof window !== 'undefined') {
+      const cacheKeys = Object.keys(localStorage).filter(key => key.startsWith('react-query'));
+      cacheKeys.forEach(key => localStorage.removeItem(key));
+    }
+    
     toast.promise(refetch(), {
       loading: "Refreshing RWA tokens...",
       success: "RWA tokens updated!",
@@ -280,10 +288,26 @@ const RWATokensGrid = () => {
             }
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={handleRefresh}>
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Refresh
-        </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleRefresh}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => {
+              // Test: Add a mock token to localStorage for testing
+              const mockToken = `CMOCKTOKEN${Date.now().toString().slice(-6)}ABCDEF1234567890ABCDEF123456`;
+              const userTokensKey = `userTokens_${address}`;
+              const existingTokens = JSON.parse(localStorage.getItem(userTokensKey) || '[]');
+              if (!existingTokens.includes(mockToken)) {
+                existingTokens.push(mockToken);
+                localStorage.setItem(userTokensKey, JSON.stringify(existingTokens));
+                handleRefresh();
+                toast.success("Test token added! Check if it appears.");
+              }
+            }}>
+              + Test Token
+            </Button>
+          </div>
       </div>
 
       {/* Tokens Grid */}
