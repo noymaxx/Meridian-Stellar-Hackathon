@@ -2,6 +2,7 @@
 
 pub mod soroswap_adapter;
 pub mod blend_adapter;
+pub mod srwa_blend_integration;
 
 use soroban_sdk::{contracttype, Address};
 
