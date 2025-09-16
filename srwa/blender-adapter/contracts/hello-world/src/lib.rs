@@ -817,6 +817,48 @@ impl BlendPoolIntegration {
         Self::check_compliance(env, user, pool_address, token, amount, request_type)
     }
 
+    /// Configurar reserva no pool Blend automaticamente
+    pub fn setup_pool_reserve(
+        env: Env,
+        admin: Address,
+        pool_address: Address,
+        asset: Address,
+    ) {
+        admin.require_auth();
+
+        // Verificar se é admin
+        let stored_admin: Address = env.storage().instance()
+            .get(&ADMIN_KEY)
+            .expect("Not initialized");
+
+        if admin != stored_admin {
+            panic!("Not authorized");
+        }
+
+        // Armazenar reserva localmente
+        let reserve_info = ReserveInfo {
+            asset: asset.clone(),
+            c_factor: 8000,
+            l_factor: 7500,
+            util: 0,
+            max_util: 9500,
+            r_base: 0,
+            r_one: 500,
+            r_two: 1000,
+            r_three: 10000,
+            reactivity: 100,
+            supply_cap: 1000000000000,
+            enabled: true,
+        };
+
+        let mut reserves: Map<Address, ReserveInfo> = env.storage().instance()
+            .get(&RESERVES)
+            .unwrap_or(Map::new(&env));
+
+        reserves.set(asset, reserve_info);
+        env.storage().instance().set(&RESERVES, &reserves);
+    }
+
     /// Get config do token
     pub fn get_token_config(
         env: Env,
