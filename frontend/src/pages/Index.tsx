@@ -9,6 +9,7 @@ import { MarketChart } from "@/components/ui/market-chart";
 import { FreighterDebug } from "@/components/wallet/FreighterDebug";
 import { useBlendPools } from "@/hooks/markets/useBlendPools";
 import { useEnhancedPoolData } from "@/hooks/markets/useDefIndexData";
+import { useWallet } from "@/components/wallet/WalletProvider";
 import { mockMarketStats, mockMarkets, mockMarketCharts } from "@/lib/mock-data";
 
 // Import das imagens para a órbita
@@ -43,6 +44,9 @@ const Index = () => {
   // Fetch real pool data
   const { pools: blendPools, loading: poolsLoading } = useBlendPools();
   const { enhancedPools, loading: analyticsLoading } = useEnhancedPoolData(blendPools);
+  
+  // Wallet connection
+  const { isConnected, isConnecting, connect } = useWallet();
   
   const topMarkets = enhancedPools.slice(0, 3);
   const isLoading = poolsLoading || analyticsLoading;
@@ -201,8 +205,14 @@ const Index = () => {
               transition={{ duration: 0.1, delay: 1 }}
             >
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
-                <Button className="btn-primary w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-body-1 relative overflow-hidden group">
-                  <span className="relative z-10">Connect Wallet</span>
+                <Button 
+                  onClick={connect}
+                  disabled={isConnecting}
+                  className="btn-primary w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-body-1 relative overflow-hidden group"
+                >
+                  <span className="relative z-10">
+                    {isConnecting ? "Connecting..." : "Connect Wallet"}
+                  </span>
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   <div className="absolute inset-0 bg-gradient-to-r from-brand-600 to-brand-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </Button>
