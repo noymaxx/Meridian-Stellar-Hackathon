@@ -293,9 +293,11 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
         const template = params.template || "RwaEquity";
         const adminAddress = params.admin || address;
 
-        // simple salt: 32 bytes (64 hex chars) from name+symbol+time
+        // simple salt: 32 bytes (64 hex chars) from name+symbol+time (BROWSER COMPATIBLE)
         const input = `${params.name}-${params.symbol}-${Date.now()}`;
-        const baseHex = Buffer.from(input).toString('hex');
+        const encoder = new TextEncoder();
+        const bytes = encoder.encode(input);
+        const baseHex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
         const saltHex = baseHex.length >= 64
           ? baseHex.slice(0, 64)
           : (baseHex + '0'.repeat(64 - baseHex.length));
@@ -448,9 +450,31 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
   const handleDirectSRWADeploy = async (params: { template: string; name: string; symbol: string; admin: string; decimals?: number }) => {
     console.log("🔗 [SRWA Operations] Starting direct SRWA deployment:", params);
     
-    // 🚀 POOL GIGANTE DE CONTRATOS FRESCOS - CRIE QUALQUER TOKEN COM QUALQUER NOME! 
+    // 🚀 ULTRA MEGA POOL - CRIE QUALQUER TOKEN COM QUALQUER NOME! (36+ CONTRATOS)
     const contractsToTry = [
-      // 🆕 MEGA POOL - 10 CONTRATOS FRESCOS NOVOS
+      // 🌟 NOVA MEGA POOL - 20 CONTRATOS ULTRA FRESCOS (RECÉM CRIADOS)
+      { id: "CBQEAJ6YTZTX4EBY5TBKCETA3TOGQCMUFSOZ6NVRMOBTNKRYYAGJKGRH", name: "🌟 Mega Fresh #1", compliance: getContractId("complianceCore") },
+      { id: "CA6HELVSPPTCWKXSPKZCDMBKCBAYPUBVFTZWVIC2IKLRSQP6OANLYQIS", name: "🌟 Mega Fresh #2", compliance: getContractId("complianceCore") },
+      { id: "CBKMALAF23EDOX2YSDUR6GON6EE2WSUA4V237Z6BVXQIME2X24TIJ62C", name: "🌟 Mega Fresh #3", compliance: getContractId("complianceCore") },
+      { id: "CAJWCLXCF2Y3A5H2R2PNLLVHYQDWKJ6DQPKGR5TGDIVTOVZEZ5DUMP55", name: "🌟 Mega Fresh #4", compliance: getContractId("complianceCore") },
+      { id: "CANCQ47MAJRLX6L76QIEK3KXQ7XFJRUVZ75ACEXTPMJQNR76ZVE4QTYQ", name: "🌟 Mega Fresh #5", compliance: getContractId("complianceCore") },
+      { id: "CBEZFX7ZKNBLCTJSYHRJ6FVE3WTSRIXUHPRDUZKQH37QZJPNZUDLVFSG", name: "🌟 Mega Fresh #6", compliance: getContractId("complianceCore") },
+      { id: "CBDPZ6MW37WIQKP2BSUMSWTDERIPE477B3RIKQ4BS76GXONSFB5O3D6P", name: "🌟 Mega Fresh #7", compliance: getContractId("complianceCore") },
+      { id: "CB7QC7CMYXTCKZYSTZVNPEFEZPCXOE73E2NVWOGVRUA34XCX4OS7YOGP", name: "🌟 Mega Fresh #8", compliance: getContractId("complianceCore") },
+      { id: "CCTVTRMCYGEXYZIG4FSUMFBIBOQZTGWEM5D44KYANHQXKTOJZY7BDLAF", name: "🌟 Mega Fresh #9", compliance: getContractId("complianceCore") },
+      { id: "CAH5I6LB4P2IPPMESGL67MEBZQCDMCHBNXX3DDXSYSQUJXFAYDWUQAGI", name: "🌟 Mega Fresh #10", compliance: getContractId("complianceCore") },
+      { id: "CBBFZ54XFA4RYYCBXHGKPNO42ZTF5RY2LMR534TULNLLQ2TEDWDXCU3Z", name: "🌟 Mega Fresh #11", compliance: getContractId("complianceCore") },
+      { id: "CCCV76SNPI7MDWFLLWNMU444MLE54TYF7AUACPMGSB54P6IKRDUUGLK6", name: "🌟 Mega Fresh #12", compliance: getContractId("complianceCore") },
+      { id: "CDDNOVH74H5QZSAIJ2ECWXPYMEET4VNUHGJBHZGXL2MEUVXQH63FEBKV", name: "🌟 Mega Fresh #13", compliance: getContractId("complianceCore") },
+      { id: "CCWE3DYNE5OJPLV5OKIEVXTDPAF7AJLYH75DMKNER6GDJGYIZZDOBXMT", name: "🌟 Mega Fresh #14", compliance: getContractId("complianceCore") },
+      { id: "CALC77XGYL3VNXJ2R2O4BNKML772RF7V2QFZBGU475Z6LFUFPZ4IZ3EB", name: "🌟 Mega Fresh #15", compliance: getContractId("complianceCore") },
+      { id: "CAH4OSIHWO2ZW76VOSWQFR7Y3YOO2UT24SOS2Q2KCUX25I47WTTRVVMZ", name: "🌟 Mega Fresh #16", compliance: getContractId("complianceCore") },
+      { id: "CCZCSFJRYEEVPNKS37ZD5LN4O6SL3OU4ABZZHW4ZELN7U3NZ54R3EOAI", name: "🌟 Mega Fresh #17", compliance: getContractId("complianceCore") },
+      { id: "CBAXPVFADKRXWW2IU7PMKTTXALVBYTRZOZIOQFMCHQNC7PJHVKIMB7AO", name: "🌟 Mega Fresh #18", compliance: getContractId("complianceCore") },
+      { id: "CCLHJECTBWGIG3RA3G2SRKXSORAHNVAPJEFL5W3EI5O457AKLRSDPN4X", name: "🌟 Mega Fresh #19", compliance: getContractId("complianceCore") },
+      { id: "CCYFQTM52CITNHJUMHFVEMHGLR7K4MZJIUET7RWD4KNFMHFDLEOBCFSW", name: "🌟 Mega Fresh #20", compliance: getContractId("complianceCore") },
+      
+      // 🚀 ULTRA FRESH POOL - 10 CONTRATOS
       { id: "CBK753TZL5HZ3UXLEKPHM6T4V3FRQPHXYM27UATV37HCATAYFJTK7EN6", name: "🚀 Ultra Fresh #1", compliance: getContractId("complianceCore") },
       { id: "CDG3INTAIUBWS5DND4YJ5RJTSGYUODLIEFLCSRKDHQTYCHBF2SCI3Y2J", name: "🚀 Ultra Fresh #2", compliance: getContractId("complianceCore") },
       { id: "CCAAFZZ36DFL7Q5D72KEVPGW55HQZOS7IVE7O6BR3H7VBD3ZTPRKMPB6", name: "🚀 Ultra Fresh #3", compliance: getContractId("complianceCore") },
@@ -511,9 +535,10 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
       
       console.error("🔗 [SRWA Operations] ✅ Sistema funcionando! Apenas precisa de mais contratos frescos na pool.");
       console.error(`
-🎯 AGORA VOCÊ PODE CRIAR QUALQUER TOKEN COM QUALQUER NOME!
+🎯 ULTRA MEGA POOL DISPONÍVEL! CRIE QUALQUER TOKEN COM QUALQUER NOME!
 
-📊 Status: ${contractsToTry.length} contratos testados
+📊 Status: ${contractsToTry.length} contratos testados (36+ contratos frescos)
+🌟 Pool: 20 Mega Fresh + 10 Ultra Fresh + 6 outros = 36+ contratos
 🚀 Próximo passo: Tentar novamente - um dos contratos deve funcionar
 
 ⚡ Para adicionar mais contratos frescos:

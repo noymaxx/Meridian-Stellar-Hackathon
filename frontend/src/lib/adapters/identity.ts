@@ -433,17 +433,23 @@ function getTopicName(topicId: number): string {
 }
 
 /**
- * Convert string to hex for claim data
+ * Convert string to hex for claim data (BROWSER COMPATIBLE)
  */
 export function stringToHex(str: string): string {
-  return Buffer.from(str, 'utf8').toString('hex').padEnd(64, '0');
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(str);
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+  return hex.padEnd(64, '0');
 }
 
 /**
- * Convert hex to string for claim data
+ * Convert hex to string for claim data (BROWSER COMPATIBLE)
  */
 export function hexToString(hex: string): string {
-  return Buffer.from(hex.replace(/^0x/, ''), 'hex').toString('utf8').replace(/\0/g, '');
+  const cleanHex = hex.replace(/^0x/, '');
+  const bytes = new Uint8Array(cleanHex.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16)) || []);
+  const decoder = new TextDecoder();
+  return decoder.decode(bytes).replace(/\0/g, '');
 }
 
 /**
