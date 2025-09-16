@@ -28,28 +28,33 @@ export function KPICard({
   };
 
   return (
-    <Card className={cn("card-institutional hover-lift p-4 sm:p-6", className)}>
-      <div className="flex items-start justify-between">
-        <div className="space-y-2 flex-1 min-w-0">
-          <div className="flex items-center space-x-2">
-            {Icon && <Icon className="h-3 w-3 sm:h-4 sm:w-4 text-fg-muted flex-shrink-0" />}
-            <p className="text-xs sm:text-body-2 text-fg-secondary font-medium truncate">{title}</p>
+    <Card className={cn("card-institutional hover-lift p-4 sm:p-6 h-32 sm:h-36", className)}>
+      <div className="flex flex-col h-full justify-between">
+        <div className="flex items-start justify-between">
+          <div className="space-y-2 flex-1 min-w-0">
+            <div className="flex items-center space-x-2">
+              {Icon && <Icon className="h-3 w-3 sm:h-4 sm:w-4 text-fg-muted flex-shrink-0" />}
+              <p className="text-xs sm:text-body-2 text-fg-secondary font-medium truncate">{title}</p>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg sm:text-xl lg:text-h2 font-semibold text-fg-primary tabular-nums break-words">
+                {value}
+              </h3>
+            </div>
           </div>
-          <div className="space-y-1">
-            <h3 className="text-lg sm:text-xl lg:text-h2 font-semibold text-fg-primary tabular-nums break-words">
-              {value}
-            </h3>
-            {subtitle && (
-              <p className="text-xs sm:text-micro text-fg-muted">{subtitle}</p>
-            )}
-          </div>
+          
+          {trend && trendValue && (
+            <div className={cn("text-xs sm:text-micro font-medium flex-shrink-0 ml-2", trendColors[trend])}>
+              {trend === "up" && "↗ "}
+              {trend === "down" && "↘ "}
+              {trendValue}
+            </div>
+          )}
         </div>
         
-        {trend && trendValue && (
-          <div className={cn("text-xs sm:text-micro font-medium flex-shrink-0 ml-2", trendColors[trend])}>
-            {trend === "up" && "↗ "}
-            {trend === "down" && "↘ "}
-            {trendValue}
+        {subtitle && (
+          <div className="mt-auto">
+            <p className="text-xs sm:text-micro text-fg-muted">{subtitle}</p>
           </div>
         )}
       </div>

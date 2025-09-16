@@ -199,83 +199,25 @@ const Index = () => {
             </div>
             
             <motion.div 
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4"
+              className="flex justify-center px-4"
               initial={{ opacity: 100, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.1, delay: 1 }}
             >
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
                 <Button 
-                  onClick={connect}
-                  disabled={isConnecting}
+                  onClick={() => window.location.href = '/dashboard'}
                   className="btn-primary w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-body-1 relative overflow-hidden group"
                 >
                   <span className="relative z-10">
-                    {isConnecting ? "Connecting..." : "Connect Wallet"}
+                    Launch App
                   </span>
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   <div className="absolute inset-0 bg-gradient-to-r from-brand-600 to-brand-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </Button>
               </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
-                <Button 
-                  variant="outline" 
-                  className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-body-1 backdrop-blur-sm border-brand-500/30 hover:bg-brand-500/10 relative group"
-                  onClick={() => window.location.href = '/dashboard'}
-                >
-                  <span className="relative z-10">Unified Dashboard</span>
-                  <Badge variant="secondary" className="ml-2 bg-green-500/20 text-green-400 border-green-500/30 text-xs relative z-10">
-                    NEW
-                  </Badge>
-                  <ArrowRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4 relative z-10 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </motion.div>
             </motion.div>
             
-            {/* Live Stats Preview */}
-            <motion.div 
-              className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mt-8 sm:mt-12 lg:mt-16 max-w-4xl mx-auto px-4"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.2 }}
-            >
-              <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-2 sm:p-3 lg:p-4 border border-brand-500/20">
-                {isLoading ? (
-                  <div className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums">Loading...</div>
-                ) : (
-                  <AnimatedCounter value={marketStats.totalValueLocked} className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums" />
-                )}
-                <p className="text-micro text-fg-muted uppercase tracking-wide hidden sm:block">Total Value Locked</p>
-                <p className="text-micro text-fg-muted uppercase tracking-wide sm:hidden">TVL</p>
-              </div>
-              <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-2 sm:p-3 lg:p-4 border border-brand-500/20">
-                {isLoading ? (
-                  <div className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums">-</div>
-                ) : (
-                  <AnimatedCounter value={marketStats.totalMarkets.toString()} className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums" />
-                )}
-                <p className="text-micro text-fg-muted uppercase tracking-wide hidden sm:block">Active Markets</p>
-                <p className="text-micro text-fg-muted uppercase tracking-wide sm:hidden">Markets</p>
-              </div>
-              <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-2 sm:p-3 lg:p-4 border border-brand-500/20">
-                {isLoading ? (
-                  <div className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums">-</div>
-                ) : (
-                  <AnimatedCounter value={marketStats.totalUsers.toString()} className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums" />
-                )}
-                <p className="text-micro text-fg-muted uppercase tracking-wide hidden sm:block">Institutions</p>
-                <p className="text-micro text-fg-muted uppercase tracking-wide sm:hidden">Users</p>
-              </div>
-              <div className="text-center space-y-1 sm:space-y-2 bg-card/10 backdrop-blur-sm rounded-xl p-2 sm:p-3 lg:p-4 border border-brand-500/20">
-                {isLoading ? (
-                  <div className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums">-</div>
-                ) : (
-                  <AnimatedCounter value={marketStats.avgUtilization} className="text-lg sm:text-h2 font-semibold text-brand-400 tabular-nums" />
-                )}
-                <p className="text-micro text-fg-muted uppercase tracking-wide hidden sm:block">Avg Utilization</p>
-                <p className="text-micro text-fg-muted uppercase tracking-wide sm:hidden">Util.</p>
-              </div>
-            </motion.div>
           </motion.div>
         </div>
         
@@ -594,31 +536,55 @@ const Index = () => {
                         whileHover={{ scale: 1.05 }}
                       >
                         <p className="text-micro text-fg-muted uppercase tracking-wide mb-1">TVL</p>
-                        <AnimatedCounter 
-                          value={`$${(market.tvl / 1e6).toFixed(1)}M`} 
-                          className="text-h3 font-semibold text-fg-primary tabular-nums group-hover:text-brand-300 transition-colors"
-                        />
+                        <div className="text-h3 font-semibold text-fg-primary tabular-nums group-hover:text-brand-300 transition-colors">
+                          <span>$</span>
+                          <AnimatedCounter 
+                            value={market.tvl > 0 ? `${(market.tvl / 1e6).toFixed(1)}M` : '0.0M'} 
+                            className=""
+                          />
+                        </div>
                       </motion.div>
                     </div>
                     
-                    {/* Utilization Bar */}
+                    {/* Utilization Bar - Fixed for >100% values */}
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-micro text-fg-muted">Utilization</span>
-                        <span className="text-micro text-brand-400 font-medium">{(market.utilizationRate * 100).toFixed(1)}%</span>
+                        <span className={`text-micro font-medium ${
+                          market.utilizationRate > 1 ? 'text-amber-400' : 'text-brand-400'
+                        }`}>
+                          {(market.utilizationRate * 100).toFixed(1)}%
+                        </span>
                       </div>
-                      <div className="w-full bg-bg-elev-2 rounded-full h-2">
+                      <div className="w-full bg-bg-elev-2 rounded-full h-2 overflow-hidden">
                         <motion.div 
-                          className="h-2 bg-gradient-to-r from-brand-600 to-brand-400 rounded-full"
+                          className={`h-2 rounded-full ${
+                            market.utilizationRate > 1 
+                              ? 'bg-gradient-to-r from-amber-600 to-amber-400' 
+                              : 'bg-gradient-to-r from-brand-600 to-brand-400'
+                          }`}
                           initial={{ width: 0 }}
-                          whileInView={{ width: `${market.utilizationRate * 100}%` }}
+                          whileInView={{ 
+                            width: `${Math.min(market.utilizationRate * 100, 100)}%` 
+                          }}
                           transition={{ duration: 1.5, delay: index * 0.2 }}
                         />
                       </div>
+                      {market.utilizationRate > 1 && (
+                        <div className="text-center">
+                          <span className="text-xs text-amber-400 bg-amber-400/10 px-2 py-1 rounded-full border border-amber-400/20">
+                            High Utilization
+                          </span>
+                        </div>
+                      )}
                     </div>
                     
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button variant="outline" className="w-full group-hover:bg-brand-500/10 group-hover:border-brand-400/50 group-hover:text-brand-300 transition-all">
+                      <Button 
+                        variant="outline" 
+                        className="w-full group-hover:bg-brand-500/10 group-hover:border-brand-400/50 group-hover:text-brand-300 transition-all"
+                        onClick={() => window.location.href = '/dashboard'}
+                      >
                         View Details
                         <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                       </Button>
@@ -643,7 +609,10 @@ const Index = () => {
           viewport={{ once: true }}
         >
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button className="btn-primary px-8 py-4 text-body-1 relative overflow-hidden group">
+            <Button 
+              className="btn-primary px-8 py-4 text-body-1 relative overflow-hidden group"
+              onClick={() => window.location.href = '/dashboard'}
+            >
               <span className="relative z-10">Explore All Markets</span>
               <ArrowRight className="ml-2 h-5 w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
               <motion.div 
@@ -663,117 +632,6 @@ const Index = () => {
         </motion.div>
       </section>
 
-      {/* Market Analytics Section */}
-      <section className="container mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-20 bg-gradient-to-b from-transparent via-bg-elev-1/20 to-transparent">
-        <motion.div 
-          className="text-center space-y-6 mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
-          <motion.h2 
-            className="text-2xl sm:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Real-Time Market Analytics
-          </motion.h2>
-          <motion.p 
-            className="text-sm sm:text-body-1 text-fg-secondary max-w-2xl mx-auto px-4"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            Live market data and performance metrics updated in real-time across all institutional markets.
-          </motion.p>
-        </motion.div>
-
-        <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8, staggerChildren: 0.1 }}
-          viewport={{ once: true }}
-        >
-          {isLoading ? (
-            [...Array(4)].map((_, index) => (
-              <div key={index} className="bg-card rounded-lg p-4 border border-stroke-line">
-                <div className="space-y-4 animate-pulse">
-                  <div className="h-4 w-24 bg-brand-500/20 rounded"></div>
-                  <div className="h-8 w-16 bg-brand-500/20 rounded"></div>
-                  <div className="h-32 bg-brand-500/10 rounded"></div>
-                </div>
-              </div>
-            ))
-          ) : enhancedPools.length > 0 ? (
-            <>
-              <MarketChart
-                title="Avg Supply Rate"
-                value={`${(enhancedPools.reduce((sum, p) => sum + p.supplyAPY, 0) / enhancedPools.length * 100).toFixed(2)}%`}
-                change="Live"
-                changeType="neutral"
-                data={[]} // Real chart data would come from historical pool data
-                type="area"
-                color="#10B981"
-              />
-              <MarketChart
-                title="Avg Borrow Rate"
-                value={`${(enhancedPools.reduce((sum, p) => sum + p.borrowAPY, 0) / enhancedPools.length * 100).toFixed(2)}%`}
-                change="Live"
-                changeType="neutral"
-                data={[]} // Real chart data would come from historical pool data
-                type="line"
-                color="#EF4444"
-              />
-              <MarketChart
-                title="Avg Utilization"
-                value={marketStats.avgUtilization}
-                change="Live"
-                changeType="neutral"
-                data={[]} // Real chart data would come from historical pool data
-                type="area"
-                color="#8B5CF6"
-              />
-              <MarketChart
-                title="Total TVL"
-                value={marketStats.totalValueLocked}
-                change="Live"
-                changeType="up"
-                data={[]} // Real chart data would come from historical pool data
-                type="line"
-                color="#F59E0B"
-              />
-            </>
-          ) : (
-            <div className="col-span-4 text-center py-12">
-              <p className="text-body-1 text-fg-muted">No market data available</p>
-            </div>
-          )}
-        </motion.div>
-
-        {/* Live Data Indicators */}
-        <motion.div 
-          className="mt-16 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          viewport={{ once: true }}
-        >
-          <div className="inline-flex items-center space-x-3 bg-card/50 backdrop-blur-sm rounded-full px-6 py-3 border border-brand-500/30">
-            <motion.div 
-              className="w-2 h-2 bg-green-400 rounded-full"
-              animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <span className="text-body-2 text-fg-secondary">Live data • Updated every 5 seconds</span>
-            <Badge variant="outline" className="text-micro text-brand-400 border-brand-500/30">
-              Real-time
-            </Badge>
-          </div>
-        </motion.div>
-      </section>
 
       {/* Social Proof Section */}
       <section className="container mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-20">
