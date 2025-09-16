@@ -118,7 +118,7 @@ export function useStellarWallet(): WalletState & WalletActions {
         });
       }
       
-    } catch (error: unknown) {
+    } catch (error: any) {
       logger.error('Connection failed:', error);
       
       let errorMessage = "Failed to connect wallet. Please try again.";
@@ -167,7 +167,7 @@ export function useStellarWallet(): WalletState & WalletActions {
       }
 
       return result.signedTransaction;
-    } catch (error: unknown) {
+    } catch (error: any) {
       logger.error('Transaction signing error:', error);
       
       if (error.message?.includes("User declined") || error.message?.includes("rejected")) {
