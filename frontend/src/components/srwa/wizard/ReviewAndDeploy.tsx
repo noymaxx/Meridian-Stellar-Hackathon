@@ -465,27 +465,6 @@ export default function ReviewAndDeploy({
         </Alert>
       )}
 
-      {/* Deploy Button */}
-      <div className="flex justify-center">
-        <Button
-          onClick={onDeploy}
-          disabled={!canDeploy}
-          size="lg"
-          className="min-w-48"
-        >
-          {isDeploying ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Deploying Contracts...
-            </>
-          ) : (
-            <>
-              <CheckCircle className="mr-2 h-5 w-5" />
-              Deploy RWA Token
-            </>
-          )}
-        </Button>
-      </div>
 
       {/* Deployment Progress */}
       {isDeploying && (

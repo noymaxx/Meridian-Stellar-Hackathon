@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -35,6 +35,20 @@ export default function ComplianceSetup({ formData, template, onChange }: Compli
   const [selectedIssuerTopics, setSelectedIssuerTopics] = useState<number[]>([]);
 
   const complianceConfig = template.compliance_config;
+
+  // Auto-select required claim topics when template changes
+  useEffect(() => {
+    const requiredTopics = getRequiredTopicsForTemplate();
+    const currentTopics = formData.claim_topics;
+    const missingRequired = requiredTopics.filter(id => !currentTopics.includes(id));
+    
+    if (missingRequired.length > 0) {
+      console.log('🔧 [ComplianceSetup] Auto-selecting missing required topics:', missingRequired);
+      onChange({ 
+        claim_topics: [...currentTopics, ...missingRequired] 
+      });
+    }
+  }, [template.id, formData.claim_topics, onChange]);
 
   const handleClaimTopicToggle = (topicId: number, checked: boolean) => {
     const updatedTopics = checked

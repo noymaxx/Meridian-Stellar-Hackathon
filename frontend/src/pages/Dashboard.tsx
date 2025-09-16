@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { KPICard } from "@/components/ui/kpi-card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, Legend } from "recharts";
 
 // Hooks  
 import { useBlendPools } from '@/hooks/markets/useBlendPools';
@@ -139,6 +139,18 @@ export default function Dashboard() {
         poolAddress: pool.address
       }))
     : [{ name: "No Data", tvl: 0, poolAddress: "" }];
+
+  // Pie chart data for TVL distribution
+  const pieChartData = enhancedPools.length > 0 
+    ? enhancedPools.map((pool, index) => ({
+        name: pool.name.length > 20 ? pool.name.slice(0, 20) + '...' : pool.name,
+        value: pool.tvl / 1e6, // Convert to millions
+        poolAddress: pool.address
+      }))
+    : [{ name: "No Data", value: 0, poolAddress: "" }];
+
+  // Colors for pie chart
+  const pieColors = ['#60A5FA', '#34D399', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 
   // Navigation handlers
   const handleViewPoolDetails = (poolAddress: string) => {
@@ -433,11 +445,12 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                {/* Dashboard Chart */}
-                <div className="w-full">
+                {/* Dashboard Charts */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* TVL Trend Chart */}
                   <div className="p-6 card-institutional hover-lift rounded-lg border bg-card text-card-foreground shadow-sm">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-h3 font-medium text-fg-primary">Pool TVL Distribution</h3>
+                      <h3 className="text-h3 font-medium text-fg-primary">TVL Trend</h3>
                     </div>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
@@ -453,6 +466,38 @@ export default function Dashboard() {
                           <Tooltip formatter={(value: any) => [`$${value.toFixed(1)}M`, 'TVL']} />
                           <Area type="monotone" dataKey="tvl" stroke="#60A5FA" strokeWidth={2} fill="url(#areaFillAdmin)" />
                         </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* TVL Distribution Pie Chart */}
+                  <div className="p-6 card-institutional hover-lift rounded-lg border bg-card text-card-foreground shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-h3 font-medium text-fg-primary">TVL Distribution</h3>
+                    </div>
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={pieChartData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(1)}%`}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {pieChartData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip 
+                            formatter={(value: any) => [`$${value.toFixed(1)}M`, 'TVL']}
+                            labelFormatter={(label) => `Pool: ${label}`}
+                          />
+                          <Legend />
+                        </PieChart>
                       </ResponsiveContainer>
                     </div>
                   </div>

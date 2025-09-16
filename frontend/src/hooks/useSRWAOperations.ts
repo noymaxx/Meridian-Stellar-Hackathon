@@ -295,7 +295,9 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
 
         // simple salt: 32 bytes (64 hex chars) from name+symbol+time
         const input = `${params.name}-${params.symbol}-${Date.now()}`;
-        const baseHex = Buffer.from(input).toString('hex');
+        const encoder = new TextEncoder();
+        const bytes = encoder.encode(input);
+        const baseHex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
         const saltHex = baseHex.length >= 64
           ? baseHex.slice(0, 64)
           : (baseHex + '0'.repeat(64 - baseHex.length));
