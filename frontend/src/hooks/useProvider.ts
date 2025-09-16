@@ -12,7 +12,7 @@ const CONTRACT_IDS = {
   complianceModules: "CC3PYCRZ5ULYSFYI4L5FFZQL2K6VKVUDKUYXWZEPNFLEWGQ35UDN6QY3",
   integrations: "CC3PXDZGOPJ6PJTRBEWRPFXRHFKJOFTK2CEAACR4KQQT7A6IB6YGUJUY", // ✅ CLI Working
   srwaToken: "CCJGETMTUTETF3QV7EKVE6EIKD45TL2JWYF4VUCCXO3EVPPRRAMPAJ4O", // ✅ CLI Working
-  newSrwaToken: "CC6SV375E33YP33UP5SPANV2RDJ2ZDXNLVEZCYYSDNISSWIIBP56UJJJ", // ✅ NOVO TOKEN
+  newSrwaToken: "CAWBBZKM4EDKGOECO5TM5XW4QQ72MSXTM6FM74MB5PEI2TWRNZQNN7A4", // ✅ FRESH SRWA TOKEN (NOVO)
 };
 
 export interface UseProviderReturn {
@@ -172,6 +172,40 @@ export const useProvider = (): UseProviderReturn => {
           return tx;
         } catch (error) {
           console.error("🔗 [Contract] Error in mint:", error);
+          throw error;
+        }
+      },
+
+      set_authorized: async (params: any) => {
+        console.log("🔗 [Contract] REAL set_authorized called with:", params);
+        
+        try {
+          // Check if id is a secret key and convert to public key
+          let idAddress = params.id;
+          if (typeof params.id === 'string' && params.id.startsWith('S')) {
+            const keypair = Keypair.fromSecret(params.id);
+            idAddress = keypair.publicKey();
+            console.log("🔗 [Contract] Converted secret key to public key:", idAddress);
+          }
+
+          const scValParams = {
+            id: Address.fromString(idAddress).toScVal(),
+            authorized: nativeToScVal(!!params.authorized, { type: "bool" }),
+          };
+
+          const account = await getAccount();
+          const tx = new TransactionBuilder(account, {
+            fee: "10000000",
+            networkPassphrase: NETWORK_PASSPHRASE,
+          })
+            .addOperation(contractInstance.call("set_authorized", scValParams.id, scValParams.authorized))
+            .setTimeout(30)
+            .build();
+
+          console.log("🔗 [Contract] Transaction prepared for set_authorized");
+          return tx;
+        } catch (error) {
+          console.error("🔗 [Contract] Error in set_authorized:", error);
           throw error;
         }
       },

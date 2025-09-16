@@ -97,6 +97,7 @@ export interface WalletAdapter {
 
 export interface SignTransactionOptions {
   network?: string;
+  networkPassphrase?: string;
   accountToSign?: string;
 }
 

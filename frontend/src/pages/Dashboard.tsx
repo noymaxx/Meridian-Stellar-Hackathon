@@ -16,6 +16,8 @@ import { useBlendPools } from '@/hooks/markets/useBlendPools';
 import { useEnhancedPoolData } from '@/hooks/markets/useDefIndexData';
 import { MarketsDashboard } from '@/components/markets/MarketsDashboard';
 import { mockUserPositions, type UserPosition } from "@/lib/mock-data";
+import RWATokensGrid from '@/components/dashboard/RWATokensGrid';
+import { RWALendingPools } from '@/components/rwa/RWALendingPools';
 
 // Icons
 import { 
@@ -277,7 +279,7 @@ export default function Dashboard() {
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="flex justify-center">
-              <TabsList className="grid w-full max-w-md grid-cols-3 h-10 sm:h-12 bg-card/50 backdrop-blur-sm border border-brand-500/20">
+              <TabsList className="grid w-full max-w-2xl grid-cols-4 h-10 sm:h-12 bg-card/50 backdrop-blur-sm border border-brand-500/20">
                 <TabsTrigger 
                   value="markets" 
                   className="data-[state=active]:bg-brand-500/20 data-[state=active]:text-brand-300 transition-all duration-300 text-xs sm:text-sm"
@@ -285,6 +287,14 @@ export default function Dashboard() {
                   <Globe className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   <span className="hidden sm:inline">Markets</span>
                   <span className="sm:hidden">Mkts</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="rwa" 
+                  className="data-[state=active]:bg-brand-500/20 data-[state=active]:text-brand-300 transition-all duration-300 text-xs sm:text-sm"
+                >
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">RWA</span>
+                  <span className="sm:hidden">RWA</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="portfolio" 
@@ -347,6 +357,45 @@ export default function Dashboard() {
                   onSupply={handleSupply}
                   onBorrow={handleBorrow}
                 />
+              </motion.div>
+            </TabsContent>
+
+            {/* RWA Tab */}
+            <TabsContent value="rwa" className="space-y-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="space-y-8"
+              >
+                <div className="text-center space-y-4">
+                  <motion.h2 
+                    className="text-2xl sm:text-3xl lg:text-4xl font-bold text-fg-primary"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                  >
+                    Your RWA Token Portfolio
+                  </motion.h2>
+                  <motion.p 
+                    className="text-base sm:text-lg text-fg-secondary max-w-2xl mx-auto px-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                  >
+                    Manage your Real World Asset tokens and view your holdings.
+                  </motion.p>
+                </div>
+
+                <RWATokensGrid />
+                
+                {/* Spacer */}
+                <div className="py-8">
+                  <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                </div>
+
+                {/* RWA Lending Pools Section */}
+                <RWALendingPools showOnlyRWAFriendly={true} />
               </motion.div>
             </TabsContent>
 
