@@ -24,10 +24,8 @@ export function RWAPortfolioCard({ className }: RWAPortfolioCardProps) {
   
   // Navigation handlers with debug logging
   const handleCreateRWAToken = () => {
-    console.log('🚀 NATIVE EVENT: Create RWA Token clicked');
     try {
       navigate('/srwa-issuance');
-      console.log('✅ Navigation successful to /srwa-issuance');
     } catch (error) {
       console.error('❌ Navigation error:', error);
       window.location.href = '/srwa-issuance';
@@ -35,10 +33,8 @@ export function RWAPortfolioCard({ className }: RWAPortfolioCardProps) {
   };
 
   const handleExploreMarkets = () => {
-    console.log('🚀 NATIVE EVENT: Explore Markets clicked');
     try {
       navigate('/dashboard', { state: { tab: 'markets' } });
-      console.log('✅ Navigation successful to markets');
     } catch (error) {
       console.error('❌ Navigation error:', error);
       window.location.href = '/dashboard?tab=markets';
@@ -46,11 +42,9 @@ export function RWAPortfolioCard({ className }: RWAPortfolioCardProps) {
   };
 
   const handleRefresh = async () => {
-    console.log('🚀 NATIVE EVENT: Refresh clicked');
     setIsRefreshing(true);
     try {
       await refreshAssets();
-      console.log('✅ Refresh successful');
     } catch (error) {
       console.error('❌ Refresh error:', error);
     } finally {
@@ -60,11 +54,9 @@ export function RWAPortfolioCard({ className }: RWAPortfolioCardProps) {
 
   // Copy transaction hash to clipboard
   const handleCopyTransactionHash = async (txHash: string) => {
-    console.log('🚀 NATIVE EVENT: Copy transaction hash clicked', txHash);
     try {
       await navigator.clipboard.writeText(txHash);
       setCopyFeedback(txHash);
-      console.log('✅ Hash copied to clipboard:', txHash);
       
       // Clear feedback after 2 seconds
       setTimeout(() => {
@@ -90,12 +82,10 @@ export function RWAPortfolioCard({ className }: RWAPortfolioCardProps) {
 
   // Open transaction in block explorer
   const handleViewOnExplorer = (txHash: string) => {
-    console.log('🚀 NATIVE EVENT: View on explorer clicked', txHash);
     try {
       // Use the formatTransactionForDisplay helper to get the correct explorer URL
       const explorerUrl = `https://stellar.expert/explorer/testnet/tx/${txHash}`;
       window.open(explorerUrl, '_blank', 'noopener,noreferrer');
-      console.log('✅ Opened in explorer:', explorerUrl);
     } catch (error) {
       console.error('❌ Explorer open error:', error);
     }
@@ -115,7 +105,6 @@ export function RWAPortfolioCard({ className }: RWAPortfolioCardProps) {
         e.preventDefault();
         e.stopPropagation();
         
-        console.log(`🎯 NATIVE DOM EVENT: ${action} clicked`);
         
         if (action === 'create-rwa') {
           handleCreateRWAToken();

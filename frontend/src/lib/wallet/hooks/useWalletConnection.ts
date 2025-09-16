@@ -8,7 +8,7 @@ import {
   WalletAdapter 
 } from '../types';
 import { createWalletAdapter } from '../adapters';
-import { ValidationService } from '../services';
+import { ValidationService, StorageService } from '../services';
 import { WALLET_INFO } from '../config';
 import { createLogger } from '../utils';
 
@@ -98,6 +98,23 @@ export function useWalletConnection(): UseWalletConnectionReturn {
       });
       setStatus(ConnectionStatus.CONNECTED);
       
+      // Save connection data to localStorage
+      if (StorageService.isStorageAvailable() && result.account) {
+        try {
+          StorageService.saveWalletConnection({
+            walletType,
+            address: result.account.address,
+            connectedAt: Date.now(),
+            network: result.account.network || 'testnet'
+          });
+          
+          logger.debug('Wallet connection saved to localStorage');
+        } catch (error) {
+          logger.warn('Failed to save wallet connection:', error);
+          // Don't fail the connection if storage fails
+        }
+      }
+      
       logger.debug('Wallet connected successfully');
     } catch (error: unknown) {
       logger.error('Connection failed:', error);
@@ -121,6 +138,17 @@ export function useWalletConnection(): UseWalletConnectionReturn {
       setSelectedWallet(null);
       setAdapter(null);
       setError(null);
+      
+      // Clear connection data from localStorage
+      if (StorageService.isStorageAvailable()) {
+        try {
+          StorageService.clearWalletConnection();
+          logger.debug('Wallet connection cleared from localStorage');
+        } catch (error) {
+          logger.warn('Failed to clear wallet connection from localStorage:', error);
+          // Don't fail the disconnection if storage fails
+        }
+      }
       
       logger.debug('Wallet disconnected successfully');
     } catch (error: unknown) {
@@ -163,6 +191,48 @@ export function useWalletConnection(): UseWalletConnectionReturn {
   useEffect(() => {
     checkWalletAvailability();
   }, [checkWalletAvailability]);
+
+  // Restore saved wallet connection on mount
+  useEffect(() => {
+    const restoreConnection = async () => {
+      // Only try to restore if not already connected and storage is available
+      if (status !== ConnectionStatus.DISCONNECTED || !StorageService.isStorageAvailable()) {
+        return;
+      }
+
+      const savedConnection = StorageService.getWalletConnection();
+      
+      if (!savedConnection) {
+        logger.debug('No saved wallet connection found');
+        return;
+      }
+
+      logger.debug('Attempting to restore wallet connection', {
+        walletType: savedConnection.walletType,
+        address: savedConnection.address.slice(0, 8) + '...'
+      });
+
+      try {
+        // Wait for available wallets to be loaded
+        await checkWalletAvailability();
+        
+        // Try to connect with the saved wallet type
+        await connect(savedConnection.walletType);
+        
+        logger.debug('Wallet connection restored successfully');
+      } catch (error) {
+        logger.warn('Failed to restore wallet connection:', error);
+        
+        // Clear invalid saved connection
+        StorageService.clearWalletConnection();
+      }
+    };
+
+    // Add small delay to ensure component is fully mounted
+    const timeoutId = setTimeout(restoreConnection, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [connect, status, checkWalletAvailability]);
 
   // Periodic connection check
   useEffect(() => {
