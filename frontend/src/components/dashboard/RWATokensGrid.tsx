@@ -280,10 +280,16 @@ const RWATokensGrid = () => {
             }
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={handleRefresh}>
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Refresh
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" onClick={() => window.location.href = '/srwa-issuance'}>
+            <TrendingUp className="w-4 h-4 mr-2" />
+            Create New Token
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleRefresh}>
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Tokens Grid */}
@@ -302,7 +308,7 @@ const RWATokensGrid = () => {
             <div className="flex gap-3 justify-center">
               <Button onClick={() => window.location.href = '/srwa-issuance'}>
                 <TrendingUp className="w-4 h-4 mr-2" />
-                Create Token
+                Create Your First Token
               </Button>
               <Button variant="outline" onClick={handleRefresh}>
                 <RefreshCw className="w-4 h-4 mr-2" />

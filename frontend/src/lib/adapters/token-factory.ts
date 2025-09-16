@@ -239,10 +239,12 @@ export async function getFactoryAdmin(): Promise<Address> {
 // Helper functions
 
 function generateSalt(name: string, symbol: string): string {
-  // Generate a deterministic salt based on token name and symbol
+  // Generate a deterministic salt based on token name and symbol (BROWSER COMPATIBLE)
   const input = `${name}-${symbol}-${Date.now()}`;
-  // In a real implementation, this would use crypto.subtle or similar
-  return Buffer.from(input).toString('hex').slice(0, 64);
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(input);
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+  return hex.slice(0, 64);
 }
 
 function generateMockAddress(prefix: string): Address {

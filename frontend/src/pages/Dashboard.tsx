@@ -386,6 +386,11 @@ export default function Dashboard() {
                         <RWAPortfolioCard />
                       </div>
                     )}
+
+                    {/* 🚀 USER CREATED RWA TOKENS SECTION */}
+                    <div className="space-y-6">
+                      <RWATokensGrid />
+                    </div>
                   </div>
                 )}
               </div>
