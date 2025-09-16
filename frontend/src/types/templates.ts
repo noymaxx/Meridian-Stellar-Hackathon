@@ -58,7 +58,7 @@ export const RWA_TEMPLATES: Record<TokenTemplate, RWATemplate> = {
       "Startup equity tokens",
       "Infrastructure investments"
     ],
-    icon: "🏢",
+    icon: "",
     
     default_config: {
       decimals: 18,
@@ -168,7 +168,7 @@ export const RWA_TEMPLATES: Record<TokenTemplate, RWATemplate> = {
       "Loan participations",
       "Mortgage-backed securities"
     ],
-    icon: "📄",
+    icon: "",
     
     default_config: {
       decimals: 6,
@@ -261,7 +261,7 @@ export const RWA_TEMPLATES: Record<TokenTemplate, RWATemplate> = {
       "Private equity fund shares",
       "Venture capital fund shares"
     ],
-    icon: "📈",
+    icon: "",
     
     default_config: {
       decimals: 18,
@@ -360,7 +360,7 @@ export const RWA_TEMPLATES: Record<TokenTemplate, RWATemplate> = {
       "Enterprise payment tokens",
       "Cross-border payment tokens"
     ],
-    icon: "💰",
+    icon: "",
     
     default_config: {
       decimals: 6,

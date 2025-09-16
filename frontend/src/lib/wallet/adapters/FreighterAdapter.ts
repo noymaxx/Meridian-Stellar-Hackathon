@@ -229,21 +229,47 @@ export class FreighterAdapter implements WalletAdapter {
       logger.debug('Signing transaction...');
       
       const signOptions = {
-        network: options?.network,
+        networkPassphrase: options?.networkPassphrase, // Use networkPassphrase from options
         accountToSign: options?.accountToSign
       };
 
+      console.log('🔗 [FreighterAdapter] Sign options:', signOptions);
+
       const result = await freighterSignTransaction(xdr, signOptions);
       
-      if (result.error) {
+      console.log('🔗 [FreighterAdapter] Raw Freighter result:', result);
+      console.log('🔗 [FreighterAdapter] Result type:', typeof result);
+      console.log('🔗 [FreighterAdapter] Result keys:', Object.keys(result || {}));
+      
+      // Check for explicit error in result
+      if (result && result.error) {
+        console.log('🔗 [FreighterAdapter] Freighter returned error:', result.error);
         const error = createWalletError(WalletErrorCode.TRANSACTION_REJECTED, result.error);
         return { success: false, error };
       }
 
+      // Handle different Freighter response formats
+      let signedXdr: string | undefined;
+      
+      if (typeof result === 'string') {
+        signedXdr = result;
+      } else if (result && typeof result === 'object') {
+        // Try different possible property names (including signedTxXdr which is what Freighter actually returns)
+        signedXdr = result.signedTransaction || result.signedTxXdr || result.signedXDR || result.xdr || result.signed;
+      }
+      
+      console.log('🔗 [FreighterAdapter] Extracted signedXdr:', signedXdr ? 'Present' : 'Missing');
+      
+      if (!signedXdr) {
+        console.error('🔗 [FreighterAdapter] Failed to extract signed transaction. Result structure:', result);
+        const error = createWalletError(WalletErrorCode.TRANSACTION_REJECTED, result?.error || 'No signed transaction returned');
+        return { success: false, error };
+      }
+
       logger.debug('Transaction signed successfully');
-      return { 
-        success: true, 
-        signedTransaction: result.signedTransaction 
+      return {
+        success: true,
+        signedTransaction: signedXdr
       };
     } catch (error) {
       logger.error('Failed to sign transaction:', error);

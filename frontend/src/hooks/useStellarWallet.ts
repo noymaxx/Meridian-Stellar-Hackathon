@@ -157,9 +157,27 @@ export function useStellarWallet(): WalletState & WalletActions {
     }
 
     try {
-      const result = await adapter.signTransaction(xdr, {
-        network: networkInfo.networkPassphrase,
+      console.log('🔗 [useStellarWallet] Signing transaction with options:', {
+        networkType: networkInfo.type,
+        networkPassphrase: networkInfo.networkPassphrase,
         accountToSign: account.address,
+        xdrLength: xdr.length
+      });
+
+      // Use explicit testnet/mainnet for Freighter compatibility
+      const freighterNetwork = networkInfo.type === 'testnet' ? 'testnet' : 'mainnet';
+      console.log('🔗 [useStellarWallet] Using Freighter network:', freighterNetwork);
+
+      const result = await adapter.signTransaction(xdr, {
+        network: freighterNetwork, // Pass the simplified network string
+        networkPassphrase: networkInfo.networkPassphrase, // Pass the full passphrase
+        accountToSign: account.address,
+      });
+
+      console.log('🔗 [useStellarWallet] Freighter sign result:', {
+        success: result.success,
+        hasSignedTransaction: !!result.signedTransaction,
+        error: result.error
       });
 
       if (!result.success || !result.signedTransaction) {

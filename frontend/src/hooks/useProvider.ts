@@ -2,8 +2,9 @@ import type { StellarWallet } from "./useWallet";
 import { Keypair, Transaction, TransactionBuilder, rpc, Contract, xdr, Address, scValToNative, nativeToScVal } from "@stellar/stellar-sdk";
 import { toast } from "sonner";
 
-// Contract IDs for SRWA contracts (UPDATED with CLI working IDs)
+// Contract IDs for SRWA contracts - Primary IDs and README fallbacks
 const CONTRACT_IDS = {
+  // Primary IDs (current)
   tokenFactory: "CAHRDR3I4NT5TVHEOS22UMS7SSHCU3CDTMXGBW4R7FNDEHCO5AZLOCOA", // ✅ CLI Working
   complianceCore: "CDMM3DRN7IRDTBQUHCS5CARLFBLECC4XPPYOTMHERHCVJBSHTTUO75FA", // ✅ CLI Working
   identityRegistry: "CBJSAOFZWWDNWJI5QEFBHYLEIBHXOHN4B5DDI6DJBSYRQ6ROU3YXJ36E", // ✅ CLI Working
@@ -12,7 +13,14 @@ const CONTRACT_IDS = {
   complianceModules: "CC3PYCRZ5ULYSFYI4L5FFZQL2K6VKVUDKUYXWZEPNFLEWGQ35UDN6QY3",
   integrations: "CC3PXDZGOPJ6PJTRBEWRPFXRHFKJOFTK2CEAACR4KQQT7A6IB6YGUJUY", // ✅ CLI Working
   srwaToken: "CCJGETMTUTETF3QV7EKVE6EIKD45TL2JWYF4VUCCXO3EVPPRRAMPAJ4O", // ✅ CLI Working
-  newSrwaToken: "CC6SV375E33YP33UP5SPANV2RDJ2ZDXNLVEZCYYSDNISSWIIBP56UJJJ", // ✅ NOVO TOKEN
+  newSrwaToken: "CB6ZABTGQABCCUX7TVB3PXR4GUVYOUAU2T2NJZGCI5EEWH7H3NEMH2YE", // ✅ WORKING SRWA TOKEN (RECOMPILED & INITIALIZED - PEER 2 AGENT)
+      freshSrwaToken: "CBNQF2LPZEVMDSBQF6WN6TNSOWQH4YUOJNLGEUDOHAR7ISKBXI7IRVES", // ✅ WORKING SRWA TOKEN (FRESH WASM - DEPLOYED KISK1)
+  
+  // README fallback IDs (properly initialized according to documentation)
+  tokenFactoryReadme: "CC3APCHN2V5U7YK6MPFNBBNFUD4URIC3GWMHUJBJTQF6QJ36ECDSZSK6",
+  complianceCoreReadme: "CBPMILI6XB3T5PIBUSOJFHOERIFAJBXYMNEGEJPCTPHRRXIRSTVMG7GI",
+  identityRegistryReadme: "CARBUWYQW45PVZ7N776IOCXGWNFE7WDLCMKAN6GZM7TVTRNLNNYYHU6Z",
+  srwaTokenReadme: "CB7NRHA2IAUT6HDBPWMKN3LBHBPVW7VOW5YTGTUIZV3J64BNOXXHLU6L",
 };
 
 export interface UseProviderReturn {
@@ -97,20 +105,40 @@ export const useProvider = (): UseProviderReturn => {
         console.log("🔗 [Contract] REAL initialize called with:", params);
         
         try {
-          // Check if admin is a secret key and convert to public key
+          // Handle admin parameter - could be string or Address object
           let adminAddress = params.admin;
-          if (params.admin.startsWith('S')) {
-            const keypair = Keypair.fromSecret(params.admin);
-            adminAddress = keypair.publicKey();
-            console.log("🔗 [Contract] Converted admin secret key to public key:", adminAddress);
+          if (typeof params.admin === 'string') {
+            if (params.admin.startsWith('S')) {
+              const keypair = Keypair.fromSecret(params.admin);
+              adminAddress = keypair.publicKey();
+              console.log("🔗 [Contract] Converted admin secret key to public key:", adminAddress);
+            }
+          } else if (params.admin && params.admin.constructor && params.admin.constructor.name === 'Address') {
+            // Handle Address object from Stellar SDK
+            adminAddress = params.admin.toString();
+            console.log("🔗 [Contract] Converted admin Address object to string:", adminAddress);
+          } else if (params.admin && typeof params.admin === 'object') {
+            // Fallback for any object that might have toString
+            adminAddress = String(params.admin);
+            console.log("🔗 [Contract] Converted admin object to string:", adminAddress);
           }
 
-          // Check if compliance_contract is a secret key and convert to public key
-          let complianceAddress = params.compliance_contract;
-          if (params.compliance_contract.startsWith('S')) {
-            const keypair = Keypair.fromSecret(params.compliance_contract);
-            complianceAddress = keypair.publicKey();
-            console.log("🔗 [Contract] Converted compliance_contract secret key to public key:", complianceAddress);
+          // Handle compliance_contract parameter - could be string or Address object
+          let complianceAddress = params.complianceContract || params.compliance_contract;
+          if (typeof complianceAddress === 'string') {
+            if (complianceAddress.startsWith('S')) {
+              const keypair = Keypair.fromSecret(complianceAddress);
+              complianceAddress = keypair.publicKey();
+              console.log("🔗 [Contract] Converted compliance_contract secret key to public key:", complianceAddress);
+            }
+          } else if (complianceAddress && complianceAddress.constructor && complianceAddress.constructor.name === 'Address') {
+            // Handle Address object from Stellar SDK
+            complianceAddress = complianceAddress.toString();
+            console.log("🔗 [Contract] Converted complianceContract Address object to string:", complianceAddress);
+          } else if (complianceAddress && typeof complianceAddress === 'object') {
+            // Fallback for any object that might have toString
+            complianceAddress = String(complianceAddress);
+            console.log("🔗 [Contract] Converted compliance object to string:", complianceAddress);
           }
 
           const scValParams = {
@@ -172,6 +200,40 @@ export const useProvider = (): UseProviderReturn => {
           return tx;
         } catch (error) {
           console.error("🔗 [Contract] Error in mint:", error);
+          throw error;
+        }
+      },
+
+      set_authorized: async (params: any) => {
+        console.log("🔗 [Contract] REAL set_authorized called with:", params);
+        
+        try {
+          // Check if id is a secret key and convert to public key
+          let idAddress = params.id;
+          if (typeof params.id === 'string' && params.id.startsWith('S')) {
+            const keypair = Keypair.fromSecret(params.id);
+            idAddress = keypair.publicKey();
+            console.log("🔗 [Contract] Converted secret key to public key:", idAddress);
+          }
+
+          const scValParams = {
+            id: Address.fromString(idAddress).toScVal(),
+            authorized: nativeToScVal(!!params.authorized, { type: "bool" }),
+          };
+
+          const account = await getAccount();
+          const tx = new TransactionBuilder(account, {
+            fee: "10000000",
+            networkPassphrase: NETWORK_PASSPHRASE,
+          })
+            .addOperation(contractInstance.call("set_authorized", scValParams.id, scValParams.authorized))
+            .setTimeout(30)
+            .build();
+
+          console.log("🔗 [Contract] Transaction prepared for set_authorized");
+          return tx;
+        } catch (error) {
+          console.error("🔗 [Contract] Error in set_authorized:", error);
           throw error;
         }
       },
@@ -378,6 +440,76 @@ export const useProvider = (): UseProviderReturn => {
           return tx;
         } catch (error) {
           console.error("🔗 [Contract] Error in bindToken:", error);
+          throw error;
+        }
+      },
+
+      // Token Factory Methods
+      deploy_with_template: async (params: any) => {
+        console.log("🔗 [Contract] REAL deploy_with_template called with:", params);
+        
+        try {
+          // Handle admin parameter
+          let adminAddress = params.admin;
+          if (typeof params.admin === 'string') {
+            if (params.admin.startsWith('S')) {
+              const keypair = Keypair.fromSecret(params.admin);
+              adminAddress = keypair.publicKey();
+              console.log("🔗 [Contract] Converted admin secret key to public key:", adminAddress);
+            }
+          } else if (params.admin && typeof params.admin.toString === 'function') {
+            adminAddress = params.admin.toString();
+            console.log("🔗 [Contract] Converted admin Address object to string:", adminAddress);
+          }
+
+          const scValParams = {
+            saltHex: nativeToScVal(params.saltHex, { type: "string" }),
+            template: nativeToScVal(params.template, { type: "string" }),
+            name: nativeToScVal(params.name, { type: "string" }),
+            symbol: nativeToScVal(params.symbol, { type: "string" }),
+            admin: Address.fromString(adminAddress).toScVal(),
+          };
+
+          const account = await getAccount();
+          const tx = new TransactionBuilder(account, {
+            fee: "10000000",
+            networkPassphrase: NETWORK_PASSPHRASE,
+          })
+            .addOperation(contractInstance.call("deploy_with_template", scValParams.saltHex, scValParams.template, scValParams.name, scValParams.symbol, scValParams.admin))
+            .setTimeout(30)
+            .build();
+
+          console.log("🔗 [Contract] Transaction prepared for deploy_with_template");
+          return tx;
+        } catch (error) {
+          console.error("🔗 [Contract] Error in deploy_with_template:", error);
+          throw error;
+        }
+      },
+
+      predict_addresses: async (params: any) => {
+        console.log("🔗 [Contract] REAL predict_addresses called with:", params);
+        
+        try {
+          const scValParams = {
+            saltHex: nativeToScVal(params.saltHex, { type: "string" }),
+          };
+
+          const account = await getAccount();
+          const result = await sorobanServer.simulateTransaction(
+            new TransactionBuilder(account, {
+              fee: "10000000",
+              networkPassphrase: NETWORK_PASSPHRASE,
+            })
+              .addOperation(contractInstance.call("predict_addresses", scValParams.saltHex))
+              .setTimeout(30)
+              .build()
+          );
+
+          console.log("🔗 [Contract] predict_addresses simulation result:", result);
+          return result;
+        } catch (error) {
+          console.error("🔗 [Contract] Error in predict_addresses:", error);
           throw error;
         }
       },

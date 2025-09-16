@@ -138,7 +138,7 @@ export function RWAPortfolioCard({ className }: RWAPortfolioCardProps) {
         className={`card-institutional p-6 ${className}`} 
         style={{ 
           position: 'relative',
-          zIndex: 9999,
+          zIndex: 1,
           pointerEvents: 'auto',
           borderRadius: '0.75rem',
           border: '1px solid hsl(var(--border))',
@@ -211,7 +211,7 @@ export function RWAPortfolioCard({ className }: RWAPortfolioCardProps) {
       className={`card-institutional p-6 ${className}`} 
       style={{ 
         position: 'relative',
-        zIndex: 9999,
+        zIndex: 1,
         pointerEvents: 'auto',
         borderRadius: '0.75rem',
         border: '1px solid hsl(var(--border))',
