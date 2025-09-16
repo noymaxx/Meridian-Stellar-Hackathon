@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle, AlertCircle, Loader2, Sparkles } from 'lucide-react';
-import { useWallet } from '@/hooks/useWallet';
+import { useWallet } from '@/components/wallet/WalletProvider';
 import { useSRWAOperations } from '@/hooks/useSRWAOperations';
 import { useProvider } from '@/hooks/useProvider';
 import { toast } from 'sonner';
@@ -31,7 +31,7 @@ const WIZARD_STEPS = [
 ];
 
 export default function TokenWizard() {
-  const { wallet, connect, isConnected } = useWallet();
+  const { address, connect, isConnected, isConnecting } = useWallet();
   const { 
     createToken, 
     deployTokenViaFactory,
@@ -78,10 +78,10 @@ export default function TokenWizard() {
 
   // Update admin when wallet connects
   useEffect(() => {
-    if (wallet?.publicKey && !formData.admin) {
-      updateFormData({ admin: wallet.publicKey });
+    if (address && !formData.admin) {
+      updateFormData({ admin: address });
     }
-  }, [wallet?.publicKey]);
+  }, [address]);
 
   const handleNext = () => {
     if (currentStep < WIZARD_STEPS.length - 1) {
@@ -110,7 +110,7 @@ export default function TokenWizard() {
   };
 
   const handleDeploy = async () => {
-    if (!isConnected || !wallet) {
+    if (!isConnected || !address) {
       toast.error("Please connect your wallet first");
       return;
     }
@@ -431,10 +431,10 @@ export default function TokenWizard() {
             <div className="space-y-3">
               <Button
                 onClick={connect}
-                disabled={isOperationsLoading}
+                disabled={isOperationsLoading || isConnecting}
                 className="btn-primary px-8 py-3 min-w-40"
               >
-                {isOperationsLoading ? (
+                {isOperationsLoading || isConnecting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Connecting...
@@ -446,39 +446,6 @@ export default function TokenWizard() {
                   </>
                 )}
               </Button>
-              
-              <div className="text-sm text-fg-muted">
-                or
-              </div>
-              
-              <Button
-                onClick={connect}
-                disabled={isOperationsLoading}
-                variant="outline"
-                className="px-8 py-3 min-w-40 border-brand-500/30 hover:bg-brand-500/10 hover:border-brand-400/50"
-              >
-                {isOperationsLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    Generate New Wallet
-                    <Sparkles className="ml-2 h-4 w-4" />
-                  </>
-                )}
-              </Button>
-            </div>
-            
-            <div className="mt-6 p-4 bg-bg-elev-3 rounded-lg border border-stroke-line">
-              <h4 className="text-sm font-semibold text-fg-primary mb-2">What happens when you connect?</h4>
-              <ul className="text-xs text-fg-secondary space-y-1 text-left">
-                <li>• A new Stellar wallet will be generated automatically</li>
-                <li>• The wallet will be funded with test XLM via friendbot</li>
-                <li>• Your wallet will be saved locally for future use</li>
-                <li>• You can start creating RWA tokens immediately</li>
-              </ul>
             </div>
           </CardContent>
         </Card>
@@ -502,28 +469,8 @@ export default function TokenWizard() {
         <div className="mt-4 flex items-center justify-center gap-4">
           <Badge variant="outline" className="text-green-400 border-green-500/30 bg-green-500/10">
             <div className="w-2 h-2 bg-green-400 rounded-full mr-2" />
-            Wallet Connected: {wallet?.publicKey.slice(0, 8)}...
+            Wallet Connected: {address?.slice(0, 8)}...
           </Badge>
-          
-          <Button
-            onClick={connect}
-            disabled={isOperationsLoading}
-            variant="outline"
-            size="sm"
-            className="text-xs px-3 py-1 border-brand-500/30 hover:bg-brand-500/10 hover:border-brand-400/50"
-          >
-            {isOperationsLoading ? (
-              <>
-                <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                Generate New Wallet
-                <Sparkles className="ml-1 h-3 w-3" />
-              </>
-            )}
-          </Button>
         </div>
       </div>
 

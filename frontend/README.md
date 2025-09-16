@@ -39,11 +39,11 @@ PanoramaBlock introduces SRWA: a SEP-41–compatible fungible token with ERC-364
 **SRWA composes natively with:**
 - **Blend (money market)**: SRWA as collateral, reserve listing, IRM, isolated spokes per RWA class
 - **SoroSwap (AMM/Router)**: execution (SRWA↔USDC/XLM), rebalancing, partial liquidations with slippage guards
-- **Reflector (price feeds)**: TWAP/spot/FX inputs clamped by custodial NAV via our OracleAdapter
+- **Reflector (price feeds)**: TWAP/spot/FX inputs clamped by custodial NAV via our OracleAdapter (haircut + bands + staleness)
 - **DeFindex (data/vaults)**: APY/TVL/positions dashboards; optional USDC→RWA vaults
 
 **Normative properties:**
-- **P-1 (Compliance correctness)**: every state mutation that alters token balances MUST call Compliance.can_transfer() and MUST revert on false
+- **P-1 (Compliance correctness)**: every state mutation that alters token balances MUST call Compliance.can_transfer(from,to,amount,ctx) and MUST revert on false
 - **P-2 (Determinism)**: given the same set of claims, modules, and integration allowlists, can_transfer is pure and deterministic
 - **P-3 (Oracle hygiene)**: effective price for collateral logic MUST be clamp(TWAP_Reflector, NAV±band) * (1-haircut), with hard staleness thresholds and degraded mode
 - **P-4 (Composable by default)**: any dApp that can call SEP-41 transfer/transfer_from/mint/burn can support SRWA without bespoke KYC code
@@ -67,6 +67,12 @@ PanoramaBlock introduces SRWA: a SEP-41–compatible fungible token with ERC-364
 - **A-3 Motorized composability**: Blend provides isolated lending spokes; SoroSwap provides execution and paths; DeFindex provides data/vaults; our Optimizer adds P2P matching with Blend fallback
 - **A-4 Operational rigor**: deterministic TokenFactory, admin console for registries and modules, IntegrationAllowlist for protocol endpoints, and runbooks
 
+#### Non-goals
+
+- **N-1**: We do not re-implement an AMM or money market at the core; we compose existing protocols first
+- **N-2**: We do not hide compliance—UX presents reasons for reverts (inelegible wallet, window closed, lockup active)
+- **N-3**: We do not bind to a single price feed; OracleAdapter is feed-agnostic with strict policies
+
 ### 3. Value Proposition
 
 #### For Issuers/Banks
@@ -82,6 +88,11 @@ PanoramaBlock introduces SRWA: a SEP-41–compatible fungible token with ERC-364
 #### For Liquidity Providers/Treasuries
 - **Guardrailed yield**: IRM with conservative slopes; utilization caps; partial liq; oracle safeguards
 - **Analytics**: DeFindex + event streams for APY/TVL/borrows/liq slippage
+- **SLA**: APY/TVL refresh ≤60s; slippage guard fixed in bps per pool
+
+#### For Integrators (Wallets, Custodians, Fintechs)
+- **Predictable contract surface**: SEP-41 + read-only registries; pre-flight is_eligible(to) to avoid failed swaps
+- **Allowlist**: protocol contracts (SoroSwap Router/Pool, Blend Spoke/Factory) kept in an IntegrationAllowlist
 
 ### 4. Design Tenets & Trade-offs
 
@@ -91,8 +102,14 @@ PanoramaBlock introduces SRWA: a SEP-41–compatible fungible token with ERC-364
 - **Explicit allowlisting** → pro: safer integrations; con: governance overhead (mitigated with batched updates & events)
 - **Upgrade discipline** → pro: safer evolution; con: slower changes (intended for institutional trust)
 
+![Design Tenets & Trade-offs](./public/docs/photoDoc1.png)
+
+
 ### 5. System Architecture Overview
 
+![System Architecture Overview](./public/docs/photo2Doc.png)
+
+![Token-first Architecture](./public/docs/photo3Doc.png)
 **Token-first Architecture:**
 
 The SRWA ecosystem follows a token-first compliance approach where:
@@ -122,10 +139,13 @@ The SRWA ecosystem follows a token-first compliance approach where:
 
 ### 6. Institutional Use-cases
 
+
 #### Treasury Credit backed by T-Bills (SRWA-TBill → USDC)
 - **Constraints**: LLTV ≤ 90%, liq threshold ≤ 92%, lot size caps for partial liq, bonus ≤ 50 bps
 - **NAV cadence**: daily (or better), staleness max 24h (business); Reflector TWAP window 30 min, staleness ≤120s
 - **Operational rules**: If NAV.stale == true ⇒ degraded mode: new borrows blocked, LLTV temporarily reduced
+
+![Treasury Credit Use Case](./public/docs/photo4Doc.png)
 
 #### Private Credit / Receivables (SRWA-Receivables → USDC)
 - **Differences**: LLTV ≤ 70%, threshold ≤ 75%, NAV cadence weekly/biweekly, haircut 100–300 bps, band ±100 bps
@@ -134,6 +154,28 @@ The SRWA ecosystem follows a token-first compliance approach where:
 #### CRE / Bridge Loans (SRWA-CRE → USDC)
 - **Differences**: LLTV ≤ 60%, threshold ≤ 65%, NAV cadence monthly, haircut ≥150 bps, band ±150 bps
 - **Larger lot caps**: on liquidation; stronger backstop requirement
+
+### 7. Risks, Assumptions & Mitigations
+
+![Risk Assessment Matrix](./public/docs/photo5Doc.png)
+
+| Risk | Vector | Mitigation (enforced) |
+|------|--------|----------------------|
+| R-1 Compliance bypass | dApp calls mint/burn/transfer without checks | SRWA requires all balance-changing paths to call COMP.can_transfer; covered in contract; unit tests enforce |
+| R-2 Wrong/forged claims | Malicious issuer of claims | Only Trusted Issuers (TIR) can write; events audited; key rotation runbooks; multi-sig for registry updates |
+| R-3 NAV stale / oracle failure | Custodian outage; feed lag | Degraded mode, staleness guards, NAV haircuts, bands; Reflector TWAP fallback; alarms |
+| R-4 Liquidity shock | Thin SRWA routes during liq | Partial liquidation with lot limits; pre-trade quotes; backstop configuration per spoke |
+| R-5 Governance mistake | Bad upgrade/param change | Multisig + timelock; dry-run on test env; Upgraded and Configured events with diffs |
+| R-6 Data drift | APY/TVL mismatch with dApps | DeFindex + local indexers; reconciliation jobs; alert on variance thresholds |
+| R-7 Privacy leakage | Over-exposed holder metadata | Store hashes of claims; minimal on-chain PII; off-chain proofs by Trusted Issuers |
+
+**Assumptions:**
+- Issuers accept the SRWA standard because it unlocks multiple rails in one integration
+- Reflector or equivalent feeds remain available on Stellar; NAV signing process is automatable
+- Institutional demand exists for USDC yield vs RWA-collateralized borrow
+
+
+![Risk Mitigation Strategies](./public/docs/photo5Doc.png)
 
 ---
 
@@ -148,7 +190,7 @@ SRWA MUST expose a SEP-41-compatible fungible interface:
 - Admin extensions: `mint(to, amount)`, `burn(from, amount)`, `force_transfer(from, to, amount)`, `freeze(addr, on)`
 
 #### R-2 (Compliance gate)
-Every state mutation that moves balances MUST call `Compliance.can_transfer(ctx: TransferCtx) -> bool` and revert on false
+Every state mutation that moves balances MUST call `Compliance.can_transfer(ctx: TransferCtx) -> bool` and revert on false. Paths covered: transfer, transfer_from, mint, burn, force_transfer.
 
 #### R-3 (Determinism)
 For a given ledger state (registries/modules/settings), `can_transfer()` MUST be deterministic and side-effect free
@@ -156,10 +198,33 @@ For a given ledger state (registries/modules/settings), `can_transfer()` MUST be
 #### R-4 (Identity model)
 Identity & claims align with ERC-3643 concepts:
 - IdentityRegistry (IR) consults IdentityRegistryStorage (IRS) to evaluate holder claims
-- ClaimTopicsRegistry (CTR) defines required claim topics per token/profile
+- ClaimTopicsRegistry (CTR) defines required claim topics per token/profile (e.g., KYC, AML, Residency, Sanctions, Accredited)
 - TrustedIssuersRegistry (TIR) controls who can issue/revoke claims per topic
 
-### 2. Data Structures & State
+#### R-5 (Integration allowlist)
+Compliance MUST support an IntegrationAllowlist for protocol endpoints (e.g., Blend Spoke, SoroSwap Router/Pool, custodial hot wallets)
+
+#### R-6 (Versioning & Upgrade)
+Upgrades MUST be gated by multisig + timelock; migrations must be explicit and audited via Upgraded events
+
+#### R-7 (Observability)
+All critical actions MUST emit structured events: compliance decisions, claim changes, registry mutations, module toggles, admin actions
+
+### 2. Contracts
+
+![Contract Architecture](./public/docs/photo6Doc.png)
+
+
+### 3. Data Structures & State
+
+#### Common types
+- `Address` := Soroban contract/account address
+- `Timestamp` := u64 (seconds)
+- `Amount` := i128 (base units; decimals from SRWA.decimals())
+- `TopicId` := u32 (e.g., 1=KYC, 2=AML, 3=Residency, 4=Sanctions, 5=Accredited)
+- `ClaimRef` := bytes32 (issuer-defined reference / off-chain locator)
+- `RegionCode` := u32 (ISO-3166 numeric or compressed)
+- `ErrorCode` := u16
 
 #### TransferCtx
 ```rust
@@ -188,6 +253,39 @@ Claim {
 }
 ```
 
+#### SRWA Storage Overview
+- `admin: Address`
+- `transfer_agent: Address` (force/clawback role)
+- `decimals: u32, symbol: string, name: string`
+- `balances: Map<Address, Amount>`
+- `allowances: Map<(owner, spender), Amount>`
+- `frozen: Map<Address, bool>`
+- `compliance_addr: Address` (bound once, changeable via governance)
+- `version: u32` (for migrations)
+
+**Invariants:**
+- `sum(balances) == totalSupply` (tracked implicitly if needed)
+- `frozen[from] || frozen[to] ⇒ can_transfer=false` unless force_transfer by transfer_agent
+- `compliance_addr != 0x0` after initialization
+
+#### Identity & Registries
+**IdentityRegistry:**
+- `issuer_admin: Address` (role to register/revoke holders)
+- `storage_addr: Address` (IRS)
+- `ctr_addr: Address` (CTR)
+- `tir_addr: Address` (TIR)
+- `verified_cache: Map<Address, bool>` (optional cache with TTL/bump)
+
+**IdentityRegistryStorage:**
+- `claims: Map<(subject, topic, ref), Claim>`
+- Indexes: by_subject, by_issuer, by_topic (optional denormalizations for speed)
+
+**ClaimTopicsRegistry:**
+- `topics: Set<TopicId>` (required for this token/profile)
+
+**TrustedIssuersRegistry:**
+- `trusted: Map<TopicId, Set<Address>>` (who can issue for a topic)
+
 ### 3. Function Contracts (APIs)
 
 #### SRWA (SEP-41 + admin + compliance hook)
@@ -197,15 +295,50 @@ Claim {
 - `balance_of(addr: Address) -> Amount`
 - `allowance(owner: Address, spender: Address) -> Amount`
 - `is_frozen(addr: Address) -> bool`
+- `compliance() -> Address`
 
 **Write functions:**
-- `approve(spender: Address, amount: Amount, live_until?: Timestamp)`
-- `transfer(from: Address, to: Address, amount: Amount)`
-- `transfer_from(spender: Address, from: Address, to: Address, amount: Amount)`
-- `mint(to: Address, amount: Amount)` [admin]
-- `burn(from: Address, amount: Amount)` [admin]
-- `force_transfer(from: Address, to: Address, amount: Amount)` [transferAgent]
+- `approve(spender: Address, amount: Amount, live_until?: Timestamp)` - Note: approval is allowed even if holder later becomes ineligible; movement will be blocked
+- `transfer(from: Address, to: Address, amount: Amount)` - Preconditions: from.require_auth(), Compliance.can_transfer(ctx)==true
+- `transfer_from(spender: Address, from: Address, to: Address, amount: Amount)` - Preconditions: spender.require_auth(), allowance sufficient, can_transfer(ctx)==true
+- `mint(to: Address, amount: Amount)` [admin] → can_transfer(purpose=MINT, from=0x0, to)
+- `burn(from: Address, amount: Amount)` [admin] → can_transfer(purpose=BURN, from, to=0x0)
+- `force_transfer(from: Address, to: Address, amount: Amount)` [transferAgent] - Bypasses frozen status but still calls can_transfer(purpose=FORCE) for audit and module veto
 - `freeze(addr: Address, on: bool)` [admin]
+
+**Events:**
+- `Transfer(from, to, amount, ctx)`
+- `Approval(owner, spender, amount, live_until)`
+- `Mint(to, amount, ctx)`, `Burn(from, amount, ctx)`
+- `ForceTransfer(from, to, amount, reason?)`
+- `Frozen(addr, on)`
+- `Configured(key, old, new)` (e.g., set compliance)
+
+#### Identity & Claims
+
+**IdentityRegistry:**
+- `register(holder: Address, identity_id: bytes32)` [issuerAdmin] - Sets holder as registered; verification derives from claims
+- `revoke(holder: Address)` [issuerAdmin]
+- `is_verified(holder: Address) -> bool` - True iff all required topics exist, non-revoked, not expired, and issued by trusted issuer
+
+**IdentityRegistryStorage:**
+- `add_claim(subject, topic, issuer, data_hash, valid_until, ref)` [trustedIssuer]
+- `revoke_claim(subject, topic, ref)` [trustedIssuer]
+- `get_claims(subject) -> Vec<Claim>`
+
+**ClaimTopicsRegistry:**
+- `add(topic_id)` [governance], `remove(topic_id)` [governance], `list() -> Vec<TopicId>`
+
+**TrustedIssuersRegistry:**
+- `add(topic_id, issuer_addr)` [governance], `remove(topic_id, issuer_addr)` [governance]
+- `is_trusted(topic_id, issuer_addr) -> bool`
+
+**Events:**
+- `ClaimAdded(subject, topic, issuer, valid_until, ref)`
+- `ClaimRevoked(subject, topic, issuer, ref)`
+- `HolderRegistered(holder, identity_id)`, `HolderRevoked(holder)`
+- `TopicAdded(topic)`, `TopicRemoved(topic)`
+- `TrustedIssuerAdded(topic, issuer)`, `TrustedIssuerRemoved(topic, issuer)`
 
 ### 4. Compliance Core & Modules
 
@@ -232,13 +365,40 @@ The compliance system follows a sequential check process:
 - `can_transfer(ctx: TransferCtx) -> bool`
 
 #### Compliance Modules
-- **JurisdictionModule**: allow_regions, deny_regions
-- **SanctionsModule**: deny_list + reliance on subject having Sanctions=clear claim
-- **AccreditedModule**: topic presence check for Accredited
-- **LockupModule**: locks with unlock timestamps
-- **MaxHoldersModule**: reads SRWA holder count and configured cap
-- **PauseFreezeModule**: mirrors pause_global, frozen addrs
-- **TransferWindowsModule**: windows by RegionCode or InvestorTier
+
+**JurisdictionModule:**
+- Config: allow_regions, deny_regions
+- Check: region(from) ∈ allow && region(to) ∈ allow && none ∈ deny
+- Admin: set_allow(region, on), set_deny(region, on)
+
+**SanctionsModule:**
+- Config: deny_list: Set<Address>
+- Check: from ∉ deny && to ∉ deny and (optionally) subject has Sanctions=clear claim
+- Admin: deny(addr, on)
+
+**AccreditedModule:**
+- Check: subject has Accredited claim for investor-class tokens
+- Edge: allow operator path (e.g., Router) if end holder is accredited
+
+**LockupModule:**
+- State: locks[holder] = unlock_ts or list of tranches
+- Check: now >= unlock_ts for the transfering balance (amount-aware if multiple tranches)
+- Post: decrement locked amount after successful transfer if tranche model used
+
+**MaxHoldersModule:**
+- Reads unique_holders_count() from SRWA
+- Check: if to is a new holder then holders+1 <= cap
+- Note: SRWA maintains is_holder flags to O(1) check
+
+**PauseFreezeModule:**
+- Reflects pause_global and frozen accounts from SRWA/admin
+- Check: mirror SRWA pause_global and frozen maps; returns DENY if active
+
+**TransferWindowsModule:**
+- Config windows per RegionCode or InvestorTier
+- Check: (now mod 7d) within window or is_business_day(now); supports holiday calendar via admin updates
+
+All modules MUST return (bool, ErrorCode) for traceable denials.
 
 ### 5. Error Codes (Canonical)
 
@@ -282,7 +442,69 @@ The compliance system follows a sequential check process:
 - Claim freshness (avg days to expiry)
 - Event integrity (missing spans)
 
+### 7. Storage, Gas & Performance
+
+- **Compact keys**: use Symbol::short(...) or small integers for storage keys to reduce footprint
+- **Eligibility caching**: optional verified_cache in IdentityRegistry with TTL/bump, invalidated on claim changes
+- **Batch ops**: admin methods for batch freezing or batch claim updates reduce operational cost
+- **Denormalized indexes**: maintain holders_count, is_holder(addr) flags in SRWA for MaxHoldersModule
+- **Time windows**: encode as small structs ({start_minute_of_week, duration_minutes}) to avoid big calendars; externalize holiday calendars via admin updates as needed
+
+### 8. Upgrade & Migration
+
+**Process:**
+1. pause_global(true) (if necessary)
+2. Timelock elapsed → update_current_contract_wasm(new_hash)
+3. migrate(version_from, version_to, payload) migrates storage keys/values
+4. Upgraded + Configured events
+5. Unpause after smoke tests
+
+**Compatibility:**
+- Never remove/rename storage keys without a migration step
+- Keep can_transfer signature stable; add new modules via enable_module
+
+**Governance:**
+- Multisig roles: Governance, IssuerAdmin, ComplianceOfficer, TransferAgent
+- Parameter changes routed via governance and logged (Configured)
+
+### 9. Security Considerations
+
+- **Reentrancy**: SRWA and Compliance perform checks → effects only; no external calls inside state mutation other than module pure checks
+- **Approval race**: use approve(spender, 0) pattern in UIs or permit-style flows if added later
+- **Front-running of claims**: registry writes are privileged; ensure issuer key management & rotation playbooks
+- **PII minimization**: only store data_hash; never raw PII
+- **Time consistency**: always pass ctx.now = ledger.timestamp() from SRWA → Compliance → Modules
+- **Emergency response**: pause_global, freeze, force_transfer with audit trails
+
+### 10. Test Vectors & Scenarios
+
+- **KYC happy path**: holder with valid KYC+AML+Residency → transfer succeeds
+- **Accreditation missing**: dApp tries transfer to non-accredited; DENY (NOT_ACCREDITED)
+- **Sanctions update mid-flow**: address added to denylist → following transfer DENY (SANCTIONS_DENY)
+- **Lockup active**: mint with lockup → attempts before unlock DENY (LOCKUP_ACTIVE)
+- **Max holders edge**: last slot filled; next new holder DENY (MAX_HOLDERS_EXCEEDED)
+- **Router pre-check**: UI calls is_verified(to) before swap; if false, no on-chain revert
+- **Force transfer**: transfer_agent moves funds; Purpose=FORCE logged; modules may veto if configured
+- **Pause global**: all user transfers DENY (PAUSED); force_transfer still audited
+- **Upgrade migration**: bump version, migrate storage, verify invariants and events
+- **Throughput**: batch claim writes; cache verification; measure can_transfer simulation cost
+
 ---
+
+## 11 Diagrams
+
+11.1 Dataflow (feeds → adapter → consumers)
+
+![Dataflow Diagram](./public/docs/photo7Doc.png)
+
+###11.2 Degraded mode state machine
+
+![Degraded Mode State Machine](./public/docs/Photo8Doc.png)
+
+### 11.3 Clamp math 
+
+![Clamp Math Diagram](./public/docs/Photo8Doc.png)
+
 
 ## Part III: Integration Guides
 
