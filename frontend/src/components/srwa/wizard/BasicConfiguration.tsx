@@ -227,6 +227,195 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
             </p>
           </div>
 
+          {/* CLI Inputs Section */}
+          <div style={{ 
+            ...cardStyle, 
+            backgroundColor: 'hsl(224, 23%, 10%)', 
+            borderColor: 'hsl(45, 100%, 60%)',
+            marginTop: '24px'
+          }}>
+            <div style={{ marginBottom: '16px' }}>
+              <h3 style={{ 
+                fontSize: '18px', 
+                fontWeight: '600', 
+                color: '#f59e0b', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px',
+                marginBottom: '8px'
+              }}>
+                <Info size={20} />
+                CLI Test Parameters
+              </h3>
+              <p style={{ color: '#6b7280', fontSize: '14px' }}>
+                Use these pre-filled values to test the token creation (based on your CLI tests)
+              </p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+              {/* Pre-filled Name */}
+              <div>
+                <Label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
+                  CLI Name
+                </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onChange({ name: 'Real World Asset Token' })}
+                  style={{ 
+                    width: '100%',
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    border: '1px solid #f59e0b',
+                    backgroundColor: '#ffffff',
+                    color: '#f59e0b',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Use "Real World Asset Token"
+                </Button>
+              </div>
+
+              {/* Pre-filled Symbol */}
+              <div>
+                <Label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
+                  CLI Symbol
+                </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onChange({ symbol: 'RWA' })}
+                  style={{ 
+                    width: '100%',
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    border: '1px solid #f59e0b',
+                    backgroundColor: '#ffffff',
+                    color: '#f59e0b',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Use "RWA"
+                </Button>
+              </div>
+
+              {/* Pre-filled Decimals */}
+              <div>
+                <Label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
+                  CLI Decimals
+                </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onChange({ decimals: 7 })}
+                  style={{ 
+                    width: '100%',
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    border: '1px solid #f59e0b',
+                    backgroundColor: '#ffffff',
+                    color: '#f59e0b',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Use "7"
+                </Button>
+              </div>
+
+              {/* Pre-filled Admin */}
+              <div>
+                <Label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
+                  CLI Admin
+                </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onChange({ admin: 'SDEBSDRWPREGR35MYYHR236DZ56BYKHKVPLNFOSKZJT2AW7U2RINYZLB' })}
+                  style={{ 
+                    width: '100%',
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    border: '1px solid #f59e0b',
+                    backgroundColor: '#ffffff',
+                    color: '#f59e0b',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Use CLI Admin
+                </Button>
+              </div>
+            </div>
+
+            {/* Additional CLI Parameters */}
+            <div style={{ marginTop: '16px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+              {/* Initial Supply */}
+              <div>
+                <Label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
+                  Initial Supply
+                </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onChange({ initial_supply: '1000000000000' })}
+                  style={{ 
+                    width: '100%',
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    border: '1px solid #f59e0b',
+                    backgroundColor: '#ffffff',
+                    color: '#f59e0b',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Use "1,000,000 RWA"
+                </Button>
+              </div>
+
+              {/* Compliance Contract */}
+              <div>
+                <Label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
+                  Compliance Contract
+                </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onChange({ complianceContract: 'CDMM3DRN7IRDTBQUHCS5CARLFBLECC4XPPYOTMHERHCVJBSHTTUO75FA' })}
+                  style={{ 
+                    width: '100%',
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    border: '1px solid #f59e0b',
+                    backgroundColor: '#ffffff',
+                    color: '#f59e0b',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Use CLI Compliance
+                </Button>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#fef3c7', border: '1px solid #f59e0b', borderRadius: '8px' }}>
+              <p style={{ fontSize: '12px', color: '#92400e', margin: '0 0 8px 0' }}>
+                <strong>Note:</strong> These are the exact values from your CLI tests in srwa-final/README.md:
+              </p>
+              <div style={{ fontSize: '11px', color: '#92400e', fontFamily: 'monospace', lineHeight: '1.4' }}>
+                <div>• Name: "Real World Asset Token"</div>
+                <div>• Symbol: "RWA"</div>
+                <div>• Decimals: 7</div>
+                <div>• Admin: SDEBSDRWPREGR35MYYHR236DZ56BYKHKVPLNFOSKZJT2AW7U2RINYZLB</div>
+                <div>• Initial Supply: 1,000,000 RWA tokens</div>
+                <div>• Compliance: CDMM3DRN7IRDTBQUHCS5CARLFBLECC4XPPYOTMHERHCVJBSHTTUO75FA</div>
+              </div>
+            </div>
+          </div>
+
           {/* Admin Address with Wallet Integration */}
           <div style={{ position: 'relative', zIndex: 10 }}>
             <Label 
