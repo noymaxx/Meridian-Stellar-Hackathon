@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useWallet } from "./useWallet";
+import { useWallet } from "@/components/wallet/WalletProvider";
 import { useProvider } from "./useProvider";
 import { toast } from "sonner";
 import { scValToNative } from "@stellar/stellar-sdk";
@@ -51,11 +51,14 @@ export interface UseSRWAOperationsReturn {
 }
 
 export const useSRWAOperations = (): UseSRWAOperationsReturn => {
-  const { wallet, isConnected } = useWallet();
+  const { address, isConnected } = useWallet();
   const { contract, signAndSend, getContractId } = useProvider();
   
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Create wallet object compatible with signAndSend
+  const wallet = address ? { publicKey: address } : null;
 
   // Helper function to handle operations
   const handleOperation = async <T>(
@@ -67,7 +70,7 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
 
     try {
       console.log(`🔗 [SRWA Operations] Starting ${operationName}`, {
-        publicKey: wallet?.publicKey,
+        publicKey: address,
         isConnected,
         timestamp: new Date().toISOString()
       });
