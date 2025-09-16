@@ -40,6 +40,14 @@ export function Header() {
             Dashboard
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
           </a>
+          <a href="/srwa-issuance" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
+            Create RWA
+            <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
+          </a>
+          <a href="/srwa-demo" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
+            RWA Demo
+            <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
+          </a>
           <a href="/docs" className="text-sm lg:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors relative group">
             Documentation
             <span className="absolute bottom-0 left-0 w-0 h-px bg-brand-400 group-hover:w-full transition-all duration-300" />
@@ -110,6 +118,12 @@ export function Header() {
             </a>
             <a href="/dashboard" className="block py-2 text-sm sm:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors font-medium">
               Dashboard
+            </a>
+            <a href="/srwa-issuance" className="block py-2 text-sm sm:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
+              Create RWA
+            </a>
+            <a href="/srwa-demo" className="block py-2 text-sm sm:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
+              RWA Demo
             </a>
             <a href="/docs" className="block py-2 text-sm sm:text-body-2 text-fg-secondary hover:text-brand-400 transition-colors">
               Documentation
