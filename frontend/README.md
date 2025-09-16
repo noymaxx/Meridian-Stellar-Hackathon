@@ -102,15 +102,14 @@ PanoramaBlock introduces SRWA: a SEP-41–compatible fungible token with ERC-364
 - **Explicit allowlisting** → pro: safer integrations; con: governance overhead (mitigated with batched updates & events)
 - **Upgrade discipline** → pro: safer evolution; con: slower changes (intended for institutional trust)
 
-Photo:C:\Users\Inteli\Documentos\Meridian-Stellar-Hackathon\frontend\dist\assets\photoDoc1.png
+![Design Tenets & Trade-offs](./dist/assets/photoDoc1.png)
 
 
 ### 5. System Architecture Overview
 
-Photo: C:\Users\Inteli\Documentos\Meridian-Stellar-Hackathon\frontend\dist\assets\photo2Doc.png
+![System Architecture Overview](./dist/assets/photo2Doc.png)
 
-Photo: 
-C:\Users\Inteli\Documentos\Meridian-Stellar-Hackathon\frontend\dist\assets\photo3Doc.png
+![Token-first Architecture](./dist/assets/photo3Doc.png)
 **Token-first Architecture:**
 
 The SRWA ecosystem follows a token-first compliance approach where:
@@ -146,9 +145,7 @@ The SRWA ecosystem follows a token-first compliance approach where:
 - **NAV cadence**: daily (or better), staleness max 24h (business); Reflector TWAP window 30 min, staleness ≤120s
 - **Operational rules**: If NAV.stale == true ⇒ degraded mode: new borrows blocked, LLTV temporarily reduced
 
-Photo: 
-
-C:\Users\Inteli\Documentos\Meridian-Stellar-Hackathon\frontend\dist\assets\photo4Doc.png
+![Treasury Credit Use Case](./dist/assets/photo4Doc.png)
 
 #### Private Credit / Receivables (SRWA-Receivables → USDC)
 - **Differences**: LLTV ≤ 70%, threshold ≤ 75%, NAV cadence weekly/biweekly, haircut 100–300 bps, band ±100 bps
@@ -160,7 +157,7 @@ C:\Users\Inteli\Documentos\Meridian-Stellar-Hackathon\frontend\dist\assets\photo
 
 ### 7. Risks, Assumptions & Mitigations
 
-(Photo5 Here)
+![Risk Assessment Matrix](./dist/assets/photo5Doc.png)
 
 | Risk | Vector | Mitigation (enforced) |
 |------|--------|----------------------|
@@ -178,7 +175,7 @@ C:\Users\Inteli\Documentos\Meridian-Stellar-Hackathon\frontend\dist\assets\photo
 - Institutional demand exists for USDC yield vs RWA-collateralized borrow
 
 
-Photo:C:\Users\Inteli\Documentos\Meridian-Stellar-Hackathon\frontend\dist\assets\photo5Doc.png
+![Risk Mitigation Strategies](./dist/assets/photo5Doc.png)
 
 ---
 
@@ -215,7 +212,7 @@ All critical actions MUST emit structured events: compliance decisions, claim ch
 
 ### 2. Contracts
 
-Photo: C:\Users\Inteli\Documentos\Meridian-Stellar-Hackathon\frontend\dist\assets\photo6Doc.png
+![Contract Architecture](./dist/assets/photo6Doc.png)
 
 
 ### 3. Data Structures & State
@@ -498,14 +495,15 @@ All modules MUST return (bool, ErrorCode) for traceable denials.
 
 11.1 Dataflow (feeds → adapter → consumers)
 
-photo: C:\Users\Inteli\Documentos\Meridian-Stellar-Hackathon\frontend\dist\assets\photo7Doc.png
+![Dataflow Diagram](./dist/assets/photo7Doc.png)
 
 ###11.2 Degraded mode state machine
 
-photo:C:\Users\Inteli\Documentos\Meridian-Stellar-Hackathon\frontend\dist\assets\Photo8Doc.png
+![Degraded Mode State Machine](./dist/assets/Photo8Doc.png)
 
 ### 11.3 Clamp math 
-photo photo:C:\Users\Inteli\Documentos\Meridian-Stellar-Hackathon\frontend\dist\assets\Photo8Doc.png
+
+![Clamp Math Diagram](./dist/assets/Photo8Doc.png)
 
 
 ## Part III: Integration Guides
