@@ -34,6 +34,12 @@ export const useUserRWATokens = (): UseUserRWATokensReturn => {
     try {
       console.log(`🔗 [useUserRWATokens] Fetching data for token:`, contractAddress);
       
+      // All tokens must be real contract addresses
+      if (!contractAddress || contractAddress.length !== 56 || !contractAddress.startsWith('C')) {
+        console.log(`🔗 [useUserRWATokens] Invalid contract address format:`, contractAddress);
+        return null;
+      }
+      
       const tokenContract = contract(contractAddress, address);
       
       // Get token metadata
@@ -156,8 +162,15 @@ export const useUserRWATokens = (): UseUserRWATokensReturn => {
         getContractId("newSrwaToken"),    // New token where user is admin
       ];
 
-      // Fetch data for all known tokens
-      const tokenDataPromises = knownTokenAddresses.map(addr => fetchTokenData(addr));
+      // Also check localStorage for user-created tokens
+      const userCreatedTokens = JSON.parse(localStorage.getItem(`userTokens_${address}`) || '[]');
+      console.log("🔗 [useUserRWATokens] User-created tokens from localStorage:", userCreatedTokens);
+      
+      // Combine known tokens with user-created tokens
+      const allTokenAddresses = [...knownTokenAddresses, ...userCreatedTokens];
+
+      // Fetch data for all tokens (known + user-created)
+      const tokenDataPromises = allTokenAddresses.map(addr => fetchTokenData(addr));
       const tokenResults = await Promise.all(tokenDataPromises);
 
       // Filter out null results and tokens with zero balance (unless user is admin)

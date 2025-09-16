@@ -1,101 +1,76 @@
-/* Dashboard Page Specific Styles */
+/* Dashboard Specific Styles */
 
-/* Native Tabs Styling */
 .dashboard-tab-button {
-  pointer-events: auto !important;
-  cursor: pointer !important;
   position: relative;
-  z-index: 10;
+  transition: all 0.2s ease-in-out;
 }
 
 .dashboard-tab-button:hover {
-  transform: none !important;
+  transform: translateY(-1px);
 }
 
 .dashboard-tab-content {
-  pointer-events: auto !important;
-  position: relative;
-  z-index: 1;
+  animation: fadeInUp 0.4s ease-out;
 }
 
-/* RWA Portfolio Isolated Container */
-.rwa-portfolio-isolated-container {
-  /* Complete isolation */
-  position: relative !important;
-  z-index: 1000 !important;
-  pointer-events: auto !important;
-  
-  /* Clear any potential conflicting styles */
-  transform: none !important;
-  will-change: auto !important;
-  
-  /* Ensure proper stacking context */
-  isolation: isolate;
-  
-  /* Prevent any motion interference */
-  backface-visibility: visible !important;
-  perspective: none !important;
-  
-  /* Ensure clicks pass through properly */
-  touch-action: auto !important;
-  user-select: auto !important;
-}
-
-/* Ensure all child elements in RWA container are interactive */
-.rwa-portfolio-isolated-container * {
-  pointer-events: auto !important;
-}
-
-/* Portfolio Tab Specific Styling */
 .dashboard-portfolio-tab {
-  /* Ensure the portfolio tab itself doesn't interfere */
-  position: relative;
-  z-index: 1;
+  min-height: 400px;
 }
 
-/* Override any potential motion or animation interference */
-.dashboard-tab-content * {
-  backface-visibility: visible !important;
-  perspective: none !important;
-  will-change: auto !important;
-}
-
-/* Ensure buttons and interactive elements work properly */
-.dashboard-tab-content button,
-.dashboard-tab-content a,
-.dashboard-tab-content [role="button"] {
-  pointer-events: auto !important;
-  cursor: pointer !important;
-  position: relative;
-  z-index: 10;
-}
-
-/* Remove any potential transform interference */
-.dashboard-tab-content [style*="transform"] {
-  transform: none !important;
-}
-
-/* Clean hover states */
-.dashboard-tab-button:not([disabled]):hover,
-.rwa-portfolio-isolated-container button:not([disabled]):hover {
-  opacity: 0.9;
-  background-color: rgba(var(--brand-500-rgb), 0.1) !important;
-}
-
-/* Ensure proper focus states */
-.dashboard-tab-button:focus,
-.rwa-portfolio-isolated-container button:focus {
-  outline: 2px solid rgba(var(--brand-500-rgb), 0.5);
-  outline-offset: 2px;
-}
-
-/* Debug styles (remove in production) */
 .rwa-portfolio-isolated-container {
-  /* Uncomment for debugging */
-  /* border: 2px solid red !important; */
+  isolation: isolate;
+  contain: layout style;
+  position: relative;
 }
 
-.dashboard-tab-button {
-  /* Uncomment for debugging */
-  /* border: 1px solid blue !important; */
+/* Fade in animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover effects for cards */
+.hover-lift {
+  transition: all 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom scrollbar for dashboard content */
+.dashboard-tab-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-tab-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.dashboard-tab-content::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 3px;
+}
+
+.dashboard-tab-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.5);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .dashboard-tab-button {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .dashboard-tab-content {
+    padding: 0 1rem;
+  }
 }

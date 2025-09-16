@@ -109,7 +109,9 @@ export function useUserBlendPositions(): UseUserBlendPositionsReturn {
     hasRWAPositions,
     loading,
     error: error?.message || null,
-    refetch,
+    refetch: async () => {
+      await refetch();
+    },
     refreshPositions,
   };
 }
@@ -221,6 +223,21 @@ export function useRWABlendPositions() {
   };
 }
 
+// Utility function to format position values for display
+export function formatPositionValue(value: number): string {
+  if (value === 0) return "$0.00";
+  
+  if (value >= 1e9) {
+    return `$${(value / 1e9).toFixed(2)}B`;
+  } else if (value >= 1e6) {
+    return `$${(value / 1e6).toFixed(2)}M`;
+  } else if (value >= 1e3) {
+    return `$${(value / 1e3).toFixed(2)}K`;
+  } else {
+    return `$${value.toFixed(2)}`;
+  }
+}
+
 // Helper hook for position health monitoring
 export function usePositionHealth() {
   const { positions, loading } = useUserBlendPositions();
@@ -240,14 +257,6 @@ export function usePositionHealth() {
     loading,
     isEmpty: positions.length === 0,
   };
-}
-
-// Helper to format position values for display
-export function formatPositionValue(value: number): string {
-  if (value === 0) return '$0.00';
-  if (value < 1000) return `$${value.toFixed(2)}`;
-  if (value < 1000000) return `$${(value / 1000).toFixed(1)}K`;
-  return `$${(value / 1000000).toFixed(2)}M`;
 }
 
 // Helper to get health factor color
