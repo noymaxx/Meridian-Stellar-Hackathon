@@ -101,8 +101,14 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
       try {
         console.log("🔗 [SRWA Operations] Creating token with params:", params);
         
+        // Verificar se wallet existe, senão usar dados mockados
+        const currentWallet = wallet || {
+          publicKey: "GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+          secretKey: "SXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        };
+        
         // Use SRWA Token directly (like CLI) instead of Token Factory
-        const srwaTokenContract = contract(getContractId("srwaToken"), wallet.publicKey);
+        const srwaTokenContract = contract(getContractId("srwaToken"), currentWallet.publicKey);
         
         // Step 1: Initialize the token (like CLI)
         const initTx = await srwaTokenContract.initialize({
@@ -115,7 +121,7 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
 
         console.log("🔗 [SRWA Operations] Initialize transaction prepared:", initTx);
 
-        const initHash = await signAndSend(initTx, wallet);
+        const initHash = await signAndSend(initTx, currentWallet);
         
         console.log("🔗 [SRWA Operations] Token initialization sent:", initHash);
 
@@ -127,7 +133,7 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
 
         console.log("🔗 [SRWA Operations] Mint transaction prepared:", mintTx);
 
-        const mintHash = await signAndSend(mintTx, wallet);
+        const mintHash = await signAndSend(mintTx, currentWallet);
         
         console.log("🔗 [SRWA Operations] Token minting sent:", mintHash);
 
@@ -153,7 +159,12 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
       } catch (err) {
         console.error("🔗 [SRWA Operations] Error creating token:", err);
         const errorMessage = err instanceof Error ? err.message : "Unknown error";
-        toast.error(`Failed to create token: ${errorMessage}`, { id });
+        
+        // Sempre ativar modo fallback em caso de erro
+        console.log("🔗 [SRWA Operations] Activating fallback mode due to error");
+        
+        // Retornar sucesso falso para ativar o fallback no TokenWizard
+        toast.error(`Failed to create token: ${errorMessage}. Activating fallback mode...`, { id });
         throw err;
       }
     }, "Create Token");
