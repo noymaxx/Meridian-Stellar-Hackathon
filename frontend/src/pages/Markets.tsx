@@ -4,6 +4,7 @@ import { Header } from '@/components/layout/Header';
 import { MarketsDashboard } from '@/components/markets/MarketsDashboard';
 import { useBlendPools } from '@/hooks/markets/useBlendPools';
 import { useEnhancedPoolData } from '@/hooks/markets/useDefIndexData';
+import { useSRWAMarkets } from '@/hooks/markets/useSRWAMarkets';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Card, CardContent } from '@/components/ui/card';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
@@ -54,9 +55,17 @@ export default function Markets() {
     error: analyticsError
   } = useEnhancedPoolData(blendPools);
 
+  // Fetch SRWA markets from deployed tokens
+  const {
+    srwaMarkets,
+    loading: srwaLoading,
+    error: srwaError,
+    refetch: refetchSRWA
+  } = useSRWAMarkets();
+
   // Combined loading and error states
-  const loading = poolsLoading || analyticsLoading;
-  const error = poolsError?.message || analyticsError?.message || null;
+  const loading = poolsLoading || analyticsLoading || srwaLoading;
+  const error = poolsError?.message || analyticsError?.message || srwaError?.message || null;
 
   // Navigation handlers
   const handleViewPoolDetails = (poolAddress: string) => {
@@ -75,6 +84,7 @@ export default function Markets() {
 
   const handleRefresh = () => {
     refetchPools();
+    refetchSRWA();
   };
 
   return (
@@ -96,6 +106,7 @@ export default function Markets() {
           {/* Markets Dashboard */}
           <MarketsDashboard
             pools={enhancedPools}
+            srwaMarkets={srwaMarkets}
             loading={loading}
             error={error}
             onRefresh={handleRefresh}

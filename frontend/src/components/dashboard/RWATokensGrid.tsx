@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { motion } from "framer-motion";
 import { 
   Coins, 
   Crown, 
@@ -77,13 +76,8 @@ const RWATokenCard = ({ token, index }: { token: RWAToken; index: number }) => {
   const hasBalance = parseFloat(token.balance) > 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      whileHover={{ y: -8, scale: 1.02 }}
-    >
-      <Card className="card-institutional hover-lift relative overflow-hidden">
+    <div>
+      <Card className="card-institutional relative overflow-hidden pointer-events-auto">
         {/* Admin Badge */}
         {token.isUserAdmin && (
           <div className="absolute top-4 right-4">
@@ -170,7 +164,7 @@ const RWATokenCard = ({ token, index }: { token: RWAToken; index: number }) => {
               variant="outline"
               size="sm"
               onClick={handleSupply}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 pointer-events-auto"
             >
               <ArrowUpRight className="w-3 h-3" />
               Supply
@@ -179,7 +173,7 @@ const RWATokenCard = ({ token, index }: { token: RWAToken; index: number }) => {
               variant="outline"
               size="sm"
               onClick={handleBorrow}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 pointer-events-auto"
             >
               <TrendingDown className="w-3 h-3" />
               Borrow
@@ -212,7 +206,7 @@ const RWATokenCard = ({ token, index }: { token: RWAToken; index: number }) => {
           defaultTab={lendingModal.defaultTab}
         />
       </Card>
-    </motion.div>
+    </div>
   );
 };
 

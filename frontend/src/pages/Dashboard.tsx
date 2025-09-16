@@ -10,12 +10,12 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, PieChart, 
 // Hooks  
 import { useBlendPools } from '@/hooks/markets/useBlendPools';
 import { useEnhancedPoolData } from '@/hooks/markets/useDefIndexData';
+import { useSRWAMarkets } from '@/hooks/markets/useSRWAMarkets';
 import { useWallet } from '@/components/wallet/WalletProvider';
-import { useWalletAssets, useRWAPortfolioStats } from '@/hooks/wallet/useWalletAssets';
+import { useWalletAssets } from '@/hooks/wallet/useWalletAssets';
 import { useUserBlendPositions, formatPositionValue } from '@/hooks/markets/useUserBlendPositions';
 import { useRecentTransactions } from '@/hooks/wallet/useWalletTransactions';
 import { MarketsDashboard } from '@/components/markets/MarketsDashboard';
-import { RWAPortfolioCard } from '@/components/portfolio/RWAPortfolioCard';
 import { mockUserPositions, type UserPosition } from "@/lib/mock-data";
 import RWATokensGrid from '@/components/dashboard/RWATokensGrid';
 import { RWALendingPools } from '@/components/rwa/RWALendingPools';
@@ -52,7 +52,6 @@ export default function Dashboard() {
   
   // Real wallet data hooks
   const walletAssets = useWalletAssets();
-  const portfolioStats = useRWAPortfolioStats();
   const blendPositions = useUserBlendPositions();
   const recentTransactions = useRecentTransactions(5);
   
@@ -83,8 +82,16 @@ export default function Dashboard() {
     error: analyticsError
   } = useEnhancedPoolData(blendPools);
 
-  const loading = poolsLoading || analyticsLoading;
-  const error = poolsError?.message || analyticsError?.message || null;
+  // SRWA Markets data
+  const {
+    srwaMarkets,
+    loading: srwaLoading,
+    error: srwaError,
+    refetch: refetchSRWA
+  } = useSRWAMarkets();
+
+  const loading = poolsLoading || analyticsLoading || srwaLoading;
+  const error = poolsError?.message || analyticsError?.message || srwaError?.message || null;
 
   // Portfolio calculations based on real wallet data
   const totalSupplied = isConnected && blendPositions.summary 
@@ -105,12 +112,15 @@ export default function Dashboard() {
     ? (blendPositions.summary.netAPY * 100).toFixed(2) + '%'
     : "3.78%";
 
-  // Market stats from enhanced pools
-  const marketStats = enhancedPools.length > 0 ? {
-    totalValueLocked: `$${(enhancedPools.reduce((sum, pool) => sum + pool.tvl, 0) / 1e6).toFixed(1)}M`,
-    totalMarkets: enhancedPools.length,
-    avgUtilization: `${(enhancedPools.reduce((sum, pool) => sum + pool.utilizationRate, 0) / enhancedPools.length * 100).toFixed(1)}%`,
-    totalUsers: enhancedPools.reduce((sum, pool) => sum + pool.activeUsers, 0)
+  // Combine Blend pools and SRWA markets for dashboard stats
+  const allMarkets = [...enhancedPools, ...srwaMarkets];
+  
+  // Market stats from all pools (Blend + SRWA)
+  const marketStats = allMarkets.length > 0 ? {
+    totalValueLocked: `$${(allMarkets.reduce((sum, pool) => sum + pool.tvl, 0) / 1e6).toFixed(1)}M`,
+    totalMarkets: allMarkets.length,
+    avgUtilization: `${(allMarkets.reduce((sum, pool) => sum + pool.utilizationRate, 0) / allMarkets.length).toFixed(1)}%`,
+    totalUsers: allMarkets.reduce((sum, pool) => sum + pool.activeUsers, 0)
   } : {
     totalValueLocked: "$0.0M",
     totalMarkets: 0,
@@ -118,12 +128,12 @@ export default function Dashboard() {
     totalUsers: 0
   };
 
-  // Dashboard stats for KPI cards
-  const dashboardStats = enhancedPools.length > 0 ? {
-    totalValueLocked: `$${(enhancedPools.reduce((sum, pool) => sum + pool.tvl, 0) / 1e6).toFixed(1)}M`,
-    averageAPY: `${(enhancedPools.reduce((sum, pool) => sum + pool.supplyAPY, 0) / enhancedPools.length * 100).toFixed(2)}%`,
-    activePools: enhancedPools.filter(pool => pool.status === 'Active').length,
-    totalUsers: enhancedPools.reduce((sum, pool) => sum + pool.activeUsers, 0)
+  // Dashboard stats for KPI cards (including SRWA)
+  const dashboardStats = allMarkets.length > 0 ? {
+    totalValueLocked: `$${(allMarkets.reduce((sum, pool) => sum + pool.tvl, 0) / 1e6).toFixed(1)}M`,
+    averageAPY: `${(allMarkets.reduce((sum, pool) => sum + pool.supplyAPY, 0) / allMarkets.length).toFixed(2)}%`,
+    activePools: allMarkets.filter(pool => pool.status === 'Active').length,
+    totalUsers: allMarkets.reduce((sum, pool) => sum + pool.activeUsers, 0)
   } : {
     totalValueLocked: "$0.0M",
     averageAPY: "0.00%",
@@ -131,18 +141,18 @@ export default function Dashboard() {
     totalUsers: 0
   };
 
-  // Chart data for dashboard
-  const poolTVLChartData = enhancedPools.length > 0 
-    ? enhancedPools.slice(0, 8).map((pool, index) => ({
+  // Chart data for dashboard (including SRWA)
+  const poolTVLChartData = allMarkets.length > 0 
+    ? allMarkets.slice(0, 8).map((pool, index) => ({
         name: pool.name.length > 15 ? pool.name.slice(0, 15) + '...' : pool.name,
         tvl: pool.tvl / 1e6, // Convert to millions
         poolAddress: pool.address
       }))
     : [{ name: "No Data", tvl: 0, poolAddress: "" }];
 
-  // Pie chart data for TVL distribution
-  const pieChartData = enhancedPools.length > 0 
-    ? enhancedPools.map((pool, index) => ({
+  // Pie chart data for TVL distribution (including SRWA)
+  const pieChartData = allMarkets.length > 0 
+    ? allMarkets.map((pool, index) => ({
         name: pool.name.length > 20 ? pool.name.slice(0, 20) + '...' : pool.name,
         value: pool.tvl / 1e6, // Convert to millions
         poolAddress: pool.address
@@ -167,6 +177,7 @@ export default function Dashboard() {
 
   const handleRefresh = () => {
     refetchPools();
+    refetchSRWA();
   };
 
   const getHealthFactorColor = (hf: string) => {
@@ -205,8 +216,8 @@ export default function Dashboard() {
               className="btn-primary w-full sm:w-auto px-4 sm:px-6 py-3 text-sm sm:text-body-1 relative overflow-hidden group"
               onClick={() => window.location.href = '/srwa-issuance'}
             >
-              <span className="relative z-10">Create SRWA</span>
-              <Plus className="ml-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 group-hover:rotate-90 transition-transform" />
+              <span className="relative">Create SRWA</span>
+              <Plus className="ml-2 h-4 w-4 sm:h-5 sm:w-5 relative" />
               <div className="absolute inset-0 bg-gradient-to-r from-brand-600 to-brand-400 opacity-0 group-hover:opacity-100 transition-opacity" />
             </Button>
           </div>
@@ -272,6 +283,7 @@ export default function Dashboard() {
 
                 <MarketsDashboard
                   pools={enhancedPools}
+                  srwaMarkets={srwaMarkets}
                   loading={loading}
                   error={error}
                   onRefresh={handleRefresh}
@@ -322,10 +334,10 @@ export default function Dashboard() {
                           disabled={isConnecting}
                           className="btn-primary w-full px-6 py-3 text-sm font-medium relative overflow-hidden group"
                         >
-                          <span className="relative z-10">
+                          <span className="relative">
                             {isConnecting ? "Connecting..." : "Connect Wallet"}
                           </span>
-                          <ArrowRight className="ml-2 h-4 w-4 relative z-10 group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="ml-2 h-4 w-4 relative" />
                           <div className="absolute inset-0 bg-gradient-to-r from-brand-600 to-brand-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </Button>
                       </div>
@@ -380,12 +392,6 @@ export default function Dashboard() {
                       />
                     </div>
 
-                    {/* RWA Portfolio Section - ISOLATED CONTAINER */}
-                    {isConnected && (walletAssets.hasRWAAssets || blendPositions.hasRWAPositions) && (
-                      <div className="rwa-portfolio-isolated-container w-full">
-                        <RWAPortfolioCard />
-                      </div>
-                    )}
 
                     {/* 🚀 USER CREATED RWA TOKENS SECTION */}
                     <div className="space-y-6">

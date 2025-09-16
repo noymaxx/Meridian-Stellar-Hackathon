@@ -19,10 +19,11 @@ import {
 } from 'lucide-react';
 import { EnhancedPoolData } from '@/types/markets';
 import { BlendPool } from '@/types/blend';
+import { SRWAMarketData } from '@/hooks/markets/useSRWAMarkets';
 import { cn } from '@/lib/utils';
 
 interface PoolCardProps {
-  pool: EnhancedPoolData & Partial<BlendPool>; // Support both types
+  pool: (EnhancedPoolData & Partial<BlendPool>) | SRWAMarketData; // Support Blend pools and SRWA markets
   onViewDetails: (poolAddress: string) => void;
   onSupply: (poolAddress: string) => void;
   onBorrow: (poolAddress: string) => void;
@@ -41,6 +42,9 @@ export const PoolCard: React.FC<PoolCardProps> = ({
   // ===== UTILITY FUNCTIONS =====
   
   const formatCurrency = (amount: number): string => {
+    if (isNaN(amount) || !isFinite(amount)) {
+      return "$0.00";
+    }
     if (amount >= 1e9) return `$${(amount / 1e9).toFixed(1)}B`;
     if (amount >= 1e6) return `$${(amount / 1e6).toFixed(1)}M`;
     if (amount >= 1e3) return `$${(amount / 1e3).toFixed(1)}K`;
@@ -48,6 +52,9 @@ export const PoolCard: React.FC<PoolCardProps> = ({
   };
 
   const formatPercent = (value: number): string => {
+    if (isNaN(value) || value === 0 || !isFinite(value)) {
+      return "—"; // Em dash for better visual appearance
+    }
     return `${value.toFixed(2)}%`;
   };
 
@@ -104,6 +111,16 @@ export const PoolCard: React.FC<PoolCardProps> = ({
   };
 
   const getPoolTypeBadge = () => {
+    // Check if this is an SRWA market
+    if ('marketType' in pool && pool.marketType === 'srwa') {
+      return (
+        <Badge variant="outline" className="flex items-center gap-1 bg-cyan-500/10 text-cyan-400 border-cyan-500/20">
+          <Zap className="h-3 w-3" />
+          SRWA Token
+        </Badge>
+      );
+    }
+    
     const poolType = pool.poolType || 'official';
     
     if (poolType === 'community') {
@@ -236,6 +253,7 @@ export const PoolCard: React.FC<PoolCardProps> = ({
   };
 
   const getUtilizationColor = (rate: number) => {
+    if (isNaN(rate) || !isFinite(rate)) return 'bg-gray-400';
     if (rate < 0.5) return 'bg-brand-400';
     if (rate < 0.8) return 'bg-yellow-400';
     return 'bg-red-400';
@@ -247,14 +265,14 @@ export const PoolCard: React.FC<PoolCardProps> = ({
 
   return (
     <Card className={cn(
-      "group relative overflow-hidden transition-all duration-500 hover:border-brand-400/50 bg-card border-stroke-line hover:shadow-xl hover:shadow-brand-400/20 hover:scale-[1.02] hover:-translate-y-1",
+      "group relative overflow-hidden transition-all duration-300 hover:border-brand-400/50 bg-card border-stroke-line hover:shadow-lg hover:shadow-brand-400/10",
       compact ? "h-64" : "h-auto min-h-[320px]"
     )}>
       {/* Top gradient indicator */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-400 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-400 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
       
       {/* Subtle background glow on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-brand-400/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-400/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
       <CardContent className="p-6 space-y-6">
         {/* Header Section */}
@@ -311,19 +329,19 @@ export const PoolCard: React.FC<PoolCardProps> = ({
           <div className="flex justify-between items-center">
             <span className="text-micro text-fg-muted uppercase tracking-wide">Pool Utilization</span>
             <span className="text-body-2 font-medium text-fg-secondary tabular-nums">
-              {formatPercent(pool.utilizationRate * 100)}
+              {formatPercent(pool.utilizationRate)}
             </span>
           </div>
           <div className="relative h-2 bg-bg-elev-2 rounded-full overflow-hidden group-hover:h-2.5 transition-all duration-300">
             <div 
               className={cn(
                 "h-full transition-all duration-700 rounded-full relative overflow-hidden",
-                getUtilizationColor(pool.utilizationRate)
+                getUtilizationColor(pool.utilizationRate / 100)
               )}
-              style={{ width: `${pool.utilizationRate * 100}%` }}
+              style={{ width: `${Math.min(100, pool.utilizationRate)}%` }}
             >
               {/* Shimmer effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
             </div>
           </div>
         </div>
@@ -461,7 +479,7 @@ export const PoolCard: React.FC<PoolCardProps> = ({
           <div className="flex gap-3 pt-4 border-t border-stroke-line">
             <Button 
               variant="outline"
-              className="flex-1 border-brand-400/20 hover:border-brand-400 hover:bg-brand-400/10 text-brand-400 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-brand-400/20 disabled:hover:scale-100 disabled:hover:shadow-none"
+              className="flex-1 border-brand-400/20 hover:border-brand-400 hover:bg-brand-400/10 text-brand-400 transition-all duration-200 hover:shadow-md hover:shadow-brand-400/20 pointer-events-auto"
               onClick={() => onSupply(pool.address)}
               disabled={pool.status !== 'Active'}
             >
@@ -470,7 +488,7 @@ export const PoolCard: React.FC<PoolCardProps> = ({
             
             <Button 
               variant="outline"
-              className="flex-1 border-stroke-line hover:border-fg-muted hover:bg-bg-elev-2 transition-all duration-300 hover:scale-105 disabled:hover:scale-100"
+              className="flex-1 border-stroke-line hover:border-fg-muted hover:bg-bg-elev-2 transition-all duration-200 pointer-events-auto"
               onClick={() => onBorrow(pool.address)}
               disabled={pool.status !== 'Active'}
             >
@@ -480,7 +498,7 @@ export const PoolCard: React.FC<PoolCardProps> = ({
             <Button 
               variant="ghost"
               size="sm"
-              className="px-3 hover:bg-bg-elev-2 group-hover:text-brand-400 transition-all duration-300 hover:scale-110"
+              className="px-3 hover:bg-bg-elev-2 group-hover:text-brand-400 transition-all duration-200 pointer-events-auto"
               onClick={() => onViewDetails(pool.address)}
             >
               <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

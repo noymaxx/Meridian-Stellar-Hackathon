@@ -2,15 +2,10 @@
 
 .dashboard-tab-button {
   position: relative;
-  transition: all 0.2s ease-in-out;
-}
-
-.dashboard-tab-button:hover {
-  transform: translateY(-1px);
 }
 
 .dashboard-tab-content {
-  animation: fadeInUp 0.4s ease-out;
+  /* Content styles without animations */
 }
 
 .dashboard-portfolio-tab {
@@ -18,32 +13,11 @@
 }
 
 .rwa-portfolio-isolated-container {
-  isolation: isolate;
-  contain: layout style;
+  contain: layout;
   position: relative;
 }
 
-/* Fade in animation */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Hover effects for cards */
-.hover-lift {
-  transition: all 0.3s ease;
-}
-
-.hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
+/* Removed animations for stability */
 
 /* Custom scrollbar for dashboard content */
 .dashboard-tab-content::-webkit-scrollbar {

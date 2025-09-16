@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { motion } from 'framer-motion';
 import { 
   Search,
   TrendingUp,
@@ -388,14 +387,8 @@ export const RWALendingPools: React.FC<RWALendingPoolsProps> = ({
             const CategoryIcon = getCategoryIcon(pool.category);
             
             return (
-              <motion.div
-                key={pool.address}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-              >
-                <Card className="h-full hover-lift">
+              <div key={pool.address}>
+                <Card className="h-full">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="space-y-2">
@@ -493,7 +486,7 @@ export const RWALendingPools: React.FC<RWALendingPoolsProps> = ({
                     )}
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             );
           })}
         </div>

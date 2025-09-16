@@ -23,14 +23,14 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { PoolCard } from './PoolCard';
-import { SupplyModal } from './SupplyModal';
-import { BorrowModal } from './BorrowModal';
+import { LendingModal } from './LendingModal';
 import { EnhancedPoolData } from '@/types/markets';
-import { BlendPool } from '@/types/blend';
+import { SRWAMarketData } from '@/hooks/markets/useSRWAMarkets';
 import { cn } from '@/lib/utils';
 
 interface MarketsDashboardProps {
   pools: EnhancedPoolData[];
+  srwaMarkets?: SRWAMarketData[]; // SRWA markets from deployed tokens
   loading: boolean;
   error: string | null;
   onRefresh: () => void;
@@ -45,6 +45,7 @@ type ViewMode = 'grid' | 'list';
 
 export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
   pools,
+  srwaMarkets = [],
   loading,
   error,
   onRefresh,
@@ -57,6 +58,7 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
   const [selectedClass, setSelectedClass] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedPoolType, setSelectedPoolType] = useState<string>('all');
+  const [selectedMarketType, setSelectedMarketType] = useState<string>('all'); // 'all', 'blend', 'srwa'
   const [minAPY, setMinAPY] = useState<string>('');
   const [maxTVL, setMaxTVL] = useState<string>('');
   const [sortField, setSortField] = useState<SortField>('tvl');
@@ -66,40 +68,78 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
   const [showFilters, setShowFilters] = useState(false);
 
   // Modal states
-  const [supplyModal, setSupplyModal] = useState<{ isOpen: boolean; pool: BlendPool | null }>({
+  const [lendingModal, setLendingModal] = useState<{ 
+    isOpen: boolean; 
+    pool: (EnhancedPoolData | SRWAMarketData) | null; 
+    mode: 'supply' | 'borrow';
+  }>({
     isOpen: false,
-    pool: null
+    pool: null,
+    mode: 'supply'
   });
-  const [borrowModal, setBorrowModal] = useState<{ isOpen: boolean; pool: BlendPool | null }>({
-    isOpen: false,
-    pool: null
-  });
+
+  // Pool updates state - tracks simulated changes to pools
+  const [poolUpdates, setPoolUpdates] = useState<Record<string, {
+    tvlDelta: number;
+    availableLiquidityDelta: number;
+    utilizationRateDelta: number;
+    lastUpdated: number;
+  }>>({});
 
   // ===== COMPUTED VALUES =====
   
-  const marketStats = useMemo(() => {
-    if (!pools.length) return null;
+  // Combine Blend pools and SRWA markets into a unified array
+  const allMarkets = useMemo(() => {
+    // Add market type identifier to each pool/market
+    const blendPools = pools.map(pool => ({ ...pool, marketType: 'blend' as const }));
+    const srwaPoolsWithType = srwaMarkets.map(market => ({ ...market, marketType: 'srwa' as const }));
     
-    const activePools = pools.filter(p => p.status === 'Active');
-    const communityPools = pools.filter(p => p.poolType === 'community');
+    // Apply simulated updates to pools
+    const allPoolsWithUpdates = [...blendPools, ...srwaPoolsWithType].map(pool => {
+      const update = poolUpdates[pool.address];
+      if (!update) return pool;
+
+      const updatedPool = { ...pool };
+      updatedPool.tvl = Math.max(0, pool.tvl + update.tvlDelta);
+      updatedPool.availableLiquidity = Math.max(0, pool.availableLiquidity + update.availableLiquidityDelta);
+      
+      // Recalculate utilization rate
+      const totalBorrowed = updatedPool.tvl * pool.utilizationRate + update.utilizationRateDelta;
+      updatedPool.utilizationRate = updatedPool.tvl > 0 ? Math.min(0.95, Math.max(0, totalBorrowed / updatedPool.tvl)) : 0;
+      
+      return updatedPool;
+    });
+    
+    return allPoolsWithUpdates;
+  }, [pools, srwaMarkets, poolUpdates]);
+  
+  const marketStats = useMemo(() => {
+    if (!allMarkets.length) return null;
+    
+    const activeMarkets = allMarkets.filter(p => p.status === 'Active');
+    const blendMarkets = allMarkets.filter(p => p.marketType === 'blend');
+    const srwaMarkets = allMarkets.filter(p => p.marketType === 'srwa');
+    const communityPools = blendMarkets.filter(p => p.poolType === 'community');
     const unverifiedCommunityPools = communityPools.filter(p => !p.verified);
     
     return {
-      totalTVL: pools.reduce((sum, p) => sum + p.tvl, 0),
-      averageSupplyAPY: pools.reduce((sum, p) => sum + p.supplyAPY, 0) / pools.length,
-      averageBorrowAPY: pools.reduce((sum, p) => sum + p.borrowAPY, 0) / pools.length,
-      totalVolume24h: pools.reduce((sum, p) => sum + p.volume24h, 0),
-      totalUsers: pools.reduce((sum, p) => sum + p.activeUsers, 0),
-      activePools: activePools.length,
-      totalPools: pools.length,
-      averageUtilization: pools.reduce((sum, p) => sum + p.utilizationRate, 0) / pools.length,
+      totalTVL: allMarkets.reduce((sum, p) => sum + p.tvl, 0),
+      averageSupplyAPY: allMarkets.reduce((sum, p) => sum + p.supplyAPY, 0) / allMarkets.length,
+      averageBorrowAPY: allMarkets.reduce((sum, p) => sum + p.borrowAPY, 0) / allMarkets.length,
+      totalVolume24h: allMarkets.reduce((sum, p) => sum + p.volume24h, 0),
+      totalUsers: allMarkets.reduce((sum, p) => sum + p.activeUsers, 0),
+      activePools: activeMarkets.length,
+      totalPools: allMarkets.length,
+      blendMarkets: blendMarkets.length,
+      srwaMarkets: srwaMarkets.length,
+      averageUtilization: allMarkets.reduce((sum, p) => sum + p.utilizationRate, 0) / allMarkets.length,
       communityPools: communityPools.length,
       unverifiedCommunityPools: unverifiedCommunityPools.length
     };
-  }, [pools]);
+  }, [allMarkets]);
 
   const filteredAndSortedPools = useMemo(() => {
-    let filtered = pools;
+    let filtered = allMarkets;
 
     // Search filter
     if (searchQuery) {
@@ -120,17 +160,22 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
       filtered = filtered.filter(pool => pool.status === selectedStatus);
     }
 
-    // Pool type filter
+    // Pool type filter (only applies to Blend pools)
     if (selectedPoolType !== 'all') {
       if (selectedPoolType === 'official') {
-        filtered = filtered.filter(pool => !pool.poolType || pool.poolType === 'official');
+        filtered = filtered.filter(pool => pool.marketType === 'blend' && (!pool.poolType || pool.poolType === 'official'));
       } else if (selectedPoolType === 'community') {
-        filtered = filtered.filter(pool => pool.poolType === 'community');
+        filtered = filtered.filter(pool => pool.marketType === 'blend' && pool.poolType === 'community');
       } else if (selectedPoolType === 'verified') {
-        filtered = filtered.filter(pool => pool.poolType === 'community' && pool.verified === true);
+        filtered = filtered.filter(pool => pool.marketType === 'blend' && pool.poolType === 'community' && pool.verified === true);
       } else if (selectedPoolType === 'unverified') {
-        filtered = filtered.filter(pool => pool.poolType === 'community' && pool.verified === false);
+        filtered = filtered.filter(pool => pool.marketType === 'blend' && pool.poolType === 'community' && pool.verified === false);
       }
+    }
+
+    // Market type filter (Blend vs SRWA)
+    if (selectedMarketType !== 'all') {
+      filtered = filtered.filter(pool => pool.marketType === selectedMarketType);
     }
 
     // Active pools only
@@ -165,7 +210,7 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
     });
 
     return filtered;
-  }, [pools, searchQuery, selectedClass, selectedStatus, selectedPoolType, showOnlyActive, minAPY, maxTVL, sortField, sortOrder]);
+  }, [allMarkets, searchQuery, selectedClass, selectedStatus, selectedPoolType, selectedMarketType, showOnlyActive, minAPY, maxTVL, sortField, sortOrder]);
 
   // ===== UTILITY FUNCTIONS =====
   
@@ -200,6 +245,7 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
     setSelectedClass('all');
     setSelectedStatus('all');
     setSelectedPoolType('all');
+    setSelectedMarketType('all');
     setMinAPY('');
     setMaxTVL('');
     setShowOnlyActive(false);
@@ -208,175 +254,58 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
   // ===== MODAL HANDLERS =====
   
   const handleSupplyClick = (poolAddress: string) => {
-    const pool = pools.find(p => p.address === poolAddress);
+    const pool = allMarkets.find(p => p.address === poolAddress);
     if (pool) {
-      // Convert EnhancedPoolData to BlendPool format
-      const blendPool: BlendPool = {
-        address: pool.address,
-        name: pool.name,
-        class: pool.class,
-        reserves: [], // Will be populated from the enhanced pool data
-        backstopRate: 0.1, // Mock value
-        status: pool.status,
-        totalSupply: BigInt(Math.floor(pool.tvl * 1e6)),
-        totalBorrowed: BigInt(Math.floor(pool.tvl * pool.utilizationRate * 1e6)),
-        totalLiquidity: BigInt(Math.floor(pool.availableLiquidity * 1e6)),
-        averageSupplyAPY: pool.supplyAPY,
-        averageBorrowAPY: pool.borrowAPY,
-        utilizationRate: pool.utilizationRate,
-        createdAt: Date.now() - 86400000 * 30,
-        lastUpdated: Date.now(),
-        poolType: pool.poolType,
-        creator: pool.creator,
-        description: pool.description,
-        category: pool.category,
-        tags: pool.tags,
-        verified: pool.verified,
-        riskLevel: pool.riskLevel,
-        website: pool.website,
-        twitter: pool.twitter,
-        github: pool.github
-      };
-
-      // Create mock reserves for the pool
-      blendPool.reserves = [
-        {
-          asset: {
-            code: 'USDC',
-            contractAddress: 'CUSDCMOCKCONTRACTADDRESS',
-            decimals: 6,
-            symbol: 'USDC',
-            name: 'USD Coin'
-          },
-          totalSupply: BigInt(Math.floor(pool.tvl * 0.6 * 1e6)),
-          totalBorrowed: BigInt(Math.floor(pool.tvl * 0.6 * pool.utilizationRate * 1e6)),
-          availableLiquidity: BigInt(Math.floor(pool.availableLiquidity * 0.6 * 1e6)),
-          supplyAPY: pool.supplyAPY,
-          borrowAPY: pool.borrowAPY,
-          utilizationRate: pool.utilizationRate,
-          collateralFactor: 0.8,
-          liquidationFactor: 0.85,
-          lastUpdated: Date.now(),
-          enabled: true,
-          borrowable: true
-        },
-        {
-          asset: {
-            code: 'XLM',
-            contractAddress: 'CXLMMOCKCONTRACTADDRESS',
-            decimals: 7,
-            symbol: 'XLM',
-            name: 'Stellar Lumens'
-          },
-          totalSupply: BigInt(Math.floor(pool.tvl * 0.4 * 1e7 / 0.12)),
-          totalBorrowed: BigInt(Math.floor(pool.tvl * 0.4 * pool.utilizationRate * 1e7 / 0.12)),
-          availableLiquidity: BigInt(Math.floor(pool.availableLiquidity * 0.4 * 1e7 / 0.12)),
-          supplyAPY: pool.supplyAPY * 1.1,
-          borrowAPY: pool.borrowAPY * 1.1,
-          utilizationRate: pool.utilizationRate,
-          collateralFactor: 0.7,
-          liquidationFactor: 0.75,
-          lastUpdated: Date.now(),
-          enabled: true,
-          borrowable: true
-        }
-      ];
-
-      setSupplyModal({ isOpen: true, pool: blendPool });
+      setLendingModal({ isOpen: true, pool, mode: 'supply' });
     }
-    
-    // Also call the original handler if provided
-    onSupply?.(poolAddress);
   };
 
   const handleBorrowClick = (poolAddress: string) => {
-    const pool = pools.find(p => p.address === poolAddress);
+    const pool = allMarkets.find(p => p.address === poolAddress);
     if (pool) {
-      // Same conversion logic as supply
-      const blendPool: BlendPool = {
-        address: pool.address,
-        name: pool.name,
-        class: pool.class,
-        reserves: [],
-        backstopRate: 0.1,
-        status: pool.status,
-        totalSupply: BigInt(Math.floor(pool.tvl * 1e6)),
-        totalBorrowed: BigInt(Math.floor(pool.tvl * pool.utilizationRate * 1e6)),
-        totalLiquidity: BigInt(Math.floor(pool.availableLiquidity * 1e6)),
-        averageSupplyAPY: pool.supplyAPY,
-        averageBorrowAPY: pool.borrowAPY,
-        utilizationRate: pool.utilizationRate,
-        createdAt: Date.now() - 86400000 * 30,
-        lastUpdated: Date.now(),
-        poolType: pool.poolType,
-        creator: pool.creator,
-        description: pool.description,
-        category: pool.category,
-        tags: pool.tags,
-        verified: pool.verified,
-        riskLevel: pool.riskLevel,
-        website: pool.website,
-        twitter: pool.twitter,
-        github: pool.github
+      setLendingModal({ isOpen: true, pool, mode: 'borrow' });
+    }
+  };
+
+  const closeLendingModal = () => {
+    setLendingModal({ isOpen: false, pool: null, mode: 'supply' });
+  };
+
+  // Handle transaction completion - simulate pool data updates
+  const handleTransactionComplete = (poolAddress: string, amount: number, mode: 'supply' | 'borrow') => {
+    setPoolUpdates(prev => {
+      const existingUpdate = prev[poolAddress] || {
+        tvlDelta: 0,
+        availableLiquidityDelta: 0,
+        utilizationRateDelta: 0,
+        lastUpdated: Date.now()
       };
 
-      // Create mock reserves
-      blendPool.reserves = [
-        {
-          asset: {
-            code: 'USDC',
-            contractAddress: 'CUSDCMOCKCONTRACTADDRESS',
-            decimals: 6,
-            symbol: 'USDC',
-            name: 'USD Coin'
-          },
-          totalSupply: BigInt(Math.floor(pool.tvl * 0.6 * 1e6)),
-          totalBorrowed: BigInt(Math.floor(pool.tvl * 0.6 * pool.utilizationRate * 1e6)),
-          availableLiquidity: BigInt(Math.floor(pool.availableLiquidity * 0.6 * 1e6)),
-          supplyAPY: pool.supplyAPY,
-          borrowAPY: pool.borrowAPY,
-          utilizationRate: pool.utilizationRate,
-          collateralFactor: 0.8,
-          liquidationFactor: 0.85,
-          lastUpdated: Date.now(),
-          enabled: true,
-          borrowable: true
-        },
-        {
-          asset: {
-            code: 'XLM',
-            contractAddress: 'CXLMMOCKCONTRACTADDRESS',
-            decimals: 7,
-            symbol: 'XLM',
-            name: 'Stellar Lumens'
-          },
-          totalSupply: BigInt(Math.floor(pool.tvl * 0.4 * 1e7 / 0.12)),
-          totalBorrowed: BigInt(Math.floor(pool.tvl * 0.4 * pool.utilizationRate * 1e7 / 0.12)),
-          availableLiquidity: BigInt(Math.floor(pool.availableLiquidity * 0.4 * 1e7 / 0.12)),
-          supplyAPY: pool.supplyAPY * 1.1,
-          borrowAPY: pool.borrowAPY * 1.1,
-          utilizationRate: pool.utilizationRate,
-          collateralFactor: 0.7,
-          liquidationFactor: 0.75,
-          lastUpdated: Date.now(),
-          enabled: true,
-          borrowable: true
+      let tvlDelta = existingUpdate.tvlDelta;
+      let availableLiquidityDelta = existingUpdate.availableLiquidityDelta;
+      let utilizationRateDelta = existingUpdate.utilizationRateDelta;
+
+      if (mode === 'supply') {
+        // Supply increases TVL and available liquidity
+        tvlDelta += amount;
+        availableLiquidityDelta += amount;
+      } else {
+        // Borrow decreases available liquidity and increases utilization
+        // TVL remains the same (total value locked doesn't change with borrows)
+        availableLiquidityDelta -= amount;
+        utilizationRateDelta += amount;
+      }
+
+      return {
+        ...prev,
+        [poolAddress]: {
+          tvlDelta,
+          availableLiquidityDelta,
+          utilizationRateDelta,
+          lastUpdated: Date.now()
         }
-      ];
-
-      setBorrowModal({ isOpen: true, pool: blendPool });
-    }
-    
-    // Also call the original handler if provided
-    onBorrow?.(poolAddress);
-  };
-
-  const closeSupplyModal = () => {
-    setSupplyModal({ isOpen: false, pool: null });
-  };
-
-  const closeBorrowModal = () => {
-    setBorrowModal({ isOpen: false, pool: null });
+      };
+    });
   };
 
   // ===== RENDER =====
@@ -493,9 +422,12 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
                   <Users className="h-4 w-4 sm:h-5 sm:w-5 text-brand-400 group-hover:scale-110 transition-transform duration-300" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-micro text-fg-muted uppercase tracking-wide">Active Pools</p>
+                  <p className="text-xs sm:text-micro text-fg-muted uppercase tracking-wide">Active Markets</p>
                   <p className="text-lg sm:text-xl lg:text-h3 font-bold text-fg-primary tabular-nums truncate">
                     {marketStats.activePools}/{marketStats.totalPools}
+                  </p>
+                  <p className="text-xs text-fg-muted">
+                    {marketStats.blendMarkets} Blend • {marketStats.srwaMarkets} SRWA
                   </p>
                 </div>
               </div>
@@ -663,6 +595,20 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
                   </div>
 
                   <div className="space-y-2">
+                    <Label className="text-fg-secondary">Market Type</Label>
+                    <Select value={selectedMarketType} onValueChange={setSelectedMarketType}>
+                      <SelectTrigger className="bg-bg-elev-2 border-stroke-line text-fg-primary hover:border-brand-400/50">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Markets</SelectItem>
+                        <SelectItem value="blend">Blend Pools</SelectItem>
+                        <SelectItem value="srwa">SRWA Tokens</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label className="text-fg-secondary">Min Supply APY (%)</Label>
                     <Input
                       type="number"
@@ -750,23 +696,14 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
         </CardContent>
       </Card>
 
-      {/* Supply Modal */}
-      {supplyModal.pool && (
-        <SupplyModal
-          isOpen={supplyModal.isOpen}
-          onClose={closeSupplyModal}
-          pool={supplyModal.pool}
-        />
-      )}
-
-      {/* Borrow Modal */}
-      {borrowModal.pool && (
-        <BorrowModal
-          isOpen={borrowModal.isOpen}
-          onClose={closeBorrowModal}
-          pool={borrowModal.pool}
-        />
-      )}
+      {/* Lending Modal */}
+      <LendingModal
+        isOpen={lendingModal.isOpen}
+        onClose={closeLendingModal}
+        pool={lendingModal.pool}
+        mode={lendingModal.mode}
+        onTransactionComplete={handleTransactionComplete}
+      />
     </div>
   );
 };
