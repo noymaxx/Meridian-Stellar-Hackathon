@@ -1,0 +1,29 @@
+[workspace]
+resolver = "2"
+members = [
+  "contracts/identity_registry",
+  "contracts/claim_topics_registry",
+  "contracts/trusted_issuers_registry",
+  "contracts/compliance_core",
+  "contracts/compliance_modules",
+  "contracts/srwa_token",
+  "contracts/token_factory",
+  "contracts/integrations",
+]
+
+[workspace.dependencies]
+soroban-sdk = "20.3.0"
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = 0
+strip = "symbols"
+debug-assertions = false
+panic = "abort"
+codegen-units = 1
+lto = true
+
+[profile.release-with-logs]
+inherits = "release"
+debug-assertions = true
