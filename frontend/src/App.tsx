@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Home from "./pages/Home";
 import SRWAIssuance from "./pages/SRWAIssuance";
 import SRWADemo from "./pages/SRWADemo";
+import SRWATestForm from "./pages/SRWATestForm";
 import KYCEligibility from "./pages/KYCEligibility";
 import OracleNav from "./pages/OracleNav";
 import Pools from "./pages/Pools";
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/home" element={<Home />} />
             <Route path="/srwa-issuance" element={<SRWAIssuance />} />
             <Route path="/srwa-demo" element={<SRWADemo />} />
+            <Route path="/srwa-test" element={<SRWATestForm />} />
             <Route path="/kyc-eligibility" element={<KYCEligibility />} />
             <Route path="/oracle-nav" element={<OracleNav />} />
             <Route path="/pools" element={<Pools />} />
