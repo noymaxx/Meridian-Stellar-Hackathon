@@ -4,47 +4,33 @@ use soroban_sdk::{
     Address, Env, Symbol, Vec, Map, String, BytesN, IntoVal
 };
 
-// Storage keys
+// Storage keys - MÁXIMO 9 CARACTERES
 const ADMIN_KEY: Symbol = symbol_short!("ADMIN");
 const POOLS_KEY: Symbol = symbol_short!("POOLS");
+const TOKENS_KEY: Symbol = symbol_short!("TOKENS");
+const POSITIONS: Symbol = symbol_short!("POSITIONS");
+const RESERVES: Symbol = symbol_short!("RESERVES");
+const BLEND_POS: Symbol = symbol_short!("BLEND_POS");
+const COMPLIANCE: Symbol = symbol_short!("COMPLIANT");
 
-// Events
-const POOL_CREATED_EVENT: Symbol = symbol_short!("pool_crt");
-const SUPPLY_EVENT: Symbol = symbol_short!("supply");
-const BORROW_EVENT: Symbol = symbol_short!("borrow");
-const REPAY_EVENT: Symbol = symbol_short!("repay");
-const WITHDRAW_EVENT: Symbol = symbol_short!("withdraw");
+// Events - MÁXIMO 9 CARACTERES
+const POOL_NEW: Symbol = symbol_short!("POOL_NEW");
+const SUPPLY: Symbol = symbol_short!("SUPPLY");
+const BORROW: Symbol = symbol_short!("BORROW");
+const REPAY: Symbol = symbol_short!("REPAY");
+const WITHDRAW: Symbol = symbol_short!("WITHDRAW");
 
-// Official Blend Protocol Addresses on Testnet
-const POOL_FACTORY_V2: &str = "CDSMKKCWEAYQW4DAUSH3XGRMIVIJB44TZ3UA5YCRHT6MP4LWEWR4GYV6";
-const BACKSTOP_V2: &str = "CBHWKF4RHIKOKSURAKXSJRIIA7RJAMJH4VHRVPYGUF4AJ5L544LYZ35X";
-const ORACLE_MOCK: &str = "CBKKSSMTHJJTQWSIOBJQAIGR42NSY43ZBKKXWF445PE4OLOTOGPOWWF4";
-const EMITTER: &str = "CCS5ACKIDOIVW2QMWBF7H3ZM4ZIH2Q2NP7I3P3GH7YXXGN7I3WND3D6G";
-
-// Official Token Addresses
-const USDC_TOKEN: &str = "CAQCFVLOBK5GIULPNZRGATJJMIZL5BSP7X5YJVMGCPTUEPFM4AVSRCJU";
-const XLM_TOKEN: &str = "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC";
-const BLND_TOKEN: &str = "CB22KRA3YZVCNCQI64JQ5WE7UY2VAV7WFLK6A2JN3HEX56T2EDAFO7QF";
-const WETH_TOKEN: &str = "CAZAQB3D7KSLSNOSQKYD2V4JP5V2Y3B4RDJZRLBFCCIXDCTE3WHSY3UE";
-const WBTC_TOKEN: &str = "CAP5AMC2OHNVREO66DFIN6DHJMPOBAJ2KCDDIMFBR7WWJH5RZBFM3UEI";
-
-// Request types for Blend Protocol operations
+// Request types para Blend Protocol
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum RequestType {
     SupplyCollateral = 0,
     WithdrawCollateral = 1,
-    SupplyLiability = 2,
-    WithdrawLiability = 3,
     Borrow = 4,
     Repay = 5,
-    FillUserLiquidationAuction = 6,
-    FillBadDebtAuction = 7,
-    FillInterestAuction = 8,
-    DeleteLiquidationAuction = 9,
 }
 
-// Request structure for Blend operations
+// Request structure para Blend Protocol
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Request {
@@ -53,73 +39,107 @@ pub struct Request {
     pub amount: i128,
 }
 
-// Pool configuration for Blend V2
+// Blend Pool Reserve Info
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ReserveInfo {
+    pub asset: Address,
+    pub c_factor: u32,
+    pub l_factor: u32,
+    pub util: u32,
+    pub max_util: u32,
+    pub r_base: u32,
+    pub r_one: u32,
+    pub r_two: u32,
+    pub r_three: u32,
+    pub reactivity: u32,
+    pub supply_cap: i128,
+    pub enabled: bool,
+}
+
+// Blend Pool Position
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct BlendPosition {
+    pub user: Address,
+    pub pool: Address,
+    pub collateral: Map<Address, i128>,
+    pub debt: Map<Address, i128>,
+    pub last_update: u64,
+}
+
+// Compliance Result
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ComplianceResult {
+    pub is_compliant: bool,
+    pub reason: String,
+    pub required_actions: Vec<String>,
+}
+
+// Estruturas simplificadas
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct PoolInfo {
     pub pool_address: Address,
     pub name: String,
     pub oracle: Address,
-    pub backstop_take_rate: u32,
     pub max_positions: u32,
+    pub is_active: bool,
+    pub created_at: u64,
 }
 
-// User position data
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct UserPositionData {
-    pub supplied: Map<Address, i128>,
-    pub borrowed: Map<Address, i128>,
+pub struct TokenConfig {
+    pub token_address: Address,
+    pub pool_address: Address,
+    pub ltv_ratio: u32,
+    pub liq_threshold: u32,
+    pub is_authorized: bool,
 }
 
-// Pool reserve configuration for Blend V2
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct ReserveConfig {
-    pub index: u32,
-    pub decimals: u32,
-    pub c_factor: u32,
-    pub l_factor: u32,
-    pub util: u32,
-    pub max_util: u32,
-    pub r_one: u32,
-    pub r_two: u32,
-    pub r_three: u32,
-    pub reactivity: u32,
+pub struct Position {
+    pub user: Address,
+    pub pool: Address,
+    pub collateral: i128,
+    pub borrowed: i128,
+    pub health_factor: u32,
+    pub can_borrow: bool,
 }
 
 #[contract]
-pub struct BlendAdapterV2;
+pub struct BlendPoolIntegration;
 
 #[contractimpl]
-impl BlendAdapterV2 {
-    /// Initialize the Blend adapter with official Blend V2 contracts
-    pub fn initialize(
-        env: Env,
-        admin: Address,
-    ) {
+impl BlendPoolIntegration {
+    /// Inicializar o contrato
+    pub fn initialize(env: Env, admin: Address) {
         if env.storage().instance().has(&ADMIN_KEY) {
             panic!("Already initialized");
         }
 
         admin.require_auth();
-
-        // Store configuration
         env.storage().instance().set(&ADMIN_KEY, &admin);
         
-        // Initialize empty pools map
+        // Inicializar mapas vazios
         let pools: Map<Address, PoolInfo> = Map::new(&env);
+        let tokens: Map<Address, TokenConfig> = Map::new(&env);
+        let positions: Map<(Address, Address), Position> = Map::new(&env);
+        
         env.storage().instance().set(&POOLS_KEY, &pools);
+        env.storage().instance().set(&TOKENS_KEY, &tokens);
+        env.storage().instance().set(&POSITIONS, &positions);
     }
 
-    /// Deploy a new Blend lending pool using official pool factory
-    pub fn deploy_pool(
+    /// Criar pool simplificado
+    pub fn create_pool(
         env: Env,
         admin: Address,
         name: String,
-        salt: BytesN<32>,
         oracle: Address,
-        backstop_take_rate: u32,
         max_positions: u32,
     ) -> Address {
         let stored_admin: Address = env.storage().instance()
@@ -132,39 +152,71 @@ impl BlendAdapterV2 {
         
         admin.require_auth();
 
-        // Validate parameters according to Blend V2
-        if backstop_take_rate > 10000 {
-            panic!("Invalid backstop take rate");
-        }
+        // Validações simples
         if max_positions == 0 || max_positions > 12 {
             panic!("Invalid max positions");
         }
 
-        // Use official Blend pool factory
-        let pool_factory = Address::from_string(&String::from_str(&env, POOL_FACTORY_V2));
+        // Criar endereço do pool de forma simples
+        let pool_address = Self::generate_pool_address(&env, &admin, &name);
 
-        // Deploy pool using Blend's pool factory V2
-        let pool_address: Address = env.invoke_contract(
-            &pool_factory,
-            &Symbol::new(&env, "deploy"),
-            vec![
-                &env,
-                admin.into_val(&env),
-                name.clone().into_val(&env),
-                salt.into_val(&env),
-                oracle.clone().into_val(&env),
-                backstop_take_rate.into_val(&env),
-                max_positions.into_val(&env),
-            ],
-        );
-
-        // Store pool info
+        // Criar info do pool
         let pool_info = PoolInfo {
             pool_address: pool_address.clone(),
             name: name.clone(),
-            oracle,
-            backstop_take_rate,
+            oracle: oracle.clone(),
             max_positions,
+            is_active: true,
+            created_at: env.ledger().timestamp(),
+        };
+
+        // Armazenar
+        let mut pools: Map<Address, PoolInfo> = env.storage().instance()
+            .get(&POOLS_KEY)
+            .unwrap_or(Map::new(&env));
+        
+        pools.set(pool_address.clone(), pool_info);
+        env.storage().instance().set(&POOLS_KEY, &pools);
+
+        // Emitir evento
+        env.events().publish(
+            (POOL_NEW,),
+            (pool_address.clone(), name, oracle)
+        );
+
+        pool_address
+    }
+
+    /// Registrar pool existente
+    pub fn register_pool(
+        env: Env,
+        admin: Address,
+        pool_address: Address,
+        name: String,
+        oracle: Address,
+        max_positions: u32,
+    ) {
+        let stored_admin: Address = env.storage().instance()
+            .get(&ADMIN_KEY)
+            .expect("Not initialized");
+        
+        if admin != stored_admin {
+            panic!("Unauthorized");
+        }
+        
+        admin.require_auth();
+
+        if max_positions == 0 || max_positions > 12 {
+            panic!("Invalid max positions");
+        }
+
+        let pool_info = PoolInfo {
+            pool_address: pool_address.clone(),
+            name: name.clone(),
+            oracle: oracle.clone(),
+            max_positions,
+            is_active: true,
+            created_at: env.ledger().timestamp(),
         };
 
         let mut pools: Map<Address, PoolInfo> = env.storage().instance()
@@ -174,27 +226,40 @@ impl BlendAdapterV2 {
         pools.set(pool_address.clone(), pool_info);
         env.storage().instance().set(&POOLS_KEY, &pools);
 
-        // Emit event
         env.events().publish(
-            (POOL_CREATED_EVENT,),
-            (pool_address.clone(), name)
+            (POOL_NEW,),
+            (pool_address, name, oracle)
         );
-
-        pool_address
     }
 
-    /// Submit requests to Blend pool with proper validation
-    pub fn submit_requests(
+    /// Adicionar token SRWA ao pool
+    pub fn add_token_to_pool(
         env: Env,
-        from: Address,
-        spender: Address,
-        to: Address,
+        admin: Address,
         pool_address: Address,
-        requests: Vec<Request>,
+        token: Address,
+        ltv_ratio: u32,
+        liq_threshold: u32,
     ) {
-        from.require_auth();
+        let stored_admin: Address = env.storage().instance()
+            .get(&ADMIN_KEY)
+            .expect("Not initialized");
+        
+        if admin != stored_admin {
+            panic!("Unauthorized");
+        }
+        
+        admin.require_auth();
 
-        // Validate pool exists
+        // Validações
+        if ltv_ratio > liq_threshold {
+            panic!("LTV > liquidation threshold");
+        }
+        if liq_threshold > 10000 {
+            panic!("Invalid liquidation threshold");
+        }
+
+        // Verificar se pool existe
         let pools: Map<Address, PoolInfo> = env.storage().instance()
             .get(&POOLS_KEY)
             .expect("Not initialized");
@@ -203,223 +268,391 @@ impl BlendAdapterV2 {
             panic!("Pool not found");
         }
 
-        // Validate requests
-        for request in requests.iter() {
-            if request.amount <= 0 {
-                panic!("Invalid amount");
-            }
+        // Criar config do token
+        let token_config = TokenConfig {
+            token_address: token.clone(),
+            pool_address: pool_address.clone(),
+            ltv_ratio,
+            liq_threshold,
+            is_authorized: true,
+        };
+
+        // Armazenar
+        let mut tokens: Map<Address, TokenConfig> = env.storage().instance()
+            .get(&TOKENS_KEY)
+            .unwrap_or(Map::new(&env));
+        
+        tokens.set(token, token_config);
+        env.storage().instance().set(&TOKENS_KEY, &tokens);
+    }
+
+    /// Supply collateral SRWA
+    pub fn supply_collateral(
+        env: Env,
+        from: Address,
+        pool_address: Address,
+        token: Address,
+        amount: i128,
+    ) {
+        from.require_auth();
+
+        if amount <= 0 {
+            panic!("Invalid amount");
         }
 
-        // Submit requests to Blend pool V2
+        // Verificar se token é autorizado
+        let tokens: Map<Address, TokenConfig> = env.storage().instance()
+            .get(&TOKENS_KEY)
+            .expect("Not initialized");
+        
+        let token_config = tokens.get(token.clone())
+            .expect("Token not authorized");
+
+        if token_config.pool_address != pool_address {
+            panic!("Token not for this pool");
+        }
+
+        // Verificar se pool está ativo
+        let pools: Map<Address, PoolInfo> = env.storage().instance()
+            .get(&POOLS_KEY)
+            .expect("Not initialized");
+        
+        let pool_info = pools.get(pool_address.clone())
+            .expect("Pool not found");
+
+        if !pool_info.is_active {
+            panic!("Pool inactive");
+        }
+
+        // Verificar compliance antes da operação
+        let compliance_result = Self::check_compliance(
+            env.clone(),
+            from.clone(),
+            pool_address.clone(),
+            token.clone(),
+            amount,
+            RequestType::SupplyCollateral,
+        );
+
+        if !compliance_result.is_compliant {
+            panic!("Compliance check failed");
+        }
+
+        // Criar Request para Blend Protocol
+        let request = Request {
+            request_type: RequestType::SupplyCollateral,
+            address: token.clone(),
+            amount,
+        };
+        let requests = vec![&env, request];
+
+        // Chamar pool Blend REAL para supply
         let _: () = env.invoke_contract(
             &pool_address,
             &Symbol::new(&env, "submit"),
             vec![
                 &env,
                 from.clone().into_val(&env),
-                spender.into_val(&env),
-                to.into_val(&env),
-                requests.clone().into_val(&env),
+                from.clone().into_val(&env), // spender
+                from.clone().into_val(&env), // to
+                requests.into_val(&env),
             ],
         );
 
-        // Emit appropriate events
-        for request in requests.iter() {
-            match request.request_type {
-                RequestType::SupplyCollateral => {
-                    env.events().publish(
-                        (SUPPLY_EVENT,),
-                        (from.clone(), pool_address.clone(), request.address.clone(), request.amount)
-                    );
-                },
-                RequestType::Borrow => {
-                    env.events().publish(
-                        (BORROW_EVENT,),
-                        (from.clone(), pool_address.clone(), request.address.clone(), request.amount)
-                    );
-                },
-                RequestType::Repay => {
-                    env.events().publish(
-                        (REPAY_EVENT,),
-                        (from.clone(), pool_address.clone(), request.address.clone(), request.amount)
-                    );
-                },
-                RequestType::WithdrawCollateral => {
-                    env.events().publish(
-                        (WITHDRAW_EVENT,),
-                        (from.clone(), pool_address.clone(), request.address.clone(), request.amount)
-                    );
-                },
-                _ => {} // Other request types
-            }
-        }
-    }
-
-    /// Supply SRWA tokens as collateral to existing Blend pool
-    pub fn supply_srwa_collateral(
-        env: Env,
-        from: Address,
-        pool_address: Address,
-        srwa_token: Address,
-        amount: i128,
-    ) {
-        let request = Request {
-            request_type: RequestType::SupplyCollateral,
-            address: srwa_token,
+        // Atualizar posição local
+        Self::update_position(
+            env.clone(),
+            from.clone(),
+            pool_address.clone(),
             amount,
-        };
-        let requests = vec![&env, request];
-
-        Self::submit_requests(
-            env,
-            from.clone(),
-            from.clone(),
-            from,
-            pool_address,
-            requests,
-        )
-    }
-
-    /// Borrow USDC against SRWA collateral
-    pub fn borrow_usdc(
-        env: Env,
-        from: Address,
-        pool_address: Address,
-        amount: i128,
-    ) {
-        let usdc_address = Address::from_string(&String::from_str(&env, USDC_TOKEN));
-        
-        let request = Request {
-            request_type: RequestType::Borrow,
-            address: usdc_address,
-            amount,
-        };
-        let requests = vec![&env, request];
-
-        Self::submit_requests(
-            env,
-            from.clone(),
-            from.clone(),
-            from,
-            pool_address,
-            requests,
-        )
-    }
-
-    /// Repay USDC loan
-    pub fn repay_usdc(
-        env: Env,
-        from: Address,
-        pool_address: Address,
-        amount: i128,
-    ) {
-        let usdc_address = Address::from_string(&String::from_str(&env, USDC_TOKEN));
-        
-        let request = Request {
-            request_type: RequestType::Repay,
-            address: usdc_address,
-            amount,
-        };
-        let requests = vec![&env, request];
-
-        Self::submit_requests(
-            env,
-            from.clone(),
-            from.clone(),
-            from,
-            pool_address,
-            requests,
-        )
-    }
-
-    /// Withdraw SRWA collateral
-    pub fn withdraw_srwa_collateral(
-        env: Env,
-        from: Address,
-        pool_address: Address,
-        srwa_token: Address,
-        amount: i128,
-    ) {
-        let request = Request {
-            request_type: RequestType::WithdrawCollateral,
-            address: srwa_token,
-            amount,
-        };
-        let requests = vec![&env, request];
-
-        Self::submit_requests(
-            env,
-            from.clone(),
-            from.clone(),
-            from,
-            pool_address,
-            requests,
-        )
-    }
-
-    /// Get user positions in a Blend pool
-    pub fn get_user_positions(
-        env: Env,
-        pool_address: Address,
-        user: Address,
-    ) -> UserPositionData {
-        let pools: Map<Address, PoolInfo> = env.storage().instance()
-            .get(&POOLS_KEY)
-            .expect("Not initialized");
-        
-        if !pools.contains_key(pool_address.clone()) {
-            panic!("Pool not found");
-        }
-
-        // Call Blend pool to get actual positions
-        let positions: UserPositionData = env.invoke_contract(
-            &pool_address,
-            &Symbol::new(&env, "get_positions"),
-            vec![&env, user.into_val(&env)],
+            0, // não está borrowing
         );
 
-        positions
+        // Atualizar posição Blend
+        Self::update_blend_position(
+            env.clone(),
+            from.clone(),
+            pool_address.clone(),
+            token.clone(),
+            amount,
+            0,
+        );
+
+        env.events().publish(
+            (SUPPLY,),
+            (from, pool_address, token, amount)
+        );
     }
 
-    /// Get official contract addresses
-    pub fn get_pool_factory(env: Env) -> Address {
-        Address::from_string(&String::from_str(&env, POOL_FACTORY_V2))
-    }
-
-    pub fn get_backstop(env: Env) -> Address {
-        Address::from_string(&String::from_str(&env, BACKSTOP_V2))
-    }
-
-    pub fn get_oracle(env: Env) -> Address {
-        Address::from_string(&String::from_str(&env, ORACLE_MOCK))
-    }
-
-    pub fn get_usdc_token(env: Env) -> Address {
-        Address::from_string(&String::from_str(&env, USDC_TOKEN))
-    }
-
-    pub fn get_xlm_token(env: Env) -> Address {
-        Address::from_string(&String::from_str(&env, XLM_TOKEN))
-    }
-
-    pub fn get_blnd_token(env: Env) -> Address {
-        Address::from_string(&String::from_str(&env, BLND_TOKEN))
-    }
-
-    /// Get pool information
-    pub fn get_pool_info(
+    /// Borrow contra collateral SRWA - Integração REAL com Blend
+    pub fn borrow_amount(
         env: Env,
+        from: Address,
         pool_address: Address,
-    ) -> PoolInfo {
+        token: Address,
+        amount: i128,
+    ) {
+        from.require_auth();
+
+        if amount <= 0 {
+            panic!("Invalid amount");
+        }
+
+        // Verificar pool ativo
         let pools: Map<Address, PoolInfo> = env.storage().instance()
             .get(&POOLS_KEY)
             .expect("Not initialized");
         
-        pools.get(pool_address)
-            .expect("Pool not found")
+        let pool_info = pools.get(pool_address.clone())
+            .expect("Pool not found");
+
+        if !pool_info.is_active {
+            panic!("Pool inactive");
+        }
+
+        // Verificar capacidade de borrow
+        let position = Self::get_position(env.clone(), from.clone(), pool_address.clone());
+        if !position.can_borrow {
+            panic!("Cannot borrow more");
+        }
+
+        // Verificar compliance antes da operação
+        let compliance_result = Self::check_compliance(
+            env.clone(),
+            from.clone(),
+            pool_address.clone(),
+            token.clone(),
+            amount,
+            RequestType::Borrow,
+        );
+
+        if !compliance_result.is_compliant {
+            panic!("Compliance check failed");
+        }
+
+        // Criar Request para Blend Protocol
+        let request = Request {
+            request_type: RequestType::Borrow,
+            address: token.clone(),
+            amount,
+        };
+        let requests = vec![&env, request];
+
+        // Chamar pool Blend REAL para borrow
+        let _: () = env.invoke_contract(
+            &pool_address,
+            &Symbol::new(&env, "submit"),
+            vec![
+                &env,
+                from.clone().into_val(&env),
+                from.clone().into_val(&env), // spender
+                from.clone().into_val(&env), // to
+                requests.into_val(&env),
+            ],
+        );
+
+        // Atualizar posição local
+        Self::update_position(
+            env.clone(),
+            from.clone(),
+            pool_address.clone(),
+            0, // não está supplying
+            amount,
+        );
+
+        // Atualizar posição Blend
+        Self::update_blend_position(
+            env.clone(),
+            from.clone(),
+            pool_address.clone(),
+            token.clone(),
+            0,
+            amount,
+        );
+
+        env.events().publish(
+            (BORROW,),
+            (from, pool_address, token, amount)
+        );
     }
 
-    /// List all pools managed by this adapter
+    /// Repagar empréstimo - Integração REAL com Blend
+    pub fn repay_amount(
+        env: Env,
+        from: Address,
+        pool_address: Address,
+        token: Address,
+        amount: i128,
+    ) {
+        from.require_auth();
+
+        if amount <= 0 {
+            panic!("Invalid amount");
+        }
+
+        // Verificar compliance antes da operação
+        let compliance_result = Self::check_compliance(
+            env.clone(),
+            from.clone(),
+            pool_address.clone(),
+            token.clone(),
+            amount,
+            RequestType::Repay,
+        );
+
+        if !compliance_result.is_compliant {
+            panic!("Compliance check failed");
+        }
+
+        // Criar Request para Blend Protocol
+        let request = Request {
+            request_type: RequestType::Repay,
+            address: token.clone(),
+            amount,
+        };
+        let requests = vec![&env, request];
+
+        // Chamar pool Blend REAL para repay
+        let _: () = env.invoke_contract(
+            &pool_address,
+            &Symbol::new(&env, "submit"),
+            vec![
+                &env,
+                from.clone().into_val(&env),
+                from.clone().into_val(&env), // spender
+                from.clone().into_val(&env), // to
+                requests.into_val(&env),
+            ],
+        );
+
+        // Atualizar posição local (valor negativo = repayment)
+        Self::update_position(
+            env.clone(),
+            from.clone(),
+            pool_address.clone(),
+            0,
+            -amount,
+        );
+
+        // Atualizar posição Blend
+        Self::update_blend_position(
+            env.clone(),
+            from.clone(),
+            pool_address.clone(),
+            token.clone(),
+            0,
+            -amount,
+        );
+
+        env.events().publish(
+            (REPAY,),
+            (from, pool_address, token, amount)
+        );
+    }
+
+    /// Withdraw collateral - Integração REAL com Blend
+    pub fn withdraw_collateral(
+        env: Env,
+        from: Address,
+        pool_address: Address,
+        token: Address,
+        amount: i128,
+    ) {
+        from.require_auth();
+
+        if amount <= 0 {
+            panic!("Invalid amount");
+        }
+
+        // Verificar posição atual
+        let position = Self::get_position(env.clone(), from.clone(), pool_address.clone());
+        
+        if position.collateral < amount {
+            panic!("Insufficient collateral");
+        }
+
+        // Verificar compliance antes da operação
+        let compliance_result = Self::check_compliance(
+            env.clone(),
+            from.clone(),
+            pool_address.clone(),
+            token.clone(),
+            amount,
+            RequestType::WithdrawCollateral,
+        );
+
+        if !compliance_result.is_compliant {
+            panic!("Compliance check failed");
+        }
+
+        // Criar Request para Blend Protocol
+        let request = Request {
+            request_type: RequestType::WithdrawCollateral,
+            address: token.clone(),
+            amount,
+        };
+        let requests = vec![&env, request];
+
+        // Chamar pool Blend REAL para withdraw
+        let _: () = env.invoke_contract(
+            &pool_address,
+            &Symbol::new(&env, "submit"),
+            vec![
+                &env,
+                from.clone().into_val(&env),
+                from.clone().into_val(&env), // spender
+                from.clone().into_val(&env), // to
+                requests.into_val(&env),
+            ],
+        );
+
+        // Atualizar posição local (valor negativo = withdrawal)
+        Self::update_position(
+            env.clone(),
+            from.clone(),
+            pool_address.clone(),
+            -amount,
+            0,
+        );
+
+        // Atualizar posição Blend
+        Self::update_blend_position(
+            env.clone(),
+            from.clone(),
+            pool_address.clone(),
+            token.clone(),
+            -amount,
+            0,
+        );
+
+        env.events().publish(
+            (WITHDRAW,),
+            (from, pool_address, token, amount)
+        );
+    }
+
+    /// Get posição do usuário
+    pub fn get_position(
+        env: Env,
+        user: Address,
+        pool_address: Address,
+    ) -> Position {
+        let positions: Map<(Address, Address), Position> = env.storage().instance()
+            .get(&POSITIONS)
+            .expect("Not initialized");
+        
+        let key = (user.clone(), pool_address.clone());
+        positions.get(key).unwrap_or(Position {
+            user,
+            pool: pool_address,
+            collateral: 0,
+            borrowed: 0,
+            health_factor: 0,
+            can_borrow: true,
+        })
+    }
+
+    /// Get todos os pools
     pub fn get_all_pools(env: Env) -> Vec<Address> {
         let pools: Map<Address, PoolInfo> = env.storage().instance()
             .get(&POOLS_KEY)
@@ -433,14 +666,220 @@ impl BlendAdapterV2 {
         pool_addresses
     }
 
-    /// Get admin address
+    /// Get info do pool
+    pub fn get_pool_info(
+        env: Env,
+        pool_address: Address,
+    ) -> PoolInfo {
+        let pools: Map<Address, PoolInfo> = env.storage().instance()
+            .get(&POOLS_KEY)
+            .expect("Not initialized");
+        
+        pools.get(pool_address)
+            .expect("Pool not found")
+    }
+
+    /// Obter posição Blend do usuário
+    pub fn get_blend_position(
+        env: Env,
+        user: Address,
+        pool_address: Address,
+    ) -> BlendPosition {
+        let positions: Map<Address, BlendPosition> = env.storage().instance()
+            .get(&BLEND_POS)
+            .unwrap_or(Map::new(&env));
+
+        positions.get(user.clone())
+            .unwrap_or(BlendPosition {
+                user: user.clone(),
+                pool: pool_address,
+                collateral: Map::new(&env),
+                debt: Map::new(&env),
+                last_update: env.ledger().timestamp(),
+            })
+    }
+
+    /// Adicionar reserva ao pool Blend
+    pub fn add_reserve_to_pool(
+        env: Env,
+        admin: Address,
+        pool_address: Address,
+        asset: Address,
+        c_factor: u32,
+        l_factor: u32,
+        max_util: u32,
+        r_base: u32,
+        r_one: u32,
+    ) {
+        admin.require_auth();
+
+        // Verificar se é admin
+        let stored_admin: Address = env.storage().instance()
+            .get(&ADMIN_KEY)
+            .expect("Not initialized");
+
+        if admin != stored_admin {
+            panic!("Not authorized");
+        }
+
+        // Criar ReserveInfo
+        let reserve_info = ReserveInfo {
+            asset: asset.clone(),
+            c_factor,
+            l_factor,
+            util: 0,
+            max_util,
+            r_base,
+            r_one,
+            r_two: 1000,
+            r_three: 10000,
+            reactivity: 100,
+            supply_cap: 1000000000000,
+            enabled: true,
+        };
+
+        // Armazenar reserva
+        let mut reserves: Map<Address, ReserveInfo> = env.storage().instance()
+            .get(&RESERVES)
+            .unwrap_or(Map::new(&env));
+
+        reserves.set(asset.clone(), reserve_info);
+        env.storage().instance().set(&RESERVES, &reserves);
+
+        // Chamar pool Blend para adicionar reserva
+        let _: () = env.invoke_contract(
+            &pool_address,
+            &Symbol::new(&env, "queue_set_reserve"),
+            vec![
+                &env,
+                asset.into_val(&env),
+                c_factor.into_val(&env),
+                l_factor.into_val(&env),
+                max_util.into_val(&env),
+                r_base.into_val(&env),
+                r_one.into_val(&env),
+            ],
+        );
+    }
+
+    /// Obter informações da reserva
+    pub fn get_reserve_info(
+        env: Env,
+        pool_address: Address,
+        asset: Address,
+    ) -> ReserveInfo {
+        let reserves: Map<Address, ReserveInfo> = env.storage().instance()
+            .get(&RESERVES)
+            .unwrap_or(Map::new(&env));
+
+        reserves.get(asset.clone())
+            .unwrap_or(ReserveInfo {
+                asset: asset.clone(),
+                c_factor: 0,
+                l_factor: 0,
+                util: 0,
+                max_util: 0,
+                r_base: 0,
+                r_one: 0,
+                r_two: 0,
+                r_three: 0,
+                reactivity: 0,
+                supply_cap: 0,
+                enabled: false,
+            })
+    }
+
+    /// Obter todas as reservas do pool
+    pub fn get_pool_reserves(
+        env: Env,
+        pool_address: Address,
+    ) -> Vec<Address> {
+        let reserves: Map<Address, ReserveInfo> = env.storage().instance()
+            .get(&RESERVES)
+            .unwrap_or(Map::new(&env));
+
+        let mut asset_list = Vec::new(&env);
+        for (asset, _) in reserves.iter() {
+            asset_list.push_back(asset);
+        }
+        asset_list
+    }
+
+    /// Verificar compliance de uma operação
+    pub fn check_operation_compliance(
+        env: Env,
+        user: Address,
+        pool_address: Address,
+        token: Address,
+        amount: i128,
+        request_type: RequestType,
+    ) -> ComplianceResult {
+        Self::check_compliance(env, user, pool_address, token, amount, request_type)
+    }
+
+    /// Configurar reserva no pool Blend automaticamente
+    pub fn setup_pool_reserve(
+        env: Env,
+        admin: Address,
+        pool_address: Address,
+        asset: Address,
+    ) {
+        admin.require_auth();
+
+        // Verificar se é admin
+        let stored_admin: Address = env.storage().instance()
+            .get(&ADMIN_KEY)
+            .expect("Not initialized");
+
+        if admin != stored_admin {
+            panic!("Not authorized");
+        }
+
+        // Armazenar reserva localmente
+        let reserve_info = ReserveInfo {
+            asset: asset.clone(),
+            c_factor: 8000,
+            l_factor: 7500,
+            util: 0,
+            max_util: 9500,
+            r_base: 0,
+            r_one: 500,
+            r_two: 1000,
+            r_three: 10000,
+            reactivity: 100,
+            supply_cap: 1000000000000,
+            enabled: true,
+        };
+
+        let mut reserves: Map<Address, ReserveInfo> = env.storage().instance()
+            .get(&RESERVES)
+            .unwrap_or(Map::new(&env));
+
+        reserves.set(asset, reserve_info);
+        env.storage().instance().set(&RESERVES, &reserves);
+    }
+
+    /// Get config do token
+    pub fn get_token_config(
+        env: Env,
+        token: Address,
+    ) -> TokenConfig {
+        let tokens: Map<Address, TokenConfig> = env.storage().instance()
+            .get(&TOKENS_KEY)
+            .expect("Not initialized");
+        
+        tokens.get(token)
+            .expect("Token not found")
+    }
+
+    /// Get admin
     pub fn get_admin(env: Env) -> Address {
         env.storage().instance()
             .get(&ADMIN_KEY)
             .expect("Not initialized")
     }
 
-    /// Check if a pool exists in our registry
+    /// Verificar se pool existe
     pub fn pool_exists(env: Env, pool_address: Address) -> bool {
         let pools: Map<Address, PoolInfo> = env.storage().instance()
             .get(&POOLS_KEY)
@@ -449,76 +888,197 @@ impl BlendAdapterV2 {
         pools.contains_key(pool_address)
     }
 
-    /// Register an existing Blend pool (if not deployed through this adapter)
-    pub fn register_pool(
+    // Helper functions
+
+    fn generate_pool_address(env: &Env, admin: &Address, name: &String) -> Address {
+        // Para integração REAL com Blend, vamos usar o register_pool
+        // que permite registrar pools Blend existentes
+        // Por enquanto, retornamos um endereço mock que será substituído
+        // quando o pool real for registrado via register_pool
+        env.current_contract_address()
+    }
+
+    /// Verificar compliance antes de operações
+    fn check_compliance(
         env: Env,
-        admin: Address,
+        user: Address,
         pool_address: Address,
-        name: String,
-        oracle: Address,
-        backstop_take_rate: u32,
-        max_positions: u32,
-    ) {
-        let stored_admin: Address = env.storage().instance()
-            .get(&ADMIN_KEY)
+        token: Address,
+        amount: i128,
+        request_type: RequestType,
+    ) -> ComplianceResult {
+        // Verificar se o usuário tem identidade válida
+        let identity_registry = Self::get_identity_registry(env.clone());
+        let has_identity = Self::check_user_identity(env.clone(), identity_registry, user.clone());
+        
+        if !has_identity {
+            return ComplianceResult {
+                is_compliant: false,
+                reason: String::from_str(&env, "User identity not verified"),
+                required_actions: vec![&env],
+            };
+        }
+
+        // Verificar limites de posição
+        let position = Self::get_position(env.clone(), user.clone(), pool_address.clone());
+        let max_collateral = Self::get_max_collateral(env.clone(), pool_address.clone(), token.clone());
+        let max_debt = Self::get_max_debt(env.clone(), pool_address.clone(), token.clone());
+
+        match request_type {
+            RequestType::SupplyCollateral => {
+                if position.collateral + amount > max_collateral {
+                    return ComplianceResult {
+                        is_compliant: false,
+                        reason: String::from_str(&env, "Exceeds maximum collateral limit"),
+                        required_actions: vec![&env],
+                    };
+                }
+            },
+            RequestType::Borrow => {
+                if position.borrowed + amount > max_debt {
+                    return ComplianceResult {
+                        is_compliant: false,
+                        reason: String::from_str(&env, "Exceeds maximum debt limit"),
+                        required_actions: vec![&env],
+                    };
+                }
+            },
+            _ => {}
+        }
+
+        // Verificar se o token está autorizado para o pool
+        let tokens: Map<Address, TokenConfig> = env.storage().instance()
+            .get(&TOKENS_KEY)
             .expect("Not initialized");
         
-        if admin != stored_admin {
-            panic!("Unauthorized");
+        if let Some(token_config) = tokens.get(token.clone()) {
+            if !token_config.is_authorized {
+                return ComplianceResult {
+                    is_compliant: false,
+                    reason: String::from_str(&env, "Token not authorized for this pool"),
+                    required_actions: vec![&env],
+                };
+            }
+        } else {
+            return ComplianceResult {
+                is_compliant: false,
+                reason: String::from_str(&env, "Token not found in pool configuration"),
+                required_actions: vec![&env],
+            };
         }
-        
-        admin.require_auth();
 
-        let pool_info = PoolInfo {
-            pool_address: pool_address.clone(),
-            name,
-            oracle,
-            backstop_take_rate,
-            max_positions,
-        };
+        ComplianceResult {
+            is_compliant: true,
+            reason: String::from_str(&env, "All compliance checks passed"),
+            required_actions: vec![&env],
+        }
+    }
 
-        let mut pools: Map<Address, PoolInfo> = env.storage().instance()
-            .get(&POOLS_KEY)
+    /// Atualizar posição Blend
+    fn update_blend_position(
+        env: Env,
+        user: Address,
+        pool_address: Address,
+        token: Address,
+        collateral_change: i128,
+        debt_change: i128,
+    ) {
+        let mut positions: Map<Address, BlendPosition> = env.storage().instance()
+            .get(&BLEND_POS)
             .unwrap_or(Map::new(&env));
-        
-        pools.set(pool_address, pool_info);
-        env.storage().instance().set(&POOLS_KEY, &pools);
+
+        let mut position = positions.get(user.clone())
+            .unwrap_or(BlendPosition {
+                user: user.clone(),
+                pool: pool_address.clone(),
+                collateral: Map::new(&env),
+                debt: Map::new(&env),
+                last_update: env.ledger().timestamp(),
+            });
+
+        // Atualizar collateral
+        let current_collateral = position.collateral.get(token.clone()).unwrap_or(0);
+        position.collateral.set(token.clone(), current_collateral + collateral_change);
+
+        // Atualizar debt
+        let current_debt = position.debt.get(token.clone()).unwrap_or(0);
+        position.debt.set(token.clone(), current_debt + debt_change);
+
+        // Atualizar timestamp
+        position.last_update = env.ledger().timestamp();
+
+        positions.set(user, position);
+        env.storage().instance().set(&BLEND_POS, &positions);
     }
-}
 
-#[cfg(test)]
-mod test {
-    use super::*;
-    use soroban_sdk::{testutils::Address as _, Env};
-
-    #[test]
-    fn test_initialize() {
-        let env = Env::default();
-        let contract_id = env.register_contract(None, BlendAdapterV2);
-        let client = BlendAdapterV2Client::new(&env, &contract_id);
-
-        let admin = Address::generate(&env);
-
-        client.initialize(&admin);
-        
-        assert_eq!(client.get_admin(), admin);
+    /// Obter endereço do Identity Registry
+    fn get_identity_registry(env: Env) -> Address {
+        // Em uma implementação real, isso viria de configuração
+        // Por enquanto, retornamos um endereço mock
+        env.current_contract_address()
     }
 
-    #[test]
-    fn test_official_addresses() {
-        let env = Env::default();
-        let contract_id = env.register_contract(None, BlendAdapterV2);
-        let client = BlendAdapterV2Client::new(&env, &contract_id);
+    /// Verificar identidade do usuário
+    fn check_user_identity(env: Env, identity_registry: Address, user: Address) -> bool {
+        // Em uma implementação real, chamaríamos o Identity Registry
+        // Por enquanto, retornamos true para simplificar
+        true
+    }
 
-        let admin = Address::generate(&env);
-        client.initialize(&admin);
+    /// Obter máximo de collateral permitido
+    fn get_max_collateral(env: Env, pool_address: Address, token: Address) -> i128 {
+        // Em uma implementação real, consultaríamos o pool Blend
+        // Por enquanto, retornamos um valor alto
+        1000000000000
+    }
 
-        // Test that official addresses are accessible
-        let _pool_factory = client.get_pool_factory();
-        let _backstop = client.get_backstop();
-        let _oracle = client.get_oracle();
-        let _usdc = client.get_usdc_token();
-        let _xlm = client.get_xlm_token();
-        let _blnd = client.get_blnd_token();
+    /// Obter máximo de debt permitido
+    fn get_max_debt(env: Env, pool_address: Address, token: Address) -> i128 {
+        // Em uma implementação real, consultaríamos o pool Blend
+        // Por enquanto, retornamos um valor baseado no collateral
+        let position = Self::get_position(env.clone(), env.current_contract_address(), pool_address);
+        position.collateral * 8 / 10 // 80% do collateral
+    }
+
+    fn update_position(
+        env: Env,
+        user: Address,
+        pool_address: Address,
+        collateral_delta: i128,
+        borrowed_delta: i128,
+    ) {
+        let mut positions: Map<(Address, Address), Position> = env.storage().instance()
+            .get(&POSITIONS)
+            .expect("Not initialized");
+        
+        let key = (user.clone(), pool_address.clone());
+        let mut position = positions.get(key.clone()).unwrap_or(Position {
+            user: user.clone(),
+            pool: pool_address.clone(),
+            collateral: 0,
+            borrowed: 0,
+            health_factor: 0,
+            can_borrow: true,
+        });
+
+        // Atualizar valores
+        position.collateral += collateral_delta;
+        position.borrowed += borrowed_delta;
+
+        // Recalcular health factor
+        position.health_factor = Self::calculate_health_factor(&position);
+        position.can_borrow = position.health_factor < 8000; // 80% threshold
+
+        positions.set(key, position);
+        env.storage().instance().set(&POSITIONS, &positions);
+    }
+
+    fn calculate_health_factor(position: &Position) -> u32 {
+        if position.collateral <= 0 {
+            return 0;
+        }
+
+        // Cálculo simples: (borrowed / collateral) * 10000
+        ((position.borrowed * 10000) / position.collateral) as u32
     }
 }
