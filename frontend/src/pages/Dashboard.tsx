@@ -30,8 +30,7 @@ import {
   Globe,
   Zap,
   Wallet,
-  ArrowRight,
-  Sparkles
+  ArrowRight
 } from "lucide-react";
 
 // Function to get user positions based on wallet address
@@ -203,57 +202,45 @@ export default function Dashboard() {
 
         {/* Native Tabs Interface */}
         <div className="space-y-8">
-           <div className="flex justify-center">
-             <div className="grid w-full max-w-2xl grid-cols-4 h-10 sm:h-12 bg-card/50 backdrop-blur-sm border border-brand-500/20 rounded-lg p-1">
-               <button
-                 onClick={() => setActiveTab("markets")}
-                 className={`dashboard-tab-button flex items-center justify-center gap-1 sm:gap-2 rounded-md px-2 py-1 text-xs sm:text-sm font-medium transition-all duration-200 ${
-                   activeTab === "markets"
-                     ? "bg-brand-500/20 text-brand-300 shadow-sm"
-                     : "text-fg-muted hover:text-fg-primary hover:bg-background/50"
-                 }`}
-               >
-                 <Globe className="w-3 h-3 sm:w-4 sm:h-4" />
-                 <span className="hidden sm:inline">Markets</span>
-                 <span className="sm:hidden">Mkts</span>
-               </button>
-               <button
-                 onClick={() => setActiveTab("rwa")}
-                 className={`dashboard-tab-button flex items-center justify-center gap-1 sm:gap-2 rounded-md px-2 py-1 text-xs sm:text-sm font-medium transition-all duration-200 ${
-                   activeTab === "rwa"
-                     ? "bg-brand-500/20 text-brand-300 shadow-sm"
-                     : "text-fg-muted hover:text-fg-primary hover:bg-background/50"
-                 }`}
-               >
-                 <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-                 <span className="hidden sm:inline">RWA</span>
-                 <span className="sm:hidden">RWA</span>
-               </button>
-               <button
-                 onClick={() => setActiveTab("portfolio")}
-                 className={`dashboard-tab-button flex items-center justify-center gap-1 sm:gap-2 rounded-md px-2 py-1 text-xs sm:text-sm font-medium transition-all duration-200 ${
-                   activeTab === "portfolio"
-                     ? "bg-brand-500/20 text-brand-300 shadow-sm"
-                     : "text-fg-muted hover:text-fg-primary hover:bg-background/50"
-                 }`}
-               >
-                 <Shield className="w-3 h-3 sm:w-4 sm:h-4" />
-                 <span className="hidden sm:inline">Portfolio</span>
-                 <span className="sm:hidden">Port</span>
-               </button>
-               <button
-                 onClick={() => setActiveTab("dashboard")}
-                 className={`dashboard-tab-button flex items-center justify-center gap-1 sm:gap-2 rounded-md px-2 py-1 text-xs sm:text-sm font-medium transition-all duration-200 ${
-                   activeTab === "dashboard"
-                     ? "bg-brand-500/20 text-brand-300 shadow-sm"
-                     : "text-fg-muted hover:text-fg-primary hover:bg-background/50"
-                 }`}
-               >
-                 <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
-                 Dashboard
-               </button>
-             </div>
-           </div>
+          <div className="flex justify-center">
+            <div className="grid w-full max-w-md grid-cols-3 h-10 sm:h-12 bg-card/50 backdrop-blur-sm border border-brand-500/20 rounded-lg p-1">
+              <button
+                onClick={() => setActiveTab("markets")}
+                className={`dashboard-tab-button flex items-center justify-center gap-1 sm:gap-2 rounded-md px-2 py-1 text-xs sm:text-sm font-medium transition-all duration-200 ${
+                  activeTab === "markets"
+                    ? "bg-brand-500/20 text-brand-300 shadow-sm"
+                    : "text-fg-muted hover:text-fg-primary hover:bg-background/50"
+                }`}
+              >
+                <Globe className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Markets</span>
+                <span className="sm:hidden">Mkts</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("portfolio")}
+                className={`dashboard-tab-button flex items-center justify-center gap-1 sm:gap-2 rounded-md px-2 py-1 text-xs sm:text-sm font-medium transition-all duration-200 ${
+                  activeTab === "portfolio"
+                    ? "bg-brand-500/20 text-brand-300 shadow-sm"
+                    : "text-fg-muted hover:text-fg-primary hover:bg-background/50"
+                }`}
+              >
+                <Shield className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Portfolio</span>
+                <span className="sm:hidden">Port</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("dashboard")}
+                className={`dashboard-tab-button flex items-center justify-center gap-1 sm:gap-2 rounded-md px-2 py-1 text-xs sm:text-sm font-medium transition-all duration-200 ${
+                  activeTab === "dashboard"
+                    ? "bg-brand-500/20 text-brand-300 shadow-sm"
+                    : "text-fg-muted hover:text-fg-primary hover:bg-background/50"
+                }`}
+              >
+                <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                Dashboard
+              </button>
+            </div>
+          </div>
 
           {/* Markets Tab Content */}
           {activeTab === "markets" && (
@@ -282,40 +269,10 @@ export default function Dashboard() {
                 />
               </div>
             </div>
-           )}
+          )}
 
-           {/* RWA Tab Content */}
-           {activeTab === "rwa" && (
-             <div className="dashboard-tab-content space-y-8">
-               <div className="space-y-6">
-                 <div className="text-center space-y-4">
-                   <h2 className="text-2xl sm:text-3xl font-bold text-fg-primary">
-                     RWA Tokens & Lending
-                     <span className="inline-block ml-2">
-                       <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-brand-400 inline" />
-                     </span>
-                   </h2>
-                   <p className="text-base sm:text-lg text-fg-secondary max-w-2xl mx-auto px-4">
-                     Manage your Real World Asset tokens and participate in lending pools.
-                   </p>
-                 </div>
-
-                 {/* RWA Tokens Section */}
-                 <RWATokensGrid />
-                 
-                 {/* Spacer */}
-                 <div className="py-8">
-                   <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                 </div>
-
-                 {/* RWA Lending Pools Section */}
-                 <RWALendingPools showOnlyRWAFriendly={true} />
-               </div>
-             </div>
-           )}
-
-           {/* Portfolio Tab Content */}
-           {activeTab === "portfolio" && (
+          {/* Portfolio Tab Content */}
+          {activeTab === "portfolio" && (
             <div className="dashboard-tab-content dashboard-portfolio-tab space-y-8">
               <div className="space-y-6">
                 <div className="text-center space-y-4">
