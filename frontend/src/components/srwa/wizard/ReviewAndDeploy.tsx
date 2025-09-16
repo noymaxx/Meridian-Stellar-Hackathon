@@ -99,10 +99,17 @@ export default function ReviewAndDeploy({
               { label: 'Claim Topics Registry', address: deploymentResult.claim_topics_registry_address },
               { label: 'Trusted Issuers Registry', address: deploymentResult.trusted_issuers_reg },
             ].map((contract) => (
-              <div key={contract.label} className="flex items-center justify-between p-3 border rounded-lg">
+              <div key={contract.label} className="flex items-center justify-between p-3 border rounded-lg" style={{ 
+                backgroundColor: 'hsl(224, 23%, 10%)', // bg-elev-2
+                borderColor: 'hsl(222, 23%, 14%)' // stroke-line
+              }}>
                 <span className="font-medium">{contract.label}</span>
                 <div className="flex items-center space-x-2">
-                  <code className="text-xs bg-bg-elev-1 px-2 py-1 rounded">
+                  <code className="text-xs px-2 py-1 rounded" style={{
+                    backgroundColor: 'hsl(227, 20%, 7%)', // bg-elev-1
+                    color: 'hsl(192, 100%, 66%)', // brand-500
+                    border: '1px solid hsl(222, 23%, 14%)' // stroke-line
+                  }}>
                     {contract.address}
                   </code>
                   <Button variant="ghost" size="sm">
@@ -167,8 +174,8 @@ export default function ReviewAndDeploy({
     >
       {/* Configuration Summary */}
       <Card style={{
-        backgroundColor: '#ffffff',
-        border: '1px solid #e5e7eb',
+        backgroundColor: 'hsl(227, 20%, 7%)', // bg-elev-1
+        border: '1px solid hsl(222, 23%, 14%)', // stroke-line
         borderRadius: '12px',
         padding: '0',
         marginBottom: '24px',
@@ -343,8 +350,8 @@ export default function ReviewAndDeploy({
 
       {/* Deployment Information */}
       <Card style={{
-        backgroundColor: '#ffffff',
-        border: '1px solid #e5e7eb',
+        backgroundColor: 'hsl(227, 20%, 7%)', // bg-elev-1
+        border: '1px solid hsl(222, 23%, 14%)', // stroke-line
         borderRadius: '12px',
         padding: '0',
         marginBottom: '24px',

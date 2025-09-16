@@ -108,11 +108,11 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
       {/* Template Information */}
       <div style={cardStyle}>
         <div style={{ marginBottom: '16px' }}>
-          <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#111827', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+          <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
             <span style={{ fontSize: '32px' }}>{template.icon}</span>
             Selected Template: {template.name}
           </h3>
-          <p style={{ color: '#6b7280', fontSize: '16px' }}>
+          <p style={{ color: '#d1d5db', fontSize: '16px' }}>
             {template.description}
           </p>
         </div>
@@ -132,10 +132,10 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
       {/* Token Configuration */}
       <div style={cardStyle}>
         <div style={{ marginBottom: '24px' }}>
-          <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#111827', marginBottom: '8px' }}>
+          <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#ffffff', marginBottom: '8px' }}>
             Token Configuration
           </h3>
-          <p style={{ color: '#6b7280', fontSize: '16px' }}>
+          <p style={{ color: '#d1d5db', fontSize: '16px' }}>
             Configure the basic properties of your RWA token
           </p>
         </div>
@@ -145,7 +145,7 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
           <div style={{ position: 'relative', zIndex: 10 }}>
             <Label 
               htmlFor="name" 
-              style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}
+              style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#ffffff' }}
             >
               Token Name *
             </Label>
@@ -160,7 +160,7 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
               }}
               style={inputStyle}
             />
-            <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>
+            <p style={{ fontSize: '14px', color: '#d1d5db', marginTop: '4px' }}>
               The full name of your token (e.g., "US Treasury Bill Token")
             </p>
           </div>
@@ -169,7 +169,7 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
           <div style={{ position: 'relative', zIndex: 10 }}>
             <Label 
               htmlFor="symbol" 
-              style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}
+              style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#ffffff' }}
             >
               Token Symbol *
             </Label>
@@ -191,7 +191,7 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
                 {symbolError}
               </p>
             )}
-            <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>
+            <p style={{ fontSize: '14px', color: '#d1d5db', marginTop: '4px' }}>
               2-12 characters, uppercase letters and numbers only
             </p>
           </div>
@@ -200,7 +200,7 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
           <div style={{ position: 'relative', zIndex: 10 }}>
             <Label 
               htmlFor="decimals" 
-              style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}
+              style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#ffffff' }}
             >
               Decimals *
             </Label>
@@ -222,7 +222,7 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
                 {decimalsError}
               </p>
             )}
-            <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>
+            <p style={{ fontSize: '14px', color: '#d1d5db', marginTop: '4px' }}>
               Number of decimal places (0-18). Most tokens use 6 or 7 decimals.
             </p>
           </div>
@@ -231,7 +231,7 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
           <div style={{ position: 'relative', zIndex: 10 }}>
             <Label 
               htmlFor="admin" 
-              style={{ display: 'flex', marginBottom: '8px', fontWeight: '600', color: '#374151', alignItems: 'center', gap: '8px' }}
+              style={{ display: 'flex', marginBottom: '8px', fontWeight: '600', color: '#ffffff', alignItems: 'center', gap: '8px' }}
             >
               Admin Address *
               {isConnected && (
@@ -240,7 +240,7 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
                   style={{ 
                     fontSize: '12px', 
                     backgroundColor: '#f0fdf4', 
-                    color: '#16a34a', 
+                    color: 'hsl(192, 100%, 66%)', // brand-500 
                     border: '1px solid #16a34a',
                     position: 'relative',
                     zIndex: 15
@@ -347,7 +347,7 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
                   <Info size={16} />
                   <strong>Using Connected Wallet</strong>
                 </p>
-                <p style={{ fontSize: '12px', color: '#6b7280' }}>
+                <p style={{ fontSize: '12px', color: '#d1d5db' }}>
                   You're using your connected wallet address as the token admin.
                 </p>
                 <div style={{ 
@@ -366,7 +366,7 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
               </div>
             )}
 
-            <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>
+            <p style={{ fontSize: '14px', color: '#d1d5db', marginTop: '4px' }}>
               Stellar address that will control the token (minting, burning, compliance)
             </p>
           </div>
@@ -384,7 +384,7 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
             <h3 style={{ 
               fontSize: '20px', 
               fontWeight: '600', 
-              color: '#16a34a', 
+              color: 'hsl(192, 100%, 66%)', // brand-500 
               display: 'flex', 
               alignItems: 'center', 
               gap: '12px',
@@ -397,33 +397,33 @@ export default function BasicConfiguration({ formData, template, onChange }: Bas
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '16px' }}>
             <div>
-              <span style={{ fontSize: '14px', color: '#6b7280' }}>Token Name:</span>
-              <div style={{ fontWeight: '600', color: '#111827' }}>{formData.name}</div>
+              <span style={{ fontSize: '14px', color: '#d1d5db' }}>Token Name:</span>
+              <div style={{ fontWeight: '600', color: '#ffffff' }}>{formData.name}</div>
             </div>
             <div>
-              <span style={{ fontSize: '14px', color: '#6b7280' }}>Symbol:</span>
+              <span style={{ fontSize: '14px', color: '#d1d5db' }}>Symbol:</span>
               <div style={{ fontWeight: '600', color: '#3b82f6' }}>{formData.symbol}</div>
             </div>
             <div>
-              <span style={{ fontSize: '14px', color: '#6b7280' }}>Decimals:</span>
-              <div style={{ fontWeight: '600', color: '#111827' }}>{formData.decimals}</div>
+              <span style={{ fontSize: '14px', color: '#d1d5db' }}>Decimals:</span>
+              <div style={{ fontWeight: '600', color: '#ffffff' }}>{formData.decimals}</div>
             </div>
             <div>
-              <span style={{ fontSize: '14px', color: '#6b7280' }}>Template:</span>
-              <div style={{ fontWeight: '600', color: '#111827' }}>{template.name}</div>
+              <span style={{ fontSize: '14px', color: '#d1d5db' }}>Template:</span>
+              <div style={{ fontWeight: '600', color: '#ffffff' }}>{template.name}</div>
             </div>
           </div>
           
           <div>
-            <span style={{ fontSize: '14px', color: '#6b7280' }}>Admin Address:</span>
+            <span style={{ fontSize: '14px', color: '#d1d5db' }}>Admin Address:</span>
             <div style={{ 
               fontFamily: 'monospace', 
               fontSize: '12px', 
-              backgroundColor: '#ffffff', 
+              backgroundColor: 'hsl(227, 20%, 7%)', // bg-elev-1 
               padding: '8px', 
               borderRadius: '4px', 
-              border: '1px solid #22c55e', 
-              color: '#059669',
+              border: '1px solid hsl(192, 100%, 66%)', // brand-500
+              color: 'hsl(192, 100%, 66%)', // brand-500
               marginTop: '4px',
               wordBreak: 'break-all'
             }}>
