@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { BlendPool, BlendReserve, BlendAsset, UseBlendPoolsReturn, BlendError } from '@/types/blend';
+
+// ===== ORIGINAL BLEND SDK INTEGRATION (COMMENTED OUT FOR MOCK IMPLEMENTATION) =====
+/*
 import { Network, PoolV2, PoolOracle, PoolFactoryContractV2 } from '@blend-capital/blend-sdk';
 import { StellarSdk } from '@stellar/stellar-sdk';
 import { STELLAR_CONFIG } from '@/lib/stellar-config';
 import { fallbackPricingService, getMultipleAssetPrices } from '@/lib/pricing/fallback-pricing';
-// Community pools are now discovered via blockchain instead of registry
-
-// ===== BLEND SDK INTEGRATION =====
 
 // Blend SDK Network Configuration for real pool data
 const MAINNET_NETWORK: Network = {
@@ -26,7 +26,10 @@ const BLEND_FACTORY_ADDRESSES = {
   MAINNET_V2: 'CALI2BYU2JE6WVRUFYTS6MSBNEHGJ35P4AVCZYF3B6QOE3QKOB2PLE6M', // Real mainnet factory
   TESTNET_V2: 'CDSMKKCWEAYQW4DAUSH3XGRMIVIJB44TZ3UA5YCRHT6MP4LWEWR4GYV6'  // Real testnet factory
 };
+*/
 
+// ===== ORIGINAL BLEND SDK CLIENT (COMMENTED OUT FOR MOCK IMPLEMENTATION) =====
+/*
 class BlendSDKClient {
   private network: Network;
   private factoryAddress: string;
@@ -833,6 +836,7 @@ class BlendSDKClient {
   
 
 }
+*/
 
 // ===== HOOK IMPLEMENTATION =====
 
@@ -841,70 +845,247 @@ const CACHE_TIME = 10 * 60 * 1000; // 10 minutes
 const STALE_TIME = 60 * 1000; // 1 minute
 const BACKGROUND_REFETCH_INTERVAL = 2 * 60 * 1000; // 2 minutes
 
-export const useBlendPools = (): UseBlendPoolsReturn => {
-  const [blendClient] = useState(() => new BlendSDKClient()); // Use environment configuration
-  const queryClient = useQueryClient();
+// ===== MOCK POOLS FOR BETTER PRESENTATION =====
+const createMockBlendPools = (): BlendPool[] => {
+  const now = Date.now();
   
-  const {
-    data: pools = [],
-    isLoading: loading,
-    error: queryError,
-    refetch: queryRefetch,
-    dataUpdatedAt: lastUpdated
-  } = useQuery({
-    queryKey: [BLEND_POOLS_QUERY_KEY],
-    queryFn: () => blendClient.getAllPools(),
-    staleTime: STALE_TIME,
-    gcTime: CACHE_TIME,
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-    refetchInterval: BACKGROUND_REFETCH_INTERVAL,
-    refetchIntervalInBackground: false,
-    retry: (failureCount, error) => {
-      // Don't retry if it's a network error after 3 attempts
-      if (failureCount >= 3) return false;
-      // Don't retry if it's a user rejection or contract error
-      if (error.message?.includes('User rejected') || error.message?.includes('Contract error')) {
-        return false;
-      }
-      return true;
+  // Mock assets with realistic contract addresses
+  const mockAssets = {
+    USDC: {
+      code: 'USDC',
+      contractAddress: 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC',
+      decimals: 6,
+      symbol: 'USDC',
+      name: 'USD Coin',
+      logoURI: 'https://assets.coingecko.com/coins/images/6319/small/USD_Coin_icon.png'
     },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-  });
-
-  // Transform query error to BlendError
-  const error: BlendError | null = queryError ? {
-    code: 'NETWORK_ERROR',
-    message: queryError.message || 'Failed to fetch pool data',
-    details: queryError,
-    timestamp: Date.now()
-  } : null;
-
-  // Manual refetch function with error handling
-  const refetch = useCallback(async (): Promise<void> => {
-    try {
-      await queryRefetch();
-    } catch (err) {
-      console.error('Failed to refetch pools:', err);
-      throw err;
+    XLM: {
+      code: 'XLM',
+      contractAddress: 'CAZAQB3D7KSLSNOSQKYD2V4JP5V2Y3B4RDJZRLBFCCIXDCTE3WHSY3UE',
+      decimals: 7,
+      symbol: 'XLM',
+      name: 'Stellar Lumens',
+      logoURI: 'https://assets.coingecko.com/coins/images/100/small/Stellar_symbol_black_RGB.png'
+    },
+    USDT: {
+      code: 'USDT',
+      contractAddress: 'CAP5AMC2OHNVREO66DFIN6DHJMPOBAJ2KCDDIMFBR7WWJH5RZBFM3UEI',
+      decimals: 6,
+      symbol: 'USDT',
+      name: 'Tether USD',
+      logoURI: 'https://assets.coingecko.com/coins/images/325/small/Tether-logo.png'
+    },
+    BLND: {
+      code: 'BLND',
+      contractAddress: 'CAQCFVLOBK5GIULPNZRGATJJMIZL5BSP7X5YJVMGCPTUEPFM4AVSRCJU',
+      decimals: 7,
+      symbol: 'BLND',
+      name: 'Blend Token',
+      logoURI: 'https://blend.capital/logo.svg'
     }
-  }, [queryRefetch]);
+  };
 
-  // Invalidate cache when needed
-  const invalidateCache = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: [BLEND_POOLS_QUERY_KEY] });
-  }, [queryClient]);
+  return [
+    // Pool 1: US Treasury Bills - Conservative, High TVL
+    {
+      address: 'CTBILL4567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789POOL',
+      name: 'US Treasury Bills Pool',
+      class: 'TBill' as const,
+      reserves: [
+        {
+          asset: mockAssets.USDC,
+          totalSupply: BigInt(85000000 * 1000000), // $85M USDC
+          totalBorrowed: BigInt(60500000 * 1000000), // $60.5M borrowed
+          availableLiquidity: BigInt(24500000 * 1000000), // $24.5M available
+          supplyAPY: 0.0485, // 4.85%
+          borrowAPY: 0.0595, // 5.95%
+          utilizationRate: 0.711, // 71.1%
+          collateralFactor: 0.85,
+          liquidationFactor: 0.90,
+          lastUpdated: now,
+          enabled: true,
+          borrowable: true,
+          collateralCap: BigInt(100000000 * 1000000),
+          borrowCap: BigInt(80000000 * 1000000)
+        },
+        {
+          asset: mockAssets.XLM,
+          totalSupply: BigInt(40000000 * 10000000), // 40M XLM
+          totalBorrowed: BigInt(26000000 * 10000000), // 26M XLM borrowed
+          availableLiquidity: BigInt(14000000 * 10000000), // 14M XLM available
+          supplyAPY: 0.0420, // 4.20%
+          borrowAPY: 0.0520, // 5.20%
+          utilizationRate: 0.650, // 65%
+          collateralFactor: 0.75,
+          liquidationFactor: 0.85,
+          lastUpdated: now,
+          enabled: true,
+          borrowable: true,
+          collateralCap: BigInt(50000000 * 10000000),
+          borrowCap: BigInt(35000000 * 10000000)
+        }
+      ],
+      backstopRate: 0.1,
+      status: 'Paused' as const,
+      totalSupply: BigInt(125000000 * 1000000), // $125M total
+      totalBorrowed: BigInt(89200000 * 1000000), // $89.2M total borrowed
+      totalLiquidity: BigInt(35800000 * 1000000), // $35.8M available
+      averageSupplyAPY: 0.0485,
+      averageBorrowAPY: 0.0595,
+      utilizationRate: 0.711,
+      createdAt: now - 86400000 * 90, // 90 days ago
+      lastUpdated: now,
+      poolType: 'official' as const,
+      verified: true,
+      category: 'RWA' as const,
+      description: 'Institutional-grade US Treasury Bills lending pool with high liquidity and stable returns',
+      riskLevel: 'Low' as const
+    },
 
-  // Auto-refresh every 2 minutes
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!loading) {
-        invalidateCache();
-      }
-    }, 120000); // 2 minutes
+    // Pool 2: Corporate Bonds - Balanced risk/reward
+    {
+      address: 'CCORP567890ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789BONDS',
+      name: 'Corporate Bonds Pool',
+      class: 'Receivables' as const,
+      reserves: [
+        {
+          asset: mockAssets.USDC,
+          totalSupply: BigInt(55000000 * 1000000), // $55M USDC
+          totalBorrowed: BigInt(31700000 * 1000000), // $31.7M borrowed
+          availableLiquidity: BigInt(23300000 * 1000000), // $23.3M available
+          supplyAPY: 0.0625, // 6.25%
+          borrowAPY: 0.0785, // 7.85%
+          utilizationRate: 0.576, // 57.6%
+          collateralFactor: 0.75,
+          liquidationFactor: 0.85,
+          lastUpdated: now,
+          enabled: true,
+          borrowable: true,
+          collateralCap: BigInt(70000000 * 1000000),
+          borrowCap: BigInt(45000000 * 1000000)
+        },
+        {
+          asset: mockAssets.USDT,
+          totalSupply: BigInt(23300000 * 1000000), // $23.3M USDT
+          totalBorrowed: BigInt(13400000 * 1000000), // $13.4M borrowed
+          availableLiquidity: BigInt(9900000 * 1000000), // $9.9M available
+          supplyAPY: 0.0605, // 6.05%
+          borrowAPY: 0.0765, // 7.65%
+          utilizationRate: 0.575, // 57.5%
+          collateralFactor: 0.75,
+          liquidationFactor: 0.85,
+          lastUpdated: now,
+          enabled: true,
+          borrowable: true,
+          collateralCap: BigInt(30000000 * 1000000),
+          borrowCap: BigInt(20000000 * 1000000)
+        }
+      ],
+      backstopRate: 0.12,
+      status: 'Paused' as const,
+      totalSupply: BigInt(78300000 * 1000000), // $78.3M total
+      totalBorrowed: BigInt(45100000 * 1000000), // $45.1M total borrowed
+      totalLiquidity: BigInt(33200000 * 1000000), // $33.2M available
+      averageSupplyAPY: 0.0625,
+      averageBorrowAPY: 0.0785,
+      utilizationRate: 0.576,
+      createdAt: now - 86400000 * 60, // 60 days ago
+      lastUpdated: now,
+      poolType: 'official' as const,
+      verified: true,
+      category: 'RWA' as const,
+      description: 'Diversified investment-grade corporate bonds with attractive yields and managed risk',
+      riskLevel: 'Medium' as const
+    },
 
-    return () => clearInterval(interval);
-  }, [loading, invalidateCache]);
+    // Pool 3: Commercial Real Estate - Highest yields
+    {
+      address: 'CCRE7890123ABCDEFGHIJKLMNOPQRSTUVWXYZ456789REALESTATE',
+      name: 'Commercial Real Estate Pool',
+      class: 'CRE' as const,
+      reserves: [
+        {
+          asset: mockAssets.USDC,
+          totalSupply: BigInt(95000000 * 1000000), // $95M USDC
+          totalBorrowed: BigInt(59700000 * 1000000), // $59.7M borrowed
+          availableLiquidity: BigInt(35300000 * 1000000), // $35.3M available
+          supplyAPY: 0.0745, // 7.45%
+          borrowAPY: 0.0915, // 9.15%
+          utilizationRate: 0.628, // 62.8%
+          collateralFactor: 0.65,
+          liquidationFactor: 0.75,
+          lastUpdated: now,
+          enabled: true,
+          borrowable: true,
+          collateralCap: BigInt(120000000 * 1000000),
+          borrowCap: BigInt(80000000 * 1000000)
+        },
+        {
+          asset: mockAssets.USDT,
+          totalSupply: BigInt(41700000 * 1000000), // $41.7M USDT
+          totalBorrowed: BigInt(26200000 * 1000000), // $26.2M borrowed
+          availableLiquidity: BigInt(15500000 * 1000000), // $15.5M available
+          supplyAPY: 0.0720, // 7.20%
+          borrowAPY: 0.0890, // 8.90%
+          utilizationRate: 0.628, // 62.8%
+          collateralFactor: 0.65,
+          liquidationFactor: 0.75,
+          lastUpdated: now,
+          enabled: true,
+          borrowable: true,
+          collateralCap: BigInt(50000000 * 1000000),
+          borrowCap: BigInt(35000000 * 1000000)
+        },
+        {
+          asset: mockAssets.BLND,
+          totalSupply: BigInt(20000000 * 10000000), // 20M BLND
+          totalBorrowed: BigInt(12500000 * 10000000), // 12.5M BLND borrowed
+          availableLiquidity: BigInt(7500000 * 10000000), // 7.5M BLND available
+          supplyAPY: 0.0785, // 7.85%
+          borrowAPY: 0.0965, // 9.65%
+          utilizationRate: 0.625, // 62.5%
+          collateralFactor: 0.60,
+          liquidationFactor: 0.70,
+          lastUpdated: now,
+          enabled: true,
+          borrowable: true,
+          collateralCap: BigInt(25000000 * 10000000),
+          borrowCap: BigInt(18000000 * 10000000)
+        }
+      ],
+      backstopRate: 0.15,
+      status: 'Paused' as const,
+      totalSupply: BigInt(156700000 * 1000000), // $156.7M total
+      totalBorrowed: BigInt(98400000 * 1000000), // $98.4M total borrowed
+      totalLiquidity: BigInt(58300000 * 1000000), // $58.3M available
+      averageSupplyAPY: 0.0745,
+      averageBorrowAPY: 0.0915,
+      utilizationRate: 0.628,
+      createdAt: now - 86400000 * 45, // 45 days ago
+      lastUpdated: now,
+      poolType: 'official' as const,
+      verified: true,
+      category: 'RWA' as const,
+      description: 'Premium commercial real estate opportunities with high yields across major US metros',
+      riskLevel: 'Medium' as const
+    }
+  ];
+};
+
+export const useBlendPools = (): UseBlendPoolsReturn => {
+  console.log('🚀 Using mock pools for better presentation');
+  
+  // Return mock pools immediately - no loading time for better UX
+  const pools = createMockBlendPools();
+  const loading = false;
+  const error = null;
+  const lastUpdated = Date.now();
+
+  // Mock refetch function - no network calls needed
+  const refetch = useCallback(async (): Promise<void> => {
+    console.log('🔄 Mock refetch - pools refreshed (instant)');
+    return Promise.resolve();
+  }, []);
 
   return {
     pools,
