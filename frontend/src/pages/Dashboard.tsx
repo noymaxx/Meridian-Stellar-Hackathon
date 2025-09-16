@@ -66,13 +66,6 @@ export default function Dashboard() {
   const [selectedPosition, setSelectedPosition] = useState<UserPosition | null>(null);
   const [activeTab, setActiveTab] = useState("markets");
   
-  const marketsRef = useRef(null);
-  const portfolioRef = useRef(null);
-  const adminRef = useRef(null);
-  
-  const isMarketsInView = useInView(marketsRef, { once: true, margin: "-100px" });
-  const isPortfolioInView = useInView(portfolioRef, { once: true, margin: "-100px" });
-  const isAdminInView = useInView(adminRef, { once: true, margin: "-100px" });
 
   // Markets data
   const {
@@ -311,9 +304,8 @@ export default function Dashboard() {
             {/* Markets Tab */}
             <TabsContent value="markets" className="space-y-8">
               <motion.div
-                ref={marketsRef}
-                initial={{ opacity: 0 }}
-                animate={isMarketsInView ? { opacity: 1 } : { opacity: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
                 className="space-y-6"
               >
@@ -358,9 +350,8 @@ export default function Dashboard() {
             {/* Portfolio Tab */}
             <TabsContent value="portfolio" className="space-y-8">
               <motion.div
-                ref={portfolioRef}
-                initial={{ opacity: 0 }}
-                animate={isPortfolioInView ? { opacity: 1 } : { opacity: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
                 className="space-y-6"
               >
@@ -660,9 +651,8 @@ export default function Dashboard() {
             {/* Admin Tab */}
             <TabsContent value="admin" className="space-y-8">
               <motion.div
-                ref={adminRef}
-                initial={{ opacity: 0 }}
-                animate={isAdminInView ? { opacity: 1 } : { opacity: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
                 className="space-y-6"
               >
