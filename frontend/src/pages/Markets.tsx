@@ -64,11 +64,13 @@ export default function Markets() {
   };
 
   const handleSupply = (poolAddress: string) => {
-    navigate(`/pool/${poolAddress}?action=supply`);
+    // Legacy navigation - now handled by modals in MarketsDashboard
+    console.log(`Legacy supply navigation for pool: ${poolAddress}`);
   };
 
   const handleBorrow = (poolAddress: string) => {
-    navigate(`/pool/${poolAddress}?action=borrow`);
+    // Legacy navigation - now handled by modals in MarketsDashboard
+    console.log(`Legacy borrow navigation for pool: ${poolAddress}`);
   };
 
   const handleRefresh = () => {

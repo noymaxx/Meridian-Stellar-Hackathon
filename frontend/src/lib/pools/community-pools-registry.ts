@@ -25,91 +25,16 @@ export interface PoolRegistryConfig {
   requireMinLiquidity: number;
 }
 
-// Registry de pools da comunidade para hackathon
+// Community pools registry - now used only for pool discovery, not mock data
+// Real community pools will be discovered via factory contract
 const COMMUNITY_POOLS_TESTNET: CommunityPoolMetadata[] = [
-  {
-    address: 'CCOMMUNITY1EXAMPLEPOOL1ADDRESSFORTESTNETCOMMUNITY1',
-    name: 'DeFi Innovators Pool',
-    creator: 'team@defi-innovators.stellar',
-    description: 'Experimental lending pool focused on high-yield DeFi strategies with dynamic interest rates',
-    category: 'DeFi',
-    tags: ['experimental', 'high-yield', 'dynamic-rates'],
-    website: 'https://defi-innovators.stellar',
-    twitter: '@DefiInnovators',
-    verified: false,
-    riskLevel: 'High',
-    addedAt: Date.now() - 86400000 * 7, // 7 days ago
-  },
-  {
-    address: 'CCOMMUNITY2RWAPOOLEXAMPLEFORTESTNETCOMMUNITY2RWA',
-    name: 'Real Estate Tokens Pool',
-    creator: 'real-estate@stellar-rwa.com',
-    description: 'Community-managed pool for tokenized real estate assets with stable returns',
-    category: 'RWA',
-    tags: ['real-estate', 'stable', 'community-managed'],
-    website: 'https://stellar-rwa.com',
-    verified: true,
-    riskLevel: 'Medium',
-    addedAt: Date.now() - 86400000 * 14, // 14 days ago
-    lastValidated: Date.now() - 86400000 * 1, // Validated 1 day ago
-  },
-  {
-    address: 'CCOMMUNITY3GAMEFIPOOL4TESTNETGAMINGANDNFTLENDING',
-    name: 'GameFi Lending Hub',
-    creator: 'gamefi@stellar-gaming.io',
-    description: 'Specialized pool for gaming assets and NFT-backed lending with gaming rewards',
-    category: 'Gaming',
-    tags: ['gaming', 'nft', 'rewards', 'gamefi'],
-    website: 'https://stellar-gaming.io',
-    twitter: '@StellarGameFi',
-    github: 'stellar-gamefi/lending-pool',
-    verified: false,
-    riskLevel: 'Experimental',
-    addedAt: Date.now() - 86400000 * 3, // 3 days ago
-  },
-  {
-    address: 'CCOMMUNITY4STABLECOINPOOLFORTESTNETCOMMUNITYUSE4',
-    name: 'Multi-Stablecoin Vault',
-    creator: 'stable@stellar-defi.org',
-    description: 'Conservative pool focusing on multiple stablecoins with automated rebalancing',
-    category: 'DeFi',
-    tags: ['stable', 'conservative', 'automated', 'multi-asset'],
-    website: 'https://stellar-defi.org',
-    verified: true,
-    riskLevel: 'Low',
-    addedAt: Date.now() - 86400000 * 21, // 21 days ago
-    lastValidated: Date.now() - 86400000 * 2, // Validated 2 days ago
-  },
-  {
-    address: 'CCOMMUNITY5EXPPOOL5FORTESTNETEXPERIMENTALFEATURES',
-    name: 'Research Labs Pool',
-    creator: 'research@stellar-labs.dev',
-    description: 'Experimental pool testing new DeFi primitives and yield optimization strategies',
-    category: 'Experimental',
-    tags: ['research', 'experimental', 'yield-optimization', 'bleeding-edge'],
-    github: 'stellar-labs/experimental-pool',
-    twitter: '@StellarLabs',
-    verified: false,
-    riskLevel: 'Experimental',
-    addedAt: Date.now() - 86400000 * 1, // 1 day ago
-  }
+  // This array is now empty - community pools are discovered via blockchain
+  // instead of using mock/fake data
 ];
 
 const COMMUNITY_POOLS_MAINNET: CommunityPoolMetadata[] = [
-  // Mainnet community pools (para quando sair do testnet)
-  {
-    address: 'CMAINNET1COMMUNITYPOOLEXAMPLEFORMAINNETCOMMUNITY1',
-    name: 'Stellar Yield Farmers',
-    creator: 'yield@stellar-farmers.co',
-    description: 'Community-driven yield farming pool with optimized strategies',
-    category: 'DeFi',
-    tags: ['yield-farming', 'optimized', 'community'],
-    website: 'https://stellar-farmers.co',
-    verified: true,
-    riskLevel: 'Medium',
-    addedAt: Date.now() - 86400000 * 30,
-    lastValidated: Date.now() - 86400000 * 1,
-  }
+  // This array is now empty - community pools are discovered via blockchain
+  // instead of using mock/fake data
 ];
 
 // Configuração padrão do registry

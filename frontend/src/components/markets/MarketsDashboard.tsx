@@ -23,7 +23,10 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { PoolCard } from './PoolCard';
+import { SupplyModal } from './SupplyModal';
+import { BorrowModal } from './BorrowModal';
 import { EnhancedPoolData } from '@/types/markets';
+import { BlendPool } from '@/types/blend';
 import { cn } from '@/lib/utils';
 
 interface MarketsDashboardProps {
@@ -32,8 +35,8 @@ interface MarketsDashboardProps {
   error: string | null;
   onRefresh: () => void;
   onViewPoolDetails: (poolAddress: string) => void;
-  onSupply: (poolAddress: string) => void;
-  onBorrow: (poolAddress: string) => void;
+  onSupply?: (poolAddress: string) => void; // Made optional since we'll handle modals internally
+  onBorrow?: (poolAddress: string) => void; // Made optional since we'll handle modals internally
 }
 
 type SortField = 'tvl' | 'supplyAPY' | 'borrowAPY' | 'utilizationRate' | 'volume24h' | 'activeUsers';
@@ -61,6 +64,16 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [showOnlyActive, setShowOnlyActive] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Modal states
+  const [supplyModal, setSupplyModal] = useState<{ isOpen: boolean; pool: BlendPool | null }>({
+    isOpen: false,
+    pool: null
+  });
+  const [borrowModal, setBorrowModal] = useState<{ isOpen: boolean; pool: BlendPool | null }>({
+    isOpen: false,
+    pool: null
+  });
 
   // ===== COMPUTED VALUES =====
   
@@ -190,6 +203,180 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
     setMinAPY('');
     setMaxTVL('');
     setShowOnlyActive(false);
+  };
+
+  // ===== MODAL HANDLERS =====
+  
+  const handleSupplyClick = (poolAddress: string) => {
+    const pool = pools.find(p => p.address === poolAddress);
+    if (pool) {
+      // Convert EnhancedPoolData to BlendPool format
+      const blendPool: BlendPool = {
+        address: pool.address,
+        name: pool.name,
+        class: pool.class,
+        reserves: [], // Will be populated from the enhanced pool data
+        backstopRate: 0.1, // Mock value
+        status: pool.status,
+        totalSupply: BigInt(Math.floor(pool.tvl * 1e6)),
+        totalBorrowed: BigInt(Math.floor(pool.tvl * pool.utilizationRate * 1e6)),
+        totalLiquidity: BigInt(Math.floor(pool.availableLiquidity * 1e6)),
+        averageSupplyAPY: pool.supplyAPY,
+        averageBorrowAPY: pool.borrowAPY,
+        utilizationRate: pool.utilizationRate,
+        createdAt: Date.now() - 86400000 * 30,
+        lastUpdated: Date.now(),
+        poolType: pool.poolType,
+        creator: pool.creator,
+        description: pool.description,
+        category: pool.category,
+        tags: pool.tags,
+        verified: pool.verified,
+        riskLevel: pool.riskLevel,
+        website: pool.website,
+        twitter: pool.twitter,
+        github: pool.github
+      };
+
+      // Create mock reserves for the pool
+      blendPool.reserves = [
+        {
+          asset: {
+            code: 'USDC',
+            contractAddress: 'CUSDCMOCKCONTRACTADDRESS',
+            decimals: 6,
+            symbol: 'USDC',
+            name: 'USD Coin'
+          },
+          totalSupply: BigInt(Math.floor(pool.tvl * 0.6 * 1e6)),
+          totalBorrowed: BigInt(Math.floor(pool.tvl * 0.6 * pool.utilizationRate * 1e6)),
+          availableLiquidity: BigInt(Math.floor(pool.availableLiquidity * 0.6 * 1e6)),
+          supplyAPY: pool.supplyAPY,
+          borrowAPY: pool.borrowAPY,
+          utilizationRate: pool.utilizationRate,
+          collateralFactor: 0.8,
+          liquidationFactor: 0.85,
+          lastUpdated: Date.now(),
+          enabled: true,
+          borrowable: true
+        },
+        {
+          asset: {
+            code: 'XLM',
+            contractAddress: 'CXLMMOCKCONTRACTADDRESS',
+            decimals: 7,
+            symbol: 'XLM',
+            name: 'Stellar Lumens'
+          },
+          totalSupply: BigInt(Math.floor(pool.tvl * 0.4 * 1e7 / 0.12)),
+          totalBorrowed: BigInt(Math.floor(pool.tvl * 0.4 * pool.utilizationRate * 1e7 / 0.12)),
+          availableLiquidity: BigInt(Math.floor(pool.availableLiquidity * 0.4 * 1e7 / 0.12)),
+          supplyAPY: pool.supplyAPY * 1.1,
+          borrowAPY: pool.borrowAPY * 1.1,
+          utilizationRate: pool.utilizationRate,
+          collateralFactor: 0.7,
+          liquidationFactor: 0.75,
+          lastUpdated: Date.now(),
+          enabled: true,
+          borrowable: true
+        }
+      ];
+
+      setSupplyModal({ isOpen: true, pool: blendPool });
+    }
+    
+    // Also call the original handler if provided
+    onSupply?.(poolAddress);
+  };
+
+  const handleBorrowClick = (poolAddress: string) => {
+    const pool = pools.find(p => p.address === poolAddress);
+    if (pool) {
+      // Same conversion logic as supply
+      const blendPool: BlendPool = {
+        address: pool.address,
+        name: pool.name,
+        class: pool.class,
+        reserves: [],
+        backstopRate: 0.1,
+        status: pool.status,
+        totalSupply: BigInt(Math.floor(pool.tvl * 1e6)),
+        totalBorrowed: BigInt(Math.floor(pool.tvl * pool.utilizationRate * 1e6)),
+        totalLiquidity: BigInt(Math.floor(pool.availableLiquidity * 1e6)),
+        averageSupplyAPY: pool.supplyAPY,
+        averageBorrowAPY: pool.borrowAPY,
+        utilizationRate: pool.utilizationRate,
+        createdAt: Date.now() - 86400000 * 30,
+        lastUpdated: Date.now(),
+        poolType: pool.poolType,
+        creator: pool.creator,
+        description: pool.description,
+        category: pool.category,
+        tags: pool.tags,
+        verified: pool.verified,
+        riskLevel: pool.riskLevel,
+        website: pool.website,
+        twitter: pool.twitter,
+        github: pool.github
+      };
+
+      // Create mock reserves
+      blendPool.reserves = [
+        {
+          asset: {
+            code: 'USDC',
+            contractAddress: 'CUSDCMOCKCONTRACTADDRESS',
+            decimals: 6,
+            symbol: 'USDC',
+            name: 'USD Coin'
+          },
+          totalSupply: BigInt(Math.floor(pool.tvl * 0.6 * 1e6)),
+          totalBorrowed: BigInt(Math.floor(pool.tvl * 0.6 * pool.utilizationRate * 1e6)),
+          availableLiquidity: BigInt(Math.floor(pool.availableLiquidity * 0.6 * 1e6)),
+          supplyAPY: pool.supplyAPY,
+          borrowAPY: pool.borrowAPY,
+          utilizationRate: pool.utilizationRate,
+          collateralFactor: 0.8,
+          liquidationFactor: 0.85,
+          lastUpdated: Date.now(),
+          enabled: true,
+          borrowable: true
+        },
+        {
+          asset: {
+            code: 'XLM',
+            contractAddress: 'CXLMMOCKCONTRACTADDRESS',
+            decimals: 7,
+            symbol: 'XLM',
+            name: 'Stellar Lumens'
+          },
+          totalSupply: BigInt(Math.floor(pool.tvl * 0.4 * 1e7 / 0.12)),
+          totalBorrowed: BigInt(Math.floor(pool.tvl * 0.4 * pool.utilizationRate * 1e7 / 0.12)),
+          availableLiquidity: BigInt(Math.floor(pool.availableLiquidity * 0.4 * 1e7 / 0.12)),
+          supplyAPY: pool.supplyAPY * 1.1,
+          borrowAPY: pool.borrowAPY * 1.1,
+          utilizationRate: pool.utilizationRate,
+          collateralFactor: 0.7,
+          liquidationFactor: 0.75,
+          lastUpdated: Date.now(),
+          enabled: true,
+          borrowable: true
+        }
+      ];
+
+      setBorrowModal({ isOpen: true, pool: blendPool });
+    }
+    
+    // Also call the original handler if provided
+    onBorrow?.(poolAddress);
+  };
+
+  const closeSupplyModal = () => {
+    setSupplyModal({ isOpen: false, pool: null });
+  };
+
+  const closeBorrowModal = () => {
+    setBorrowModal({ isOpen: false, pool: null });
   };
 
   // ===== RENDER =====
@@ -540,8 +727,8 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
                   key={pool.address}
                   pool={pool}
                   onViewDetails={onViewPoolDetails}
-                  onSupply={onSupply}
-                  onBorrow={onBorrow}
+                  onSupply={handleSupplyClick}
+                  onBorrow={handleBorrowClick}
                   compact={viewMode === 'list'}
                 />
               ))}
@@ -560,6 +747,24 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
           )}
         </CardContent>
       </Card>
+
+      {/* Supply Modal */}
+      {supplyModal.pool && (
+        <SupplyModal
+          isOpen={supplyModal.isOpen}
+          onClose={closeSupplyModal}
+          pool={supplyModal.pool}
+        />
+      )}
+
+      {/* Borrow Modal */}
+      {borrowModal.pool && (
+        <BorrowModal
+          isOpen={borrowModal.isOpen}
+          onClose={closeBorrowModal}
+          pool={borrowModal.pool}
+        />
+      )}
     </div>
   );
 };
