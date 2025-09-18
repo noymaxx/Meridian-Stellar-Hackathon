@@ -306,6 +306,46 @@ const Index = () => {
         </motion.div>
       </section>
 
+      {/* How to use Section */}
+      <section className="container mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-20">
+        <motion.div 
+          className="text-center space-y-4 mb-8"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <motion.h2 
+            className="text-2xl sm:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            How to use
+          </motion.h2>
+          <motion.p 
+            className="text-sm sm:text-body-1 text-fg-secondary max-w-2xl mx-auto px-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            Watch a brief overview of how to get started with the app.
+          </motion.p>
+        </motion.div>
+
+        <div className="relative mx-auto max-w-5xl aspect-video rounded-xl overflow-hidden border border-stroke-line">
+          <iframe 
+            className="w-full h-full"
+            src="https://www.youtube.com/embed/GdjYSfRO3sk?si=A-fEM0nSTO71iSwQ&autoplay=1&mute=1&controls=1"
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        </div>
+      </section>
+
       {/* Enhanced Features Section */}
       <section ref={featuresRef} className="container mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-20">
         <motion.div 
