@@ -16,13 +16,15 @@ import {
   Trash2, 
   Info, 
   AlertCircle,
-  Target 
+  Target,
+  Wallet
 } from 'lucide-react';
 
 import { TokenCreationForm } from '@/types/srwa-contracts';
 import { RWATemplate } from '@/types/templates';
 import { getCountryByCode } from '@/data/countries';
 import JurisdictionSelector from './JurisdictionSelector';
+import { useWallet } from '@/components/wallet/WalletProvider';
 
 interface AdvancedSettingsProps {
   formData: TokenCreationForm;
@@ -34,7 +36,13 @@ interface AdvancedSettingsProps {
 export default function AdvancedSettings({ formData, template, onChange }: AdvancedSettingsProps) {
   const [newDistributionAddress, setNewDistributionAddress] = useState('');
   const [newDistributionAmount, setNewDistributionAmount] = useState('');
+  const { address, isConnected, connect } = useWallet();
 
+  const useMyWallet = () => {
+    if (address) {
+      setNewDistributionAddress(address);
+    }
+  };
 
   const addDistribution = () => {
     if (!newDistributionAddress || !newDistributionAmount) return;
@@ -209,11 +217,37 @@ export default function AdvancedSettings({ formData, template, onChange }: Advan
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="md:col-span-2">
                   <Label>Recipient Address</Label>
-                  <Input
-                    placeholder="GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                    value={newDistributionAddress}
-                    onChange={(e) => setNewDistributionAddress(e.target.value)}
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+                      value={newDistributionAddress}
+                      onChange={(e) => setNewDistributionAddress(e.target.value)}
+                      className="flex-1"
+                    />
+                    {isConnected ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={useMyWallet}
+                        className="px-3"
+                        title="Use my wallet address"
+                      >
+                        <Wallet className="h-4 w-4" />
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={connect}
+                        className="px-3"
+                        title="Connect wallet to use address"
+                      >
+                        <Wallet className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <Label>Amount</Label>

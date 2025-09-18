@@ -3,7 +3,7 @@ import { toast } from "@/hooks/use-toast";
 import { useMobileDetection } from "./useMobileDetection";
 import { MobileWallet, type MobileWalletInfo } from "@/lib/wallet/mobile-wallet";
 import { useStellarWallet } from "./useStellarWallet";
-import { Transaction } from '@stellar/stellar-sdk';
+import { TransactionBuilder } from '@stellar/stellar-sdk';
 
 export type WalletMode = 'desktop' | 'mobile' | 'tablet';
 export type WalletProvider = 'freighter' | 'mobile' | 'none';
@@ -63,6 +63,10 @@ export interface AdaptiveWalletActions {
   // Utility
   switchToDesktopMode: () => void;
   switchToMobileMode: () => void;
+  
+  // Debug functions
+  forceMobileMode: () => void;
+  getDebugInfo: () => any;
 }
 
 export function useAdaptiveWallet(): AdaptiveWalletState & AdaptiveWalletActions {
@@ -78,19 +82,25 @@ export function useAdaptiveWallet(): AdaptiveWalletState & AdaptiveWalletActions
   
   // Determine wallet mode based on device
   useEffect(() => {
+    console.log('🔍 [AdaptiveWallet] Device detection result:', {
+      isMobile: deviceDetection.isMobile,
+      isTablet: deviceDetection.isTablet,
+      isDesktop: deviceDetection.isDesktop,
+      deviceType: deviceDetection.deviceType,
+      screenWidth: deviceDetection.screenWidth,
+      userAgent: navigator.userAgent.slice(0, 50) + '...'
+    });
+    
     if (deviceDetection.isMobile) {
       setWalletMode('mobile');
+      console.log('📱 [AdaptiveWallet] Set to MOBILE mode');
     } else if (deviceDetection.isTablet) {
       setWalletMode('tablet'); // Tablets can use either mode
+      console.log('📱 [AdaptiveWallet] Set to TABLET mode');
     } else {
       setWalletMode('desktop');
+      console.log('💻 [AdaptiveWallet] Set to DESKTOP mode');
     }
-    
-    console.log('📱 [AdaptiveWallet] Device detected:', {
-      deviceType: deviceDetection.deviceType,
-      walletMode: deviceDetection.isMobile ? 'mobile' : deviceDetection.isTablet ? 'tablet' : 'desktop',
-      screenWidth: deviceDetection.screenWidth
-    });
   }, [deviceDetection]);
   
   // Check for existing mobile wallet
@@ -111,12 +121,23 @@ export function useAdaptiveWallet(): AdaptiveWalletState & AdaptiveWalletActions
     setIsConnecting(true);
     setError(null);
     
+    console.log('🔍 [AdaptiveWallet] Connect called with:', {
+      walletMode,
+      walletProvider,
+      deviceType: deviceDetection.deviceType,
+      isMobile: deviceDetection.isMobile,
+      isTablet: deviceDetection.isTablet,
+      isDesktop: deviceDetection.isDesktop
+    });
+    
     try {
       if (walletMode === 'mobile' || (walletMode === 'tablet' && walletProvider === 'mobile')) {
         // Mobile wallet connection
         console.log('📱 [AdaptiveWallet] Connecting mobile wallet...');
         
         const address = await MobileWallet.getAddress();
+        console.log('📱 [AdaptiveWallet] Mobile wallet address result:', address ? 'SUCCESS' : 'FAILED');
+        
         if (!address) {
           throw new Error('Failed to generate mobile wallet');
         }
@@ -191,7 +212,7 @@ export function useAdaptiveWallet(): AdaptiveWalletState & AdaptiveWalletActions
         console.log('📱 [AdaptiveWallet] Signing with mobile wallet...');
         
         // Parse XDR and sign with mobile wallet
-        const transaction = Transaction.fromXDR(xdr, 'Test SDF Network ; September 2015');
+        const transaction = TransactionBuilder.fromXDR(xdr, 'Test SDF Network ; September 2015');
         
         const signedTx = await MobileWallet.signTransaction(transaction);
         return signedTx.toXDR();
@@ -300,5 +321,23 @@ export function useAdaptiveWallet(): AdaptiveWalletState & AdaptiveWalletActions
     // Utility actions
     switchToDesktopMode,
     switchToMobileMode,
+    
+    // Debug functions
+    forceMobileMode: () => {
+      console.log('🔧 [AdaptiveWallet] FORCING MOBILE MODE');
+      setWalletMode('mobile');
+      setWalletProvider('mobile');
+    },
+    getDebugInfo: () => ({
+      deviceDetection,
+      walletMode,
+      walletProvider,
+      mobileWalletInfo,
+      isConnecting,
+      error,
+      userAgent: navigator.userAgent,
+      screenWidth: window.innerWidth,
+      screenHeight: window.innerHeight
+    })
   };
 }

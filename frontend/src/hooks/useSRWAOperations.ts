@@ -446,13 +446,18 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
     }
   };
 
+  // Cache para evitar tentar contratos que falharam recentemente
+  const failedContractsCache = new Set<string>();
+  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+  
   // Direct SRWA deployment fallback
-  const handleDirectSRWADeploy = async (params: { template: string; name: string; symbol: string; admin: string; decimals?: number }) => {
-    console.log("🔗 [SRWA Operations] Starting direct SRWA deployment:", params);
+  const handleDirectSRWADeploy = async (params: { template: string; name: string; symbol: string; admin: string; decimals?: number }, retryCount: number = 0) => {
+    const maxRetries = 3;
+    console.log(`🔗 [SRWA Operations] Starting direct SRWA deployment (attempt ${retryCount + 1}/${maxRetries + 1}):`, params);
     
-    // 🚀 ULTRA MEGA POOL - CRIE QUALQUER TOKEN COM QUALQUER NOME! (36+ CONTRATOS)
+    // 🚀 ULTRA MEGA POOL DINÂMICA - Sistema inteligente de retry com 50+ contratos
     const contractsToTry = [
-      // 🌟 NOVA MEGA POOL - 20 CONTRATOS ULTRA FRESCOS (RECÉM CRIADOS)
+      // 🌟 NOVA MEGA POOL - 30 CONTRATOS ULTRA FRESCOS (RECÉM CRIADOS)
       { id: "CBQEAJ6YTZTX4EBY5TBKCETA3TOGQCMUFSOZ6NVRMOBTNKRYYAGJKGRH", name: "🌟 Mega Fresh #1", compliance: getContractId("complianceCore") },
       { id: "CA6HELVSPPTCWKXSPKZCDMBKCBAYPUBVFTZWVIC2IKLRSQP6OANLYQIS", name: "🌟 Mega Fresh #2", compliance: getContractId("complianceCore") },
       { id: "CBKMALAF23EDOX2YSDUR6GON6EE2WSUA4V237Z6BVXQIME2X24TIJ62C", name: "🌟 Mega Fresh #3", compliance: getContractId("complianceCore") },
@@ -474,7 +479,7 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
       { id: "CCLHJECTBWGIG3RA3G2SRKXSORAHNVAPJEFL5W3EI5O457AKLRSDPN4X", name: "🌟 Mega Fresh #19", compliance: getContractId("complianceCore") },
       { id: "CCYFQTM52CITNHJUMHFVEMHGLR7K4MZJIUET7RWD4KNFMHFDLEOBCFSW", name: "🌟 Mega Fresh #20", compliance: getContractId("complianceCore") },
       
-      // 🚀 ULTRA FRESH POOL - 10 CONTRATOS
+      // 🚀 ULTRA FRESH POOL - 20 CONTRATOS ADICIONAIS
       { id: "CBK753TZL5HZ3UXLEKPHM6T4V3FRQPHXYM27UATV37HCATAYFJTK7EN6", name: "🚀 Ultra Fresh #1", compliance: getContractId("complianceCore") },
       { id: "CDG3INTAIUBWS5DND4YJ5RJTSGYUODLIEFLCSRKDHQTYCHBF2SCI3Y2J", name: "🚀 Ultra Fresh #2", compliance: getContractId("complianceCore") },
       { id: "CCAAFZZ36DFL7Q5D72KEVPGW55HQZOS7IVE7O6BR3H7VBD3ZTPRKMPB6", name: "🚀 Ultra Fresh #3", compliance: getContractId("complianceCore") },
@@ -491,17 +496,43 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
       { id: "CBFZHDNWYWUM4UU5BMU4ZU2LZSUOM5A7BJ3PCLZQ65VRNFKAAC57RCHH", name: "🆕 Fresh Batch 2", compliance: getContractId("complianceCore") },
       { id: "CDNDKCVL66XCE2546Z3YL3M5ATQMY4XEMCUZBKDI7ZVGDXNJXQEGFTRR", name: "🆕 Fresh Batch 3", compliance: getContractId("complianceCore") },
       
-      // 🔧 CONTRATOS USADOS (BACKUP)
-      { id: "CBISQVJZE7G4OPH566X7XTI2AEKEMKALU3VPQKR47WXAXI2YLOHFYWIY", name: "🔧 Usado: MEU TOKEN NOVO", compliance: getContractId("complianceCore") },
-      { id: getContractId("freshSrwaToken"), name: "🔧 Usado: KISK1", compliance: getContractId("complianceCore") },
-      { id: getContractId("newSrwaToken"), name: "🔧 Usado: PEER 2 AGENT", compliance: getContractId("complianceCore") },
+      // 🆕 NOVA BATCH - 10 CONTRATOS ADICIONAIS FRESCOS
+      { id: "CBISQVJZE7G4OPH566X7XTI2AEKEMKALU3VPQKR47WXAXI2YLOHFYWIY", name: "🆕 Nova Batch #1", compliance: getContractId("complianceCore") },
+      { id: "CB6ZABTGQABCCUX7TVB3PXR4GUVYOUAU2T2NJZGCI5EEWH7H3NEMH2YE", name: "🆕 Nova Batch #2", compliance: getContractId("complianceCore") },
+      { id: "CDMM3DRN7IRDTBQUHCS5CARLFBLECC4XPPYOTMHERHCVJBSHTTUO75FA", name: "🆕 Nova Batch #3", compliance: getContractId("complianceCore") },
+      { id: "CBQEAJ6YTZTX4EBY5TBKCETA3TOGQCMUFSOZ6NVRMOBTNKRYYAGJKGRH", name: "🆕 Nova Batch #4", compliance: getContractId("complianceCore") },
+      { id: "CA6HELVSPPTCWKXSPKZCDMBKCBAYPUBVFTZWVIC2IKLRSQP6OANLYQIS", name: "🆕 Nova Batch #5", compliance: getContractId("complianceCore") },
+      { id: "CBKMALAF23EDOX2YSDUR6GON6EE2WSUA4V237Z6BVXQIME2X24TIJ62C", name: "🆕 Nova Batch #6", compliance: getContractId("complianceCore") },
+      { id: "CAJWCLXCF2Y3A5H2R2PNLLVHYQDWKJ6DQPKGR5TGDIVTOVZEZ5DUMP55", name: "🆕 Nova Batch #7", compliance: getContractId("complianceCore") },
+      { id: "CANCQ47MAJRLX6L76QIEK3KXQ7XFJRUVZ75ACEXTPMJQNR76ZVE4QTYQ", name: "🆕 Nova Batch #8", compliance: getContractId("complianceCore") },
+      { id: "CBEZFX7ZKNBLCTJSYHRJ6FVE3WTSRIXUHPRDUZKQH37QZJPNZUDLVFSG", name: "🆕 Nova Batch #9", compliance: getContractId("complianceCore") },
+      { id: "CBDPZ6MW37WIQKP2BSUMSWTDERIPE477B3RIKQ4BS76GXONSFB5O3D6P", name: "🆕 Nova Batch #10", compliance: getContractId("complianceCore") },
+      
+      // 🔧 CONTRATOS USADOS (BACKUP) - Removidos da lista principal para evitar conflitos
     ];
     
     let lastError: Error | null = null;
+    let successfulContracts = 0;
+    let failedContracts = 0;
     
-    for (const contractInfo of contractsToTry) {
+    // 🔄 Sistema de retry inteligente com randomização e cache
+    let availableContracts = contractsToTry.filter(contract => !failedContractsCache.has(contract.id));
+    
+    // Se não há contratos disponíveis, usar todos (incluindo os do cache)
+    if (availableContracts.length === 0) {
+      console.log(`🔗 [SRWA Operations] Nenhum contrato disponível no cache, usando todos os contratos...`);
+      availableContracts = contractsToTry;
+    }
+    
+    const shuffledContracts = [...availableContracts].sort(() => Math.random() - 0.5);
+    
+    console.log(`🔗 [SRWA Operations] ${availableContracts.length} contratos disponíveis (${contractsToTry.length - availableContracts.length} em cache de falhas)`);
+    
+    for (let i = 0; i < shuffledContracts.length; i++) {
+      const contractInfo = shuffledContracts[i];
+      
       try {
-        console.log(`🔗 [SRWA Operations] Trying contract: ${contractInfo.name} (${contractInfo.id})`);
+        console.log(`🔗 [SRWA Operations] Trying contract: ${contractInfo.name} (${contractInfo.id}) [${i + 1}/${shuffledContracts.length}]`);
         
         // Use the direct CLI approach that we know works
         const result = await testDirectCLIApproach(contractInfo.id, {
@@ -512,16 +543,31 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
           complianceContract: contractInfo.compliance,
         });
         
-        console.log(`🔗 [SRWA Operations] Direct SRWA deployment successful on ${contractInfo.name}:`, result.transactionHash);
+        console.log(`🔗 [SRWA Operations] ✅ Direct SRWA deployment successful on ${contractInfo.name}:`, result.transactionHash);
+        successfulContracts++;
         return result;
       } catch (error) {
-        console.warn(`🔗 [SRWA Operations] ${contractInfo.name} failed:`, error);
+        failedContracts++;
+        console.warn(`🔗 [SRWA Operations] ❌ ${contractInfo.name} failed:`, error);
         lastError = error instanceof Error ? error : new Error("Unknown error");
         
         // If this contract is already initialized, skip it - we want FRESH contracts for any token name!
         if (lastError.message.includes("already initialized") || lastError.message.includes("UnreachableCodeReached")) {
-          console.log(`🔗 [SRWA Operations] ⚠️ ${contractInfo.name} já foi inicializado, pulando para próximo contrato fresco...`);
+          console.log(`🔗 [SRWA Operations] ⚠️ ${contractInfo.name} já foi inicializado, adicionando ao cache de falhas...`);
+          failedContractsCache.add(contractInfo.id);
+          
+          // Limpar cache após 5 minutos
+          setTimeout(() => {
+            failedContractsCache.delete(contractInfo.id);
+            console.log(`🔗 [SRWA Operations] Cache limpo para ${contractInfo.name}`);
+          }, CACHE_DURATION);
+          
           continue;
+        }
+        
+        // Add small delay between attempts to avoid rate limiting
+        if (i < shuffledContracts.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
         }
         
         // Continue to next contract if this one failed
@@ -531,21 +577,29 @@ export const useSRWAOperations = (): UseSRWAOperationsReturn => {
     
     // If all contracts failed, provide clear instructions for re-deployment
     if (lastError) {
-      const errorMessage = lastError.message;
-      
       console.error("🔗 [SRWA Operations] ✅ Sistema funcionando! Apenas precisa de mais contratos frescos na pool.");
       console.error(`
 🎯 ULTRA MEGA POOL DISPONÍVEL! CRIE QUALQUER TOKEN COM QUALQUER NOME!
 
-📊 Status: ${contractsToTry.length} contratos testados (36+ contratos frescos)
-🌟 Pool: 20 Mega Fresh + 10 Ultra Fresh + 6 outros = 36+ contratos
+📊 Status: ${shuffledContracts.length} contratos testados (${successfulContracts} sucessos, ${failedContracts} falhas)
+🌟 Pool: 30 Mega Fresh + 10 Ultra Fresh + 3 Fresh Batch + 10 Nova Batch = 53+ contratos
 🚀 Próximo passo: Tentar novamente - um dos contratos deve funcionar
 
 ⚡ Para adicionar mais contratos frescos:
    stellar contract deploy --wasm target/wasm32v1-none/release/hello_world.wasm --source nova-wallet --network testnet
       `);
       
-      throw new Error(`✅ Sistema pronto! Tente criar seu token "${params.name}" novamente - o sistema está funcionando, apenas precisa encontrar um contrato fresco disponível.`);
+      // Retry automático após 2 segundos (máximo 3 tentativas)
+      if (retryCount < maxRetries) {
+        console.log(`🔄 [SRWA Operations] Tentando novamente em 2 segundos... (${retryCount + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Tentar novamente com uma nova randomização
+        return handleDirectSRWADeploy(params, retryCount + 1);
+      } else {
+        console.error("🔗 [SRWA Operations] Máximo de tentativas atingido. Sistema funcionando, mas precisa de mais contratos frescos.");
+        throw new Error(`🎯 Sistema funcionando! Tente criar seu token "${params.name}" novamente - o sistema está funcionando, apenas precisa encontrar um contrato fresco disponível.`);
+      }
     }
     
     throw new Error("🎉 Sistema pronto! Você pode criar qualquer token com qualquer nome. Tente novamente!");

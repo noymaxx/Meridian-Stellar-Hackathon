@@ -10,6 +10,7 @@ import { FreighterDebug } from "@/components/wallet/FreighterDebug";
 import { useBlendPools } from "@/hooks/markets/useBlendPools";
 import { useEnhancedPoolData } from "@/hooks/markets/useDefIndexData";
 import { useWallet } from "@/components/wallet/WalletProvider";
+import { useAdaptiveWallet } from "@/hooks/useAdaptiveWallet";
 import { mockMarketStats, mockMarkets, mockMarketCharts } from "@/lib/mock-data";
 
 // Import das imagens para a órbita
@@ -47,6 +48,9 @@ const Index = () => {
   
   // Wallet connection
   const { isConnected, isConnecting, connect } = useWallet();
+  
+  // Debug mobile wallet
+  const adaptiveWallet = useAdaptiveWallet();
   
   const topMarkets = enhancedPools.slice(0, 3);
   const isLoading = poolsLoading || analyticsLoading;
@@ -99,85 +103,85 @@ const Index = () => {
               <div className="relative flex items-center justify-center">
                 {/* One large orbit; replace the placeholders with your PNGs */}
                 <div className="absolute -z-0 inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="relative h-[640px] w-[640px]">
+                  <div className="relative h-[320px] w-[320px] sm:h-[480px] sm:w-[480px] lg:h-[640px] lg:w-[640px]">
                     {/* Static ring (drawn once) + rotating images. Replace src with your PNGs. */}
                     <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
                       <circle cx="50" cy="50" r="48" className="stroke-brand-500/30" strokeWidth="0.1" fill="none" strokeDasharray="1 2" />
                     </svg>
                     {/* Rotating items on the main (visible) orbit */}
                     {/* Blend Protocol - 2 instances */}
-                    <CustomOrbitingCircles key="blend-1" radius={300} duration={20} delay={0} path={false}>
-                      <img src={blendLogo} alt="Blend Protocol" className="h-10 w-10 opacity-80 rounded-full" />
+                    <CustomOrbitingCircles key="blend-1" radius={150} duration={20} delay={0} path={false}>
+                      <img src={blendLogo} alt="Blend Protocol" className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10 opacity-80 rounded-full" />
                     </CustomOrbitingCircles>
           
                     
                     {/* DeFi Index - 2 instances */}
-                    <CustomOrbitingCircles key="defi-1" radius={300} duration={20} delay={2} path={false}>
-                      <img src={defiImage} alt="DeFi Index" className="h-auto w-14 opacity-80 rounded-full" />
+                    <CustomOrbitingCircles key="defi-1" radius={150} duration={20} delay={2} path={false}>
+                      <img src={defiImage} alt="DeFi Index" className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10 opacity-80 rounded-full" />
                     </CustomOrbitingCircles>
              
                     
                     {/* Reflector - 2 instances */}
-                    <CustomOrbitingCircles key="reflector-1" radius={300} duration={20} delay={4} path={false}>
-                      <img src={reflectorImage} alt="Reflector" className="h-10 w-10 opacity-80 rounded-full" />
+                    <CustomOrbitingCircles key="reflector-1" radius={150} duration={20} delay={4} path={false}>
+                      <img src={reflectorImage} alt="Reflector" className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10 opacity-80 rounded-full" />
                     </CustomOrbitingCircles>
                
                     
                     {/* SoroSwap - 2 instances */}
-                    <CustomOrbitingCircles key="soroswap-1" radius={300} duration={20} delay={6} path={false}>
-                      <img src={soroSwapLogo} alt="SoroSwap" className="h-10 w-10 opacity-80 rounded-full" />
+                    <CustomOrbitingCircles key="soroswap-1" radius={150} duration={20} delay={6} path={false}>
+                      <img src={soroSwapLogo} alt="SoroSwap" className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10 opacity-80 rounded-full" />
                     </CustomOrbitingCircles>
           
                     
                     {/* Stellar - 2 instances */}
-                    <CustomOrbitingCircles key="stellar-1" radius={300} duration={20} delay={8} path={false}>
-                      <img src={stellarLogo} alt="Stellar" className="h-10 w-10 opacity-80 rounded-full" />
+                    <CustomOrbitingCircles key="stellar-1" radius={150} duration={20} delay={8} path={false}>
+                      <img src={stellarLogo} alt="Stellar" className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10 opacity-80 rounded-full" />
                     </CustomOrbitingCircles>
              
 
 
                     {/* Reverse orbit - Inner ring with different delays */}
                     {/* Blend Protocol - 2 instances reverse */}
-                    <CustomOrbitingCircles key="blend-rev-1" radius={320} reverse duration={20} delay={1} path={false}>
-                      <img src={blendLogo} alt="Blend Protocol" className="h-auto w-14 opacity-80 rounded-full" />
+                    <CustomOrbitingCircles key="blend-rev-1" radius={160} reverse duration={20} delay={1} path={false}>
+                      <img src={blendLogo} alt="Blend Protocol" className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10 opacity-80 rounded-full" />
                     </CustomOrbitingCircles>
       
                     
                     {/* DeFi Index - 2 instances reverse */}
-                    <CustomOrbitingCircles key="defi-rev-1" radius={320} reverse duration={20} delay={3} path={false}>
-                      <img src={defiImage} alt="DeFi Index" className="h-10 w-10 opacity-80 rounded-full" />
+                    <CustomOrbitingCircles key="defi-rev-1" radius={160} reverse duration={20} delay={3} path={false}>
+                      <img src={defiImage} alt="DeFi Index" className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10 opacity-80 rounded-full" />
                     </CustomOrbitingCircles>
 
                     
                     {/* Reflector - 2 instances reverse */}
-                    <CustomOrbitingCircles key="reflector-rev-1" radius={320} reverse duration={20} delay={5} path={false}>
-                      <img src={reflectorImage} alt="Reflector" className="h-10 w-10 opacity-80 rounded-full" />
+                    <CustomOrbitingCircles key="reflector-rev-1" radius={160} reverse duration={20} delay={5} path={false}>
+                      <img src={reflectorImage} alt="Reflector" className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10 opacity-80 rounded-full" />
                     </CustomOrbitingCircles>
     
                     
                     {/* SoroSwap - 2 instances reverse */}
-                    <CustomOrbitingCircles key="soroswap-rev-1" radius={320} reverse duration={20} delay={7} path={false}>
-                      <img src={soroSwapLogo} alt="SoroSwap" className="h-10 w-10 opacity-80 rounded-full" />
+                    <CustomOrbitingCircles key="soroswap-rev-1" radius={160} reverse duration={20} delay={7} path={false}>
+                      <img src={soroSwapLogo} alt="SoroSwap" className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10 opacity-80 rounded-full" />
                     </CustomOrbitingCircles>
  
                     
                     {/* Stellar - 2 instances reverse */}
-                    <CustomOrbitingCircles key="stellar-rev-1" radius={320} reverse duration={20} delay={9} path={false}>
-                      <img src={stellarLogo} alt="Stellar" className="h-10 w-10 opacity-80 rounded-full" />
+                    <CustomOrbitingCircles key="stellar-rev-1" radius={160} reverse duration={20} delay={9} path={false}>
+                      <img src={stellarLogo} alt="Stellar" className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10 opacity-80 rounded-full" />
                     </CustomOrbitingCircles>
     
  
                   </div>
                 </div>
                 <motion.h1 
-                  className="text-3xl sm:text-4xl md:text-5xl lg:text-display-1 font-semibold text-fg-primary max-w-4xl mx-auto relative z-10 px-4"
+                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-display-1 font-semibold text-fg-primary max-w-4xl mx-auto relative z-10 px-4"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.4 }}
                 >
                   Panorama Block
                   <motion.span 
-                    className="block text-brand-400 mt-2 text-xl sm:text-2xl md:text-3xl lg:text-4xl"
+                    className="block text-brand-400 mt-1 sm:mt-2 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.8 }}
@@ -199,7 +203,7 @@ const Index = () => {
             </div>
             
             <motion.div 
-              className="flex flex-col justify-center items-center gap-4 px-4"
+              className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 px-4"
               initial={{ opacity: 100, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.1, delay: 1 }}
@@ -207,7 +211,7 @@ const Index = () => {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
                 <Button 
                   onClick={() => window.location.href = '/dashboard'}
-                  className="btn-primary w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-body-1 relative overflow-hidden group"
+                  className="btn-primary w-full sm:w-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm sm:text-body-1 relative overflow-hidden group"
                 >
                   <span className="relative z-10">
                     Launch App
@@ -221,7 +225,7 @@ const Index = () => {
                 <Button 
                   variant="outline"
                   onClick={() => window.location.href = '/docs'}
-                  className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-body-1 border-brand-500/30 text-brand-300 hover:bg-brand-500/10 hover:border-brand-400/50 hover:text-brand-200 transition-all group"
+                  className="w-full sm:w-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm sm:text-body-1 border-brand-500/30 text-brand-300 hover:bg-brand-500/10 hover:border-brand-400/50 hover:text-brand-200 transition-all group"
                 >
                   <span className="relative z-10">
                     Documentation
@@ -240,9 +244,9 @@ const Index = () => {
       </ParallaxBackground>
 
       {/* Enhanced Stats Section */}
-      <section className="container mx-auto max-w-7xl px-4 sm:px-6 py-16 sm:py-20 -mt-8 sm:-mt-16 relative z-20">
+      <section className="container mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-16 lg:py-20 -mt-4 sm:-mt-8 lg:-mt-16 relative z-20">
         <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, staggerChildren: 0.1 }}
@@ -316,7 +320,7 @@ const Index = () => {
           viewport={{ once: true }}
         >
           <motion.h2 
-            className="text-2xl sm:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -333,7 +337,7 @@ const Index = () => {
           </motion.p>
         </motion.div>
 
-        <div className="relative mx-auto max-w-5xl aspect-video rounded-xl overflow-hidden border border-stroke-line">
+        <div className="relative mx-auto max-w-4xl sm:max-w-5xl aspect-video rounded-xl overflow-hidden border border-stroke-line">
           <iframe 
             className="w-full h-full"
             src="https://www.youtube.com/embed/GdjYSfRO3sk?si=A-fEM0nSTO71iSwQ&autoplay=1&mute=1&controls=1"
@@ -356,7 +360,7 @@ const Index = () => {
           viewport={{ once: true }}
         >
           <motion.h2 
-            className="text-2xl sm:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -374,7 +378,7 @@ const Index = () => {
         </motion.div>
 
         <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
           initial={{ opacity: 0 }}
           animate={isFeatureInView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.8, staggerChildren: 0.1 }}
@@ -461,7 +465,7 @@ const Index = () => {
           viewport={{ once: true }}
         >
           <motion.h2 
-            className="text-2xl sm:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -472,7 +476,7 @@ const Index = () => {
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
             >
-              <Star className="h-5 w-5 sm:h-6 sm:w-6 text-brand-400 inline" />
+              <Star className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-brand-400 inline" />
             </motion.span>
           </motion.h2>
           <motion.p 
@@ -486,7 +490,7 @@ const Index = () => {
         </motion.div>
 
         <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8 lg:mb-12"
           initial={{ opacity: 0 }}
           animate={isMarketsInView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.8, staggerChildren: 0.15 }}
@@ -696,7 +700,7 @@ const Index = () => {
           viewport={{ once: true }}
         >
           <motion.h2 
-            className="text-2xl sm:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-h1 font-semibold text-fg-primary px-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -715,7 +719,7 @@ const Index = () => {
 
         {/* Partner Logos */}
         <motion.div 
-          className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16 opacity-60 px-4"
+          className="flex flex-wrap justify-center items-center gap-2 sm:gap-4 lg:gap-6 mb-8 sm:mb-12 lg:mb-16 opacity-60 px-4"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 0.6, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
@@ -736,7 +740,7 @@ const Index = () => {
 
         {/* Testimonials */}
         <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, staggerChildren: 0.2 }}
@@ -848,7 +852,7 @@ const Index = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <h2 className="text-xl sm:text-2xl lg:text-h2 font-semibold text-fg-primary mb-4 px-4">
+                <h2 className="text-lg sm:text-xl md:text-2xl lg:text-h2 font-semibold text-fg-primary mb-4 px-4">
                   Enterprise-Ready Platform
                 </h2>
                 <p className="text-sm sm:text-body-1 text-fg-secondary max-w-2xl mx-auto px-4">
@@ -856,7 +860,7 @@ const Index = () => {
                 </p>
               </motion.div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 {[
                   {
                     icon: CheckCircle,
@@ -940,7 +944,7 @@ const Index = () => {
                 <div className="text-2xl font-bold text-primary-foreground">R</div>
               </motion.div>
               <div className="text-left">
-                <span className="text-xl sm:text-2xl lg:text-h2 font-semibold text-fg-primary">Panorama Block</span>
+                <span className="text-lg sm:text-xl md:text-2xl lg:text-h2 font-semibold text-fg-primary">Panorama Block</span>
                 <p className="text-micro text-brand-400 font-medium">Institutional DeFi</p>
               </div>
             </motion.div>
@@ -999,6 +1003,33 @@ const Index = () => {
       
       {/* Debug Component (only shows in development) */}
       <FreighterDebug />
+      
+      {/* Mobile Wallet Debug */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 right-4 bg-black/80 text-white p-4 rounded-lg text-xs max-w-xs z-50">
+          <h3 className="font-bold mb-2">🔧 Mobile Debug</h3>
+          <div className="space-y-1">
+            <div>Mode: {adaptiveWallet.walletMode}</div>
+            <div>Provider: {adaptiveWallet.walletProvider}</div>
+            <div>Connected: {adaptiveWallet.isConnected ? 'Yes' : 'No'}</div>
+            <div>Error: {adaptiveWallet.error || 'None'}</div>
+            <div className="pt-2 space-x-2">
+              <button 
+                onClick={adaptiveWallet.forceMobileMode}
+                className="bg-blue-600 px-2 py-1 rounded text-xs"
+              >
+                Force Mobile
+              </button>
+              <button 
+                onClick={() => console.log('Debug Info:', adaptiveWallet.getDebugInfo())}
+                className="bg-green-600 px-2 py-1 rounded text-xs"
+              >
+                Log Debug
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
