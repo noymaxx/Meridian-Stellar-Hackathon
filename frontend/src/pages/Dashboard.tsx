@@ -21,6 +21,7 @@ import { mockUserPositions, type UserPosition } from "@/lib/mock-data";
 import RWATokensGrid from '@/components/dashboard/RWATokensGrid';
 import { RWALendingPools } from '@/components/rwa/RWALendingPools';
 import { BlendIntegrationStatus } from '@/components/dashboard/BlendIntegrationStatus';
+import { MobileWalletIndicator } from '@/components/wallet/MobileWalletIndicator';
 
 // Icons
 import { 
@@ -94,7 +95,7 @@ export default function Dashboard() {
   } = useSRWAMarkets();
 
   const loading = poolsLoading || analyticsLoading || srwaLoading;
-  const error = poolsError?.message || analyticsError?.message || srwaError?.message || null;
+  const error = poolsError || analyticsError || srwaError || null;
 
   // Portfolio calculations based on real wallet data
   const totalSupplied = isConnected && blendPositions.summary 
@@ -201,6 +202,9 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       <Header />
       
+      {/* Mobile Wallet Authentication Status */}
+      <MobileWalletIndicator variant="banner" className="mx-4 sm:mx-6 mt-4" />
+      
       <main className="container mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
 
         {/* Header with Create SRWA Button */}
@@ -288,7 +292,7 @@ export default function Dashboard() {
                   pools={enhancedPools}
                   srwaMarkets={srwaMarkets}
                   loading={loading}
-                  error={error}
+                  error={error ? (typeof error === 'string' ? error : error.message || 'Unknown error') : null}
                   onRefresh={handleRefresh}
                   onViewPoolDetails={handleViewPoolDetails}
                   onSupply={handleSupply}

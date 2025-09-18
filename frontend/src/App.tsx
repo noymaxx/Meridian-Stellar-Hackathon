@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { WalletProvider } from "@/components/wallet/WalletProvider";
+import { MobileWalletStatusBar, MobileWalletFloatingIndicator } from "@/components/wallet/MobileWalletIndicator";
 import Index from "./pages/Index";
 import Markets from "./pages/Markets";
 import Portfolio from "./pages/Portfolio";
@@ -35,6 +36,9 @@ const App = () => (
       <WalletProvider>
         <Toaster />
         <Sonner />
+        {/* Mobile Wallet Status Indicators */}
+        <MobileWalletStatusBar />
+        <MobileWalletFloatingIndicator />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />

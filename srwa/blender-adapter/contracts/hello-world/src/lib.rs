@@ -1,7 +1,8 @@
 #![no_std]
 use soroban_sdk::{
     contract, contractimpl, contracttype, symbol_short, vec,
-    Address, Env, Symbol, Vec, Map, String, log
+    Address, Env, Symbol, Vec, Map, String, log,
+    token::TokenClient
 };
 
 // Storage keys - MÁXIMO 9 CARACTERES
@@ -389,7 +390,7 @@ impl BlendPoolIntegration {
         log!(&env, "Pool reserve set up successfully");
     }
 
-    /// Supply collateral SRWA - VERSÃO MOCK PARA TESTING
+    /// Supply collateral SRWA - VERSÃO COM TRANSFERÊNCIA REAL
     pub fn supply_collateral(
         env: Env,
         from: Address,
@@ -405,6 +406,12 @@ impl BlendPoolIntegration {
             panic!("Invalid amount");
         }
 
+        // ✅ TRANSFERÊNCIA REAL: Transferir tokens do usuário para o pool
+        let token_client = TokenClient::new(&env, &token);
+        token_client.transfer(&from, &pool_address, &amount);
+        
+        log!(&env, "Tokens transferred from {} to pool {}", from, pool_address);
+
         // Atualizar posição local
         Self::update_position(
             env.clone(),
@@ -419,10 +426,10 @@ impl BlendPoolIntegration {
             (from, pool_address, token, amount)
         );
         
-        log!(&env, "Collateral supplied successfully");
+        log!(&env, "Collateral supplied successfully with real transfer");
     }
 
-    /// Borrow amount - VERSÃO MOCK PARA TESTING
+    /// Borrow amount - VERSÃO COM TRANSFERÊNCIA REAL
     pub fn borrow_amount(
         env: Env,
         from: Address,
@@ -438,6 +445,12 @@ impl BlendPoolIntegration {
             panic!("Invalid amount");
         }
 
+        // ✅ TRANSFERÊNCIA REAL: Transferir tokens do pool para o usuário
+        let token_client = TokenClient::new(&env, &token);
+        token_client.transfer(&pool_address, &from, &amount);
+        
+        log!(&env, "Tokens transferred from pool {} to user {}", pool_address, from);
+
         // Atualizar posição local
         Self::update_position(
             env.clone(),
@@ -452,10 +465,10 @@ impl BlendPoolIntegration {
             (from, pool_address, token, amount)
         );
         
-        log!(&env, "Amount borrowed successfully");
+        log!(&env, "Amount borrowed successfully with real transfer");
     }
 
-    /// Repay amount - VERSÃO MOCK PARA TESTING
+    /// Repay amount - VERSÃO COM TRANSFERÊNCIA REAL
     pub fn repay_amount(
         env: Env,
         from: Address,
@@ -471,6 +484,12 @@ impl BlendPoolIntegration {
             panic!("Invalid amount");
         }
 
+        // ✅ TRANSFERÊNCIA REAL: Transferir tokens do usuário para o pool (repayment)
+        let token_client = TokenClient::new(&env, &token);
+        token_client.transfer(&from, &pool_address, &amount);
+        
+        log!(&env, "Repayment tokens transferred from {} to pool {}", from, pool_address);
+
         // Atualizar posição local
         Self::update_position(
             env.clone(),
@@ -485,10 +504,10 @@ impl BlendPoolIntegration {
             (from, pool_address, token, amount)
         );
         
-        log!(&env, "Amount repaid successfully");
+        log!(&env, "Amount repaid successfully with real transfer");
     }
 
-    /// Withdraw collateral - VERSÃO MOCK PARA TESTING
+    /// Withdraw collateral - VERSÃO COM TRANSFERÊNCIA REAL
     pub fn withdraw_collateral(
         env: Env,
         from: Address,
@@ -504,6 +523,12 @@ impl BlendPoolIntegration {
             panic!("Invalid amount");
         }
 
+        // ✅ TRANSFERÊNCIA REAL: Transferir tokens do pool para o usuário (withdrawal)
+        let token_client = TokenClient::new(&env, &token);
+        token_client.transfer(&pool_address, &from, &amount);
+        
+        log!(&env, "Withdrawal tokens transferred from pool {} to user {}", pool_address, from);
+
         // Atualizar posição local
         Self::update_position(
             env.clone(),
@@ -518,7 +543,7 @@ impl BlendPoolIntegration {
             (from, pool_address, token, amount)
         );
         
-        log!(&env, "Collateral withdrawn successfully");
+        log!(&env, "Collateral withdrawn successfully with real transfer");
     }
 
     /// Get posição do usuário

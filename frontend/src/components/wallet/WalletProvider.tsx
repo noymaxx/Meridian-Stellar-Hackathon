@@ -1,8 +1,8 @@
 import React, { createContext, useContext, ReactNode } from "react";
-import { useStellarWallet, WalletState, WalletActions } from "@/hooks/useStellarWallet";
+import { useAdaptiveWallet, type AdaptiveWalletState, type AdaptiveWalletActions } from "@/hooks/useAdaptiveWallet";
 import { FreighterInstallation } from "./FreighterInstallation";
 
-type WalletContextType = WalletState & WalletActions;
+type WalletContextType = AdaptiveWalletState & AdaptiveWalletActions;
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
@@ -11,18 +11,20 @@ interface WalletProviderProps {
 }
 
 export function WalletProvider({ children }: WalletProviderProps) {
-  const wallet = useStellarWallet();
+  const wallet = useAdaptiveWallet();
 
   return (
     <WalletContext.Provider value={wallet}>
       {children}
       
-      {/* Freighter Installation Modal */}
-      <FreighterInstallation
-        isOpen={wallet.showInstallModal}
-        onClose={wallet.closeInstallModal}
-        onRetry={wallet.retryInstallation}
-      />
+      {/* Freighter Installation Modal - only show for desktop mode */}
+      {wallet.walletMode === 'desktop' && (
+        <FreighterInstallation
+          isOpen={wallet.showInstallModal}
+          onClose={wallet.closeInstallModal}
+          onRetry={wallet.retryInstallation}
+        />
+      )}
     </WalletContext.Provider>
   );
 }

@@ -1,24 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Wallet, Menu, X, ChevronDown, Loader2 } from "lucide-react";
-import { useWallet } from "@/components/wallet/WalletProvider";
-import { WalletStatus } from "@/components/wallet/WalletStatus";
-import { formatStellarAddress } from "@/lib/stellar-config";
+import { Menu, X } from "lucide-react";
+import { AdaptiveConnectButton } from "@/components/wallet/AdaptiveConnectButton";
 import Logo from "@/assets/logoProject.png";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [walletPopoverOpen, setWalletPopoverOpen] = useState(false);
-  const { 
-    isConnected, 
-    address, 
-    balance, 
-    isConnecting,
-    connect, 
-    disconnect 
-  } = useWallet();
+  // Mobile menu state only
+  // Wallet connection is now handled by AdaptiveConnectButton
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-stroke-line bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -50,47 +39,12 @@ export function Header() {
             </a>
           </nav>
 
-          {/* Wallet Connection */}
+          {/* Adaptive Wallet Connection */}
           <div className="flex items-center space-x-2 sm:space-x-4 ml-4 lg:ml-6">
-          {isConnected ? (
-            <Popover open={walletPopoverOpen} onOpenChange={setWalletPopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="flex items-center space-x-1 sm:space-x-2 hover:bg-accent text-xs sm:text-sm"
-                >
-                  <div className="flex items-center space-x-1 sm:space-x-2">
-                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full" />
-                    <span className="hidden sm:inline">{formatStellarAddress(address)}</span>
-                    <span className="sm:hidden">{formatStellarAddress(address).slice(0, 6)}...</span>
-                    {balance && (
-                      <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
-                        {balance} XLM
-                      </Badge>
-                    )}
-                  </div>
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 p-0" align="end">
-                <WalletStatus compact={false} />
-              </PopoverContent>
-            </Popover>
-          ) : (
-            <Button 
-              onClick={connect} 
-              disabled={isConnecting}
-              className="btn-primary flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm px-2 sm:px-4"
-            >
-              {isConnecting ? (
-                <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-              ) : (
-                <Wallet className="h-3 w-3 sm:h-4 sm:w-4" />
-              )}
-              <span className="hidden sm:inline">{isConnecting ? "Connecting..." : "Connect Wallet"}</span>
-              <span className="sm:hidden">{isConnecting ? "..." : "Connect"}</span>
-            </Button>
-          )}
+            <AdaptiveConnectButton 
+              variant="outline"
+              className="text-xs sm:text-sm"
+            />
           </div>
         </div>
 
