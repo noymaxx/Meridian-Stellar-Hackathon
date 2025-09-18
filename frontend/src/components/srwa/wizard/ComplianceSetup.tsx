@@ -17,12 +17,14 @@ import {
   Plus, 
   Trash2, 
   Info,
-  CheckCircle 
+  CheckCircle,
+  Wallet
 } from 'lucide-react';
 
 import { TokenCreationForm, TrustedIssuer } from '@/types/srwa-contracts';
 import { RWATemplate } from '@/types/templates';
 import { DEFAULT_CLAIM_TOPICS } from '@/types/srwa-contracts';
+import { useWallet } from '@/components/wallet/WalletProvider';
 
 interface ComplianceSetupProps {
   formData: TokenCreationForm;
@@ -34,6 +36,7 @@ export default function ComplianceSetup({ formData, template, onChange }: Compli
   const [newIssuerAddress, setNewIssuerAddress] = useState('');
   const [selectedIssuerTopics, setSelectedIssuerTopics] = useState<number[]>([]);
 
+  const { address, isConnected } = useWallet();
   const complianceConfig = template.compliance_config;
 
   // Auto-select required claim topics when template changes
@@ -77,6 +80,14 @@ export default function ComplianceSetup({ formData, template, onChange }: Compli
   const removeTrustedIssuer = (index: number) => {
     const updatedIssuers = formData.trusted_issuers.filter((_, i) => i !== index);
     onChange({ trusted_issuers: updatedIssuers });
+  };
+
+  const useMyWallet = () => {
+    if (!address) return;
+    
+    setNewIssuerAddress(address);
+    // Auto-select all available claim topics when using "My Wallet"
+    setSelectedIssuerTopics(formData.claim_topics);
   };
 
   const getTopicName = (topicId: number): string => {
@@ -225,12 +236,33 @@ export default function ComplianceSetup({ formData, template, onChange }: Compli
             
             <div className="space-y-2">
               <Label>Issuer Address</Label>
-              <Input
-                placeholder="GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                value={newIssuerAddress}
-                onChange={(e) => setNewIssuerAddress(e.target.value)}
-                style={{ position: 'relative', zIndex: 20, pointerEvents: 'auto' }}
-              />
+              <div className="flex gap-2">
+                <Input
+                  placeholder="GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+                  value={newIssuerAddress}
+                  onChange={(e) => setNewIssuerAddress(e.target.value)}
+                  style={{ position: 'relative', zIndex: 20, pointerEvents: 'auto' }}
+                  className="flex-1"
+                />
+                {isConnected && address && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="default"
+                    onClick={useMyWallet}
+                    className="px-3 whitespace-nowrap border-brand-500/30 hover:bg-brand-500/10 hover:border-brand-400/50"
+                    style={{ position: 'relative', zIndex: 20, pointerEvents: 'auto' }}
+                  >
+                    <Wallet className="h-4 w-4 mr-2" />
+                    Use My Wallet
+                  </Button>
+                )}
+              </div>
+              {isConnected && address && (
+                <p className="text-xs text-muted-foreground">
+                  Connected wallet: {address.slice(0, 8)}...{address.slice(-8)}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle, AlertCircle, Loader2, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useWallet } from '@/components/wallet/WalletProvider';
 import { useSRWAOperations } from '@/hooks/useSRWAOperations';
 import { useProvider } from '@/hooks/useProvider';
@@ -15,7 +16,6 @@ import TemplateSelector from './wizard/TemplateSelector';
 import BasicConfiguration from './wizard/BasicConfiguration';
 import ComplianceSetup from './wizard/ComplianceSetup';
 import AdvancedSettings from './wizard/AdvancedSettings';
-import IntegrationSetup from './wizard/IntegrationSetup';
 import ReviewAndDeploy from './wizard/ReviewAndDeploy';
 
 import { TokenCreationForm, TokenTemplate, DeployedToken } from '@/types/srwa-contracts';
@@ -26,11 +26,11 @@ const WIZARD_STEPS = [
   { id: 'basic', title: 'Basic Setup', description: 'Token name, symbol and admin' },
   { id: 'compliance', title: 'Compliance', description: 'Configure compliance modules' },
   { id: 'advanced', title: 'Advanced', description: 'Jurisdictions and limits' },
-  { id: 'integration', title: 'Integration', description: 'DeFi protocol integration' },
   { id: 'review', title: 'Review & Deploy', description: 'Final review and deployment' },
 ];
 
 export default function TokenWizard() {
+  const navigate = useNavigate();
   const { address, connect, isConnected, isConnecting } = useWallet();
   
   // Clean mock tokens from localStorage on component mount
@@ -87,10 +87,6 @@ export default function TokenWizard() {
     denied_jurisdictions: [],
     initial_supply: '0',
     initial_distribution: [],
-    
-    // Step 4: Integration
-    enable_blend_integration: false,
-    enable_soroswap_integration: false,
   });
   
   const [isDeploying, setIsDeploying] = useState(false);
@@ -302,14 +298,6 @@ export default function TokenWizard() {
         );
       case 4:
         return (
-          <IntegrationSetup
-            formData={formData}
-            template={selectedTemplate}
-            onChange={updateFormData}
-          />
-        );
-      case 5:
-        return (
           <ReviewAndDeploy
             formData={formData}
             template={selectedTemplate}
@@ -331,12 +319,10 @@ export default function TokenWizard() {
       case 1: // Basic configuration
         return !!(formData.name && formData.symbol && formData.admin);
       case 2: // Compliance
-        return formData.claim_topics.length > 0;
+        return formData.template === TokenTemplate.Custom || formData.claim_topics.length > 0;
       case 3: // Advanced
         return true; // All fields are optional
-      case 4: // Integration
-        return true; // All fields are optional
-      case 5: // Review
+      case 4: // Review
         return !isDeploying;
       default:
         return false;
@@ -374,59 +360,29 @@ export default function TokenWizard() {
               </Badge>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Card className="card-institutional bg-gradient-to-br from-bg-elev-1 to-bg-elev-2">
-                  <div className="space-y-4">
-                    <h4 className="text-h3 font-semibold text-fg-primary flex items-center">
-                      <div className="w-2 h-2 bg-brand-400 rounded-full mr-3" />
-                      Contract Addresses
-                    </h4>
-                    <div className="space-y-3 text-body-2">
-                      <div className="p-3 rounded-lg bg-bg-elev-3 border border-stroke-line">
-                        <span className="text-fg-muted block mb-1">Token Contract:</span>
-                        <code className="text-xs text-brand-400 break-all">{deploymentResult.token_address}</code>
-                      </div>
-                      <div className="p-3 rounded-lg bg-bg-elev-3 border border-stroke-line">
-                        <span className="text-fg-muted block mb-1">Compliance:</span>
-                        <code className="text-xs text-brand-400 break-all">{deploymentResult.compliance_address}</code>
-                      </div>
-                      <div className="p-3 rounded-lg bg-bg-elev-3 border border-stroke-line">
-                        <span className="text-fg-muted block mb-1">Identity Registry:</span>
-                        <code className="text-xs text-brand-400 break-all">{deploymentResult.identity_registry_address}</code>
-                      </div>
+            <div className="flex justify-center">
+              <Card className="card-institutional bg-gradient-to-br from-bg-elev-1 to-bg-elev-2 w-full max-w-2xl">
+                <div className="space-y-4">
+                  <h4 className="text-h3 font-semibold text-fg-primary flex items-center justify-center">
+                    <div className="w-2 h-2 bg-brand-400 rounded-full mr-3" />
+                    Contract Addresses
+                  </h4>
+                  <div className="space-y-3 text-body-2">
+                    <div className="p-3 rounded-lg bg-bg-elev-3 border border-stroke-line">
+                      <span className="text-fg-muted block mb-1">Token Contract:</span>
+                      <code className="text-xs text-brand-400 break-all">{deploymentResult.token_address}</code>
+                    </div>
+                    <div className="p-3 rounded-lg bg-bg-elev-3 border border-stroke-line">
+                      <span className="text-fg-muted block mb-1">Compliance:</span>
+                      <code className="text-xs text-brand-400 break-all">{deploymentResult.compliance_address}</code>
+                    </div>
+                    <div className="p-3 rounded-lg bg-bg-elev-3 border border-stroke-line">
+                      <span className="text-fg-muted block mb-1">Identity Registry:</span>
+                      <code className="text-xs text-brand-400 break-all">{deploymentResult.identity_registry_address}</code>
                     </div>
                   </div>
-                </Card>
-              </div>
-              
-              <div>
-                <Card className="card-institutional bg-gradient-to-br from-bg-elev-1 to-bg-elev-2">
-                  <div className="space-y-4">
-                    <h4 className="text-h3 font-semibold text-fg-primary flex items-center">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mr-3" />
-                      Next Steps
-                    </h4>
-                    <ul className="text-body-2 space-y-2">
-                      {[
-                        "Configure trusted issuers",
-                        "Set up compliance modules", 
-                        "Add user claims",
-                        "Mint initial tokens",
-                        "Test transfers"
-                      ].map((step, index) => (
-                        <li 
-                          key={step}
-                          className="flex items-center text-fg-secondary"
-                        >
-                          <div className="w-1.5 h-1.5 bg-brand-400 rounded-full mr-3" />
-                          {step}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </Card>
-              </div>
+                </div>
+              </Card>
             </div>
             
             <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -438,6 +394,7 @@ export default function TokenWizard() {
               </Button>
               <Button 
                 variant="outline" 
+                onClick={() => navigate('/dashboard')}
                 className="px-8 py-3 border-brand-500/30 hover:bg-brand-500/10 hover:border-brand-400/50"
               >
                 View Token Dashboard

@@ -442,6 +442,105 @@ export const RWA_TEMPLATES: Record<TokenTemplate, RWATemplate> = {
       { id: "dex", name: "DEX Integration", supported: true },
     ],
   },
+
+  [TokenTemplate.Custom]: {
+    id: TokenTemplate.Custom,
+    name: "Custom Token",
+    description: "Create a fully customizable token with your own compliance rules and configuration",
+    use_cases: [
+      "Unique asset tokenization",
+      "Custom compliance requirements",
+      "Specialized use cases",
+      "Maximum flexibility needed",
+      "Non-standard token structures"
+    ],
+    icon: "⚙️",
+    
+    default_config: {
+      decimals: 18,
+      claim_topics: [], // No required claims by default
+      max_holders: undefined, // No holder limit
+      allowed_jurisdictions: [],
+      denied_jurisdictions: [],
+    },
+    
+    compliance_config: {
+      modules: {
+        jurisdiction: {
+          enabled: false,
+          require_jurisdiction_claim: false,
+          allowed_jurisdictions: [],
+          denied_jurisdictions: [],
+        },
+        lockup: {
+          enabled: false,
+          allow_partial_unlocks: true,
+          lockup_schedules: [],
+        },
+        max_holders: {
+          enabled: false,
+          max_holders: 0,
+          count_zero_balances: false,
+          admin_addresses_exempt: [],
+        },
+        pause_freeze: {
+          enabled: false,
+          allow_admin_transfers_when_paused: true,
+          freeze_addresses: [],
+        },
+        sanctions: {
+          enabled: false,
+          check_on_transfer: false,
+          check_on_mint: false,
+          auto_update_lists: false,
+          custom_blacklist: [],
+        },
+      },
+    },
+    
+    features: [
+      {
+        id: "maximum_flexibility",
+        name: "Maximum Flexibility",
+        description: "Complete control over all token parameters",
+        enabled_by_default: true,
+      },
+      {
+        id: "custom_compliance",
+        name: "Custom Compliance",
+        description: "Define your own compliance rules and requirements",
+        enabled_by_default: true,
+      },
+      {
+        id: "no_restrictions",
+        name: "No Default Restrictions",
+        description: "Start with a clean slate - add only what you need",
+        enabled_by_default: true,
+      },
+      {
+        id: "all_integrations",
+        name: "All Integrations",
+        description: "Compatible with all DeFi protocols and integrations",
+        enabled_by_default: true,
+      },
+    ],
+    
+    restrictions: [], // No default restrictions
+    
+    required_fields: ["name", "symbol", "admin"],
+    optional_fields: [
+      "decimals", "max_holders", "claim_topics", "compliance_modules",
+      "allowed_jurisdictions", "denied_jurisdictions", "initial_supply",
+      "lockup_schedules", "trusted_issuers"
+    ],
+    
+    supported_integrations: [
+      { id: "blend", name: "Blend Protocol", supported: true },
+      { id: "soroswap", name: "SoroSwap", supported: true },
+      { id: "oracle", name: "Price Oracles", supported: true },
+      { id: "dex", name: "DEX Integration", supported: true },
+    ],
+  },
 };
 
 // Helper functions para trabalhar com templates

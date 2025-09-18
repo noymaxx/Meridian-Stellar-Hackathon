@@ -27,7 +27,7 @@ export default function TemplateSelector({ selectedTemplate, onTemplateSelect }:
       <RadioGroup 
         value={selectedTemplate} 
         onValueChange={(value) => onTemplateSelect(value as TokenTemplate)}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
       >
         {templates.map((template) => (
           <div key={template.id} className="relative h-full">
@@ -55,6 +55,12 @@ export default function TemplateSelector({ selectedTemplate, onTemplateSelect }:
                           <Badge variant="secondary" className="mt-1 bg-amber-100 text-amber-800 border-amber-200">
                             <Star className="w-3 h-3 mr-1 fill-amber-500" />
                             Popular
+                          </Badge>
+                        )}
+                        {template.id === TokenTemplate.Custom && (
+                          <Badge variant="secondary" className="mt-1 bg-blue-100 text-blue-800 border-blue-200">
+                            <Star className="w-3 h-3 mr-1 fill-blue-500" />
+                            Flexible
                           </Badge>
                         )}
                       </div>

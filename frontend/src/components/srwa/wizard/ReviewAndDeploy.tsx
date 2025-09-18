@@ -142,12 +142,6 @@ export default function ReviewAndDeploy({
               <li>Add initial user claims through the identity registry</li>
               <li>Mint initial token supply to designated addresses</li>
               <li>Test transfer functionality with compliance checks</li>
-              {formData.enable_blend_integration && (
-                <li>Configure Blend Protocol integration for lending</li>
-              )}
-              {formData.enable_soroswap_integration && (
-                <li>Create liquidity pools on SoroSwap</li>
-              )}
             </ol>
           </CardContent>
         </Card>
@@ -309,42 +303,6 @@ export default function ReviewAndDeploy({
             </div>
           </div>
 
-          <Separator />
-
-          {/* Integration Settings */}
-          <div>
-            <h3 className="font-medium mb-3 flex items-center">
-              <div className="w-6 h-6 bg-amber-400/10 rounded-full flex items-center justify-center mr-2">
-                <span className="text-xs font-bold text-amber-400">4</span>
-              </div>
-              DeFi Integrations
-            </h3>
-            <div className="space-y-2">
-              {formData.enable_blend_integration ? (
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-400" />
-                  <span className="text-sm">Blend Protocol integration enabled</span>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <div className="h-4 w-4 rounded-full border-2 border-stroke-line"></div>
-                  <span className="text-sm text-muted-foreground">Blend Protocol integration disabled</span>
-                </div>
-              )}
-              
-              {formData.enable_soroswap_integration ? (
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-400" />
-                  <span className="text-sm">SoroSwap integration enabled</span>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <div className="h-4 w-4 rounded-full border-2 border-stroke-line"></div>
-                  <span className="text-sm text-muted-foreground">SoroSwap integration disabled</span>
-                </div>
-              )}
-            </div>
-          </div>
         </CardContent>
       </Card>
 
@@ -384,8 +342,7 @@ export default function ReviewAndDeploy({
                 'Identity Storage',
                 'Claim Topics Registry',
                 'Trusted Issuers Registry',
-                'Compliance Modules',
-                'Integration Adapters'
+                'Compliance Modules'
               ].map((contract) => (
                 <div key={contract} className="flex items-center space-x-2 text-sm">
                   <CheckCircle className="h-3 w-3 text-green-500" />
@@ -497,10 +454,6 @@ export default function ReviewAndDeploy({
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   <div className="h-3 w-3 rounded-full border border-stroke-line"></div>
                   <span>Configuring compliance...</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <div className="h-3 w-3 rounded-full border border-stroke-line"></div>
-                  <span>Setting up integrations...</span>
                 </div>
               </div>
             </div>

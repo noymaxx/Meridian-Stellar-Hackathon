@@ -21,6 +21,8 @@ import {
 
 import { TokenCreationForm } from '@/types/srwa-contracts';
 import { RWATemplate } from '@/types/templates';
+import { getCountryByCode } from '@/data/countries';
+import JurisdictionSelector from './JurisdictionSelector';
 
 interface AdvancedSettingsProps {
   formData: TokenCreationForm;
@@ -28,50 +30,11 @@ interface AdvancedSettingsProps {
   onChange: (updates: Partial<TokenCreationForm>) => void;
 }
 
-// Common jurisdiction options
-const JURISDICTION_OPTIONS = [
-  { code: 'US', name: 'United States' },
-  { code: 'CA', name: 'Canada' },
-  { code: 'GB', name: 'United Kingdom' },
-  { code: 'DE', name: 'Germany' },
-  { code: 'FR', name: 'France' },
-  { code: 'AU', name: 'Australia' },
-  { code: 'JP', name: 'Japan' },
-  { code: 'SG', name: 'Singapore' },
-  { code: 'CH', name: 'Switzerland' },
-  { code: 'NL', name: 'Netherlands' },
-  { code: 'AE', name: 'United Arab Emirates' },
-  { code: 'BR', name: 'Brazil' },
-  { code: 'IN', name: 'India' },
-];
-
-// Sanctioned/High-Risk jurisdictions
-const HIGH_RISK_JURISDICTIONS = [
-  { code: 'IR', name: 'Iran' },
-  { code: 'KP', name: 'North Korea' },
-  { code: 'SY', name: 'Syria' },
-  { code: 'MM', name: 'Myanmar' },
-  { code: 'AF', name: 'Afghanistan' },
-];
 
 export default function AdvancedSettings({ formData, template, onChange }: AdvancedSettingsProps) {
   const [newDistributionAddress, setNewDistributionAddress] = useState('');
   const [newDistributionAmount, setNewDistributionAmount] = useState('');
 
-  const handleJurisdictionToggle = (
-    jurisdiction: string, 
-    type: 'allowed' | 'denied',
-    checked: boolean
-  ) => {
-    const field = type === 'allowed' ? 'allowed_jurisdictions' : 'denied_jurisdictions';
-    const current = formData[field];
-    
-    const updated = checked
-      ? [...current, jurisdiction]
-      : current.filter(j => j !== jurisdiction);
-    
-    onChange({ [field]: updated });
-  };
 
   const addDistribution = () => {
     if (!newDistributionAddress || !newDistributionAmount) return;
@@ -117,107 +80,12 @@ export default function AdvancedSettings({ formData, template, onChange }: Advan
       className="space-y-6"
     >
       {/* Jurisdiction Controls */}
-      <Card style={{
-        backgroundColor: 'hsl(227, 20%, 7%)', // bg-elev-1
-        border: '1px solid hsl(222, 23%, 14%)', // stroke-line
-        borderRadius: '12px',
-        padding: '0',
-        marginBottom: '24px',
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-        position: 'relative',
-        zIndex: 1
-      }}>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Globe className="h-5 w-5" />
-            <span>Jurisdiction Controls</span>
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Configure which countries/regions can hold your tokens
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Allowed Jurisdictions */}
-          <div className="space-y-3">
-            <Label className="text-base font-medium">Allowed Jurisdictions</Label>
-            <p className="text-sm text-muted-foreground">
-              If none selected, all jurisdictions are allowed (except denied ones)
-            </p>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {JURISDICTION_OPTIONS.map((jurisdiction) => (
-                <div key={jurisdiction.code} className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={formData.allowed_jurisdictions.includes(jurisdiction.code)}
-                    onCheckedChange={(checked) => 
-                      handleJurisdictionToggle(jurisdiction.code, 'allowed', checked as boolean)
-                    }
-                    style={{ position: 'relative', zIndex: 20, pointerEvents: 'auto' }}
-                  />
-                  <span className="text-sm">{jurisdiction.name}</span>
-                </div>
-              ))}
-            </div>
-
-            {formData.allowed_jurisdictions.length > 0 && (
-              <div className="flex gap-2 flex-wrap">
-                {formData.allowed_jurisdictions.map((code) => {
-                  const jurisdiction = JURISDICTION_OPTIONS.find(j => j.code === code);
-                  return (
-                    <Badge key={code} variant="outline">
-                      {jurisdiction?.name || code}
-                    </Badge>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Denied Jurisdictions */}
-          <div className="space-y-3">
-            <Label className="text-base font-medium">Denied Jurisdictions</Label>
-            <p className="text-sm text-muted-foreground">
-              These jurisdictions will be explicitly blocked
-            </p>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {HIGH_RISK_JURISDICTIONS.map((jurisdiction) => (
-                <div key={jurisdiction.code} className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={formData.denied_jurisdictions.includes(jurisdiction.code)}
-                    onCheckedChange={(checked) => 
-                      handleJurisdictionToggle(jurisdiction.code, 'denied', checked as boolean)
-                    }
-                    style={{ position: 'relative', zIndex: 20, pointerEvents: 'auto' }}
-                  />
-                  <span className="text-sm text-red-400">{jurisdiction.name}</span>
-                </div>
-              ))}
-            </div>
-
-            {formData.denied_jurisdictions.length > 0 && (
-              <div className="flex gap-2 flex-wrap">
-                {formData.denied_jurisdictions.map((code) => {
-                  const jurisdiction = HIGH_RISK_JURISDICTIONS.find(j => j.code === code);
-                  return (
-                    <Badge key={code} variant="destructive">
-                      {jurisdiction?.name || code}
-                    </Badge>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
-              Template default: {template.name} comes with pre-configured jurisdiction settings.
-              You can customize them here based on your specific requirements.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      <JurisdictionSelector
+        allowedJurisdictions={formData.allowed_jurisdictions}
+        deniedJurisdictions={formData.denied_jurisdictions}
+        onAllowedChange={(jurisdictions) => onChange({ allowed_jurisdictions: jurisdictions })}
+        onDeniedChange={(jurisdictions) => onChange({ denied_jurisdictions: jurisdictions })}
+      />
 
       {/* Holder Limits */}
       <Card style={{
@@ -254,6 +122,7 @@ export default function AdvancedSettings({ formData, template, onChange }: Advan
                   max_holders: checked ? (template.default_config.max_holders || 1000) : undefined 
                 })
               }
+              className="data-[state=unchecked]:bg-slate-700 data-[state=unchecked]:border data-[state=unchecked]:border-slate-500"
               style={{ position: 'relative', zIndex: 20, pointerEvents: 'auto' }}
             />
           </div>
@@ -514,7 +383,7 @@ export default function AdvancedSettings({ formData, template, onChange }: Advan
                 <div className="mt-1 flex gap-1 flex-wrap">
                   {formData.allowed_jurisdictions.map(code => (
                     <Badge key={code} variant="outline" className="text-xs">
-                      {JURISDICTION_OPTIONS.find(j => j.code === code)?.name || code}
+                      {getCountryByCode(code)?.name || code}
                     </Badge>
                   ))}
                 </div>
@@ -527,7 +396,7 @@ export default function AdvancedSettings({ formData, template, onChange }: Advan
                 <div className="mt-1 flex gap-1 flex-wrap">
                   {formData.denied_jurisdictions.map(code => (
                     <Badge key={code} variant="destructive" className="text-xs">
-                      {HIGH_RISK_JURISDICTIONS.find(j => j.code === code)?.name || code}
+                      {getCountryByCode(code)?.name || code}
                     </Badge>
                   ))}
                 </div>

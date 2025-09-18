@@ -5,7 +5,8 @@ export enum TokenTemplate {
   RwaEquity = "RwaEquity",
   RwaDebt = "RwaDebt", 
   FundShare = "FundShare",
-  PermissionedStable = "PermissionedStable"
+  PermissionedStable = "PermissionedStable",
+  Custom = "Custom"
 }
 
 // Configuração do Token
@@ -180,6 +181,13 @@ export const TOKEN_TEMPLATE_DEFAULTS: Record<TokenTemplate, Partial<TokenConfig>
     allowed_jurisdictions: [],
     denied_jurisdictions: [],
   },
+  [TokenTemplate.Custom]: {
+    decimals: 18,
+    claim_topics: [], // No required claims by default
+    max_holders: undefined, // No holder limit
+    allowed_jurisdictions: [],
+    denied_jurisdictions: [],
+  },
 };
 
 // Tópicos de Claims padrão
@@ -250,7 +258,4 @@ export interface TokenCreationForm {
     amount: string;
   }>;
 
-  // Step 4: Integration
-  enable_blend_integration: boolean;
-  enable_soroswap_integration: boolean;
 }
