@@ -37,6 +37,7 @@ interface MarketsDashboardProps {
   onViewPoolDetails: (poolAddress: string) => void;
   onSupply?: (poolAddress: string) => void; // Made optional since we'll handle modals internally
   onBorrow?: (poolAddress: string) => void; // Made optional since we'll handle modals internally
+  highlightToken?: string | null; // Token address to highlight
 }
 
 type SortField = 'tvl' | 'supplyAPY' | 'borrowAPY' | 'utilizationRate' | 'volume24h' | 'activeUsers';
@@ -51,7 +52,8 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
   onRefresh,
   onViewPoolDetails,
   onSupply,
-  onBorrow
+  onBorrow,
+  highlightToken
 }) => {
   // ===== STATE =====
   const [searchQuery, setSearchQuery] = useState('');
@@ -678,6 +680,7 @@ export const MarketsDashboard: React.FC<MarketsDashboardProps> = ({
                   onSupply={handleSupplyClick}
                   onBorrow={handleBorrowClick}
                   compact={viewMode === 'list'}
+                  highlighted={highlightToken === pool.address}
                 />
               ))}
             </div>

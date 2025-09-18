@@ -1,4 +1,4 @@
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "./components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -25,6 +25,7 @@ import SoroswapPage from "./pages/Soroswap";
 import Optimizer from "./pages/Optimizer";
 import Dashboards from "./pages/Dashboards";
 import Dashboard from "./pages/Dashboard";
+import BlendOperationsSimple from "./pages/BlendOperationsSimple";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/pool/:id" element={<PoolDetail />} />
             <Route path="/soroswap" element={<SoroswapPage />} />
             <Route path="/optimizer" element={<Optimizer />} />
+            <Route path="/blend" element={<BlendOperationsSimple />} />
             <Route path="/dashboards" element={<Dashboards />} />
             <Route path="/dashboard" element={<Dashboard />} />
 

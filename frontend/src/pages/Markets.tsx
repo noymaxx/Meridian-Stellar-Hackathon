@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { MarketsDashboard } from '@/components/markets/MarketsDashboard';
 import { useBlendPools } from '@/hooks/markets/useBlendPools';
@@ -39,6 +39,8 @@ function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetError
 
 export default function Markets() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const highlightToken = searchParams.get('highlight');
   
   // Fetch Blend pools data
   const {
@@ -65,7 +67,10 @@ export default function Markets() {
 
   // Combined loading and error states
   const loading = poolsLoading || analyticsLoading || srwaLoading;
-  const error = poolsError?.message || analyticsError?.message || srwaError?.message || null;
+  const error = poolsError || analyticsError || srwaError;
+  const errorMessage = error ? 
+    (typeof error === 'string' ? error : error.message || 'Unknown error') : 
+    null;
 
   // Navigation handlers
   const handleViewPoolDetails = (poolAddress: string) => {
@@ -86,6 +91,16 @@ export default function Markets() {
     refetchPools();
     refetchSRWA();
   };
+  
+  // Debug logging
+  console.log("🔍 [Markets] Component state:", {
+    blendPoolsCount: blendPools.length,
+    enhancedPoolsCount: enhancedPools.length,
+    srwaMarketsCount: srwaMarkets.length,
+    loading,
+    error
+  });
+  
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -108,11 +123,12 @@ export default function Markets() {
             pools={enhancedPools}
             srwaMarkets={srwaMarkets}
             loading={loading}
-            error={error}
+            error={errorMessage}
             onRefresh={handleRefresh}
             onViewPoolDetails={handleViewPoolDetails}
             onSupply={handleSupply}
             onBorrow={handleBorrow}
+            highlightToken={highlightToken}
           />
         </main>
       </div>

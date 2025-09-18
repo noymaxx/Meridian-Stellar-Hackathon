@@ -29,6 +29,7 @@ interface PoolCardProps {
   onBorrow: (poolAddress: string) => void;
   compact?: boolean;
   showActions?: boolean;
+  highlighted?: boolean; // Add highlight prop
 }
 
 export const PoolCard: React.FC<PoolCardProps> = ({ 
@@ -37,7 +38,8 @@ export const PoolCard: React.FC<PoolCardProps> = ({
   onSupply, 
   onBorrow,
   compact = false,
-  showActions = true 
+  showActions = true,
+  highlighted = false
 }) => {
   // ===== UTILITY FUNCTIONS =====
   
@@ -266,7 +268,8 @@ export const PoolCard: React.FC<PoolCardProps> = ({
   return (
     <Card className={cn(
       "group relative overflow-hidden transition-all duration-300 hover:border-brand-400/50 bg-card border-stroke-line hover:shadow-lg hover:shadow-brand-400/10",
-      compact ? "h-64" : "h-auto min-h-[320px]"
+      compact ? "h-64" : "h-auto min-h-[320px]",
+      highlighted && "ring-2 ring-brand-400 border-brand-400 shadow-lg shadow-brand-400/20"
     )}>
       {/* Top gradient indicator */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-400 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />

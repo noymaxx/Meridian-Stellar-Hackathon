@@ -1,5 +1,5 @@
 import { Keypair } from "@stellar/stellar-sdk";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 export interface StellarWallet {
@@ -106,6 +106,16 @@ export const useWallet = (): UseWalletReturn => {
     toast.info("Disconnected!");
   };
 
+  // Load wallet from storage on mount
+  useEffect(() => {
+    const savedWallet = getWalletFromStorage();
+    if (savedWallet) {
+      console.log("🔗 [Wallet] Loaded wallet from storage:", savedWallet.publicKey);
+      setWallet(savedWallet);
+      setIsConnected(true);
+    }
+  }, []);
+
   return {
     wallet,
     isLoading,
@@ -114,3 +124,4 @@ export const useWallet = (): UseWalletReturn => {
     isConnected,
   };
 };
+

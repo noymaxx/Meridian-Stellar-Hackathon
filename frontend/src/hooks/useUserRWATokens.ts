@@ -157,10 +157,14 @@ export const useUserRWATokens = (): UseUserRWATokensReturn => {
       console.log("🔗 [useUserRWATokens] Fetching user RWA tokens for:", address);
 
       // Get all known SRWA token addresses including the ultra mega pool
-      const knownTokenAddresses = [
+      const basicTokenAddresses = [
         getContractId("srwaToken"),       // Original token
         getContractId("newSrwaToken"),    // New token where user is admin
         getContractId("freshSrwaToken"),  // Fresh token pool
+      ];
+      
+      // Get all mega token addresses for complete token discovery
+      const megaTokenAddresses = [
         
         // 🌟 NOVA MEGA POOL - 20 CONTRATOS ULTRA FRESCOS (RECÉM CRIADOS)
         "CBQEAJ6YTZTX4EBY5TBKCETA3TOGQCMUFSOZ6NVRMOBTNKRYYAGJKGRH", // Mega Fresh #1
@@ -202,13 +206,19 @@ export const useUserRWATokens = (): UseUserRWATokensReturn => {
         "CDNDKCVL66XCE2546Z3YL3M5ATQMY4XEMCUZBKDI7ZVGDXNJXQEGFTRR", // Fresh Batch 3
         "CBISQVJZE7G4OPH566X7XTI2AEKEMKALU3VPQKR47WXAXI2YLOHFYWIY", // MEU TOKEN NOVO
       ];
-
-      // Also check localStorage for user-created tokens
-      const userCreatedTokens = JSON.parse(localStorage.getItem(`userTokens_${address}`) || '[]');
-      console.log("🔗 [useUserRWATokens] User-created tokens from localStorage:", userCreatedTokens);
       
-      // Combine known tokens with user-created tokens
-      const allTokenAddresses = [...knownTokenAddresses, ...userCreatedTokens];
+      // Combine all known token addresses (basic + mega pools)
+      const knownTokenAddresses = [...basicTokenAddresses, ...megaTokenAddresses].filter(Boolean);
+      
+      console.log("🔍 [useUserRWATokens] Complete token search enabled:", {
+        basic: basicTokenAddresses.length,
+        mega: megaTokenAddresses.length,
+        total: knownTokenAddresses.length
+      });
+
+      // Use only network-discovered tokens (no localStorage dependency)
+      const allTokenAddresses = knownTokenAddresses;
+      console.log("🔍 [useUserRWATokens] Searching tokens directly from network:", allTokenAddresses.length);
 
       // Fetch data for all tokens (known + user-created)
       const tokenDataPromises = allTokenAddresses.map(addr => fetchTokenData(addr));

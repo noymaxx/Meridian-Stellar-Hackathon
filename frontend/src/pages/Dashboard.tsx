@@ -15,10 +15,12 @@ import { useWallet } from '@/components/wallet/WalletProvider';
 import { useWalletAssets } from '@/hooks/wallet/useWalletAssets';
 import { useUserBlendPositions, formatPositionValue } from '@/hooks/markets/useUserBlendPositions';
 import { useRecentTransactions } from '@/hooks/wallet/useWalletTransactions';
+import { useUserRWATokens } from '@/hooks/useUserRWATokens';
 import { MarketsDashboard } from '@/components/markets/MarketsDashboard';
 import { mockUserPositions, type UserPosition } from "@/lib/mock-data";
 import RWATokensGrid from '@/components/dashboard/RWATokensGrid';
 import { RWALendingPools } from '@/components/rwa/RWALendingPools';
+import { BlendIntegrationStatus } from '@/components/dashboard/BlendIntegrationStatus';
 
 // Icons
 import { 
@@ -54,6 +56,7 @@ export default function Dashboard() {
   const walletAssets = useWalletAssets();
   const blendPositions = useUserBlendPositions();
   const recentTransactions = useRecentTransactions(5);
+  const { tokens: rwaTokens } = useUserRWATokens();
   
   // User positions based on connected wallet (for backward compatibility)
   const userPositions = isConnected && blendPositions.positions.length > 0 
@@ -396,6 +399,11 @@ export default function Dashboard() {
                     {/* 🚀 USER CREATED RWA TOKENS SECTION */}
                     <div className="space-y-6">
                       <RWATokensGrid />
+                    </div>
+
+                    {/* 🔗 BLEND INTEGRATION STATUS SECTION */}
+                    <div className="space-y-6">
+                      <BlendIntegrationStatus tokens={rwaTokens} />
                     </div>
                   </div>
                 )}
