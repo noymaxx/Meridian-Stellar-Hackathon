@@ -199,7 +199,7 @@ const Index = () => {
             </div>
             
             <motion.div 
-              className="flex justify-center px-4"
+              className="flex flex-col justify-center items-center gap-4 px-4"
               initial={{ opacity: 100, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.1, delay: 1 }}
@@ -214,6 +214,19 @@ const Index = () => {
                   </span>
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   <div className="absolute inset-0 bg-gradient-to-r from-brand-600 to-brand-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Button>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
+                <Button 
+                  variant="outline"
+                  onClick={() => window.location.href = '/docs'}
+                  className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-body-1 border-brand-500/30 text-brand-300 hover:bg-brand-500/10 hover:border-brand-400/50 hover:text-brand-200 transition-all group"
+                >
+                  <span className="relative z-10">
+                    Documentation
+                  </span>
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </motion.div>
             </motion.div>
